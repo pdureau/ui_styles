@@ -1,0 +1,135 @@
+<?php
+
+/**
+ * @file
+ * Contains module file.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Modify the configuration form for layout builder components (blocks).
+ */
+function layout_builder_classes_form_alter(&$form, FormStateInterface $formState) {
+  if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
+    // Form object will be AddBlockForm or UpdateBlockForm, depending on
+    // the operation.
+    $formObject = $formState->getFormObject();
+    $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
+    if (!empty($styles)) {
+      /** @var \Drupal\layout_builder\SectionComponent $component */
+      $component = $formObject
+        ->getSectionStorage()
+        ->getSection($formObject->getDelta())
+        ->getComponent($formObject->getUuid());
+      $selected = $component->get('layout_builder_classes');
+      _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
+      // Our submit handler must execute before the default one, because the
+      // default handler stores the section & component data in the tempstore
+      // and we need to update those objects before that happens.
+      array_unshift($form['#submit'], '_layout_builder_classes_submit_block_form');
+    }
+  }
+}
+
+/**
+ * Custom submit handler for submitting LB block forms.
+ *
+ * Persists the configured block style to the component configuration data,
+ * which is later persisted to section storage by layout builder's base form.
+ */
+function _layout_builder_classes_submit_block_form(array $form, FormStateInterface $formState) {
+  $formObject = $formState->getFormObject();
+  /** @var \Drupal\layout_builder\SectionComponent $component */
+  $component = $formObject
+    ->getSectionStorage()
+    ->getSection($formObject->getDelta())
+    ->getComponent($formObject->getUuid());
+  $selected = [];
+  foreach ($form as $id => $element) {
+    if (strpos($id, 'layout_builder_class_') === 0) {
+      $value = $formState->getValue($id);
+      $id = str_replace('layout_builder_class_', '', $id);
+      $selected[$id] = $value;
+    }
+  }
+  $component->set('layout_builder_classes', $selected);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Modify the configuration form for layout builder sections (layouts).
+ */
+function layout_builder_classes_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
+  if (!empty($styles)) {
+    $formObject = $form_state->getFormObject();
+    $config = $formObject->getLayout()->getConfiguration();
+    ksm('config', $config);
+    $selected = $config['layout_builder_classes'] ?? [];
+    _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
+
+    // Our submit handler must execute before the default one, because the
+    // default handler stores the section & component data in the tempstore
+    // and we need to update those objects before that happens.
+    array_unshift($form['#submit'], '_layout_builder_classes_submit_section_form');
+  }
+}
+
+/**
+ * Custom submit handler for submitting LB section forms.
+ *
+ * This is used to persist the selected style to the layout configuration
+ * array, which layout builder's ConfigureSectionForm will persist to section
+ * storage.
+ */
+function _layout_builder_classes_submit_section_form(array $form, FormStateInterface $formState) {
+  $selected = [];
+  foreach ($form as $id => $element) {
+    if (strpos($id, 'layout_builder_class_') === 0) {
+      $value = $formState->getValue($id);
+      $id = str_replace('layout_builder_class_', '', $id);
+      $selected[$id] = $value;
+    }
+  }
+  // TODO.
+  $formObject = $formState->getFormObject();
+  $config = $formObject->getLayout()->getConfiguration();
+  $config['layout_builder_classes'] = $selected;
+  $formObject->getLayout()->setConfiguration($config);
+}
+
+/**
+ * Add style selection form elements to an existing form.
+ *
+ * @param array $form
+ *   The form array to add to.
+ * @param array $styles
+ *   The style options to make available.
+ * @param mixed $selected
+ *   The existing selected style(s), either a string or array.
+ */
+function _layout_builder_classes_add_style_selection_form_elements(array &$form, array $styles, $selected) {
+  // Set form actions to a high weight, just so that we can make our form
+  // style element appear right before them.
+  $form['actions']['#weight'] = 100;
+  $selected = $selected ?: [];
+  foreach ($styles as $definition) {
+    $id = $definition['id'];
+    $element_name = 'layout_builder_class_' . $id;
+    $default = isset($selected[$id]) ? $selected[$id] : '';
+    $form[$element_name] = [
+      '#type' => 'select',
+      '#options' => $definition['options'],
+      '#title' => '[WIP] ' . $definition['label'],
+      '#default_value' => $default,
+      '#required' => FALSE,
+      '#empty_option' => t('- None -'),
+      '#weight' => 90,
+    ];
+  }
+}
+

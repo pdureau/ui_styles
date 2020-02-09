@@ -1,0 +1,6 @@
+name: Layout Builder Classes Librray
+description: The library to browse styles from Layout Builder Classes module.
+core: 8.x
+type: module
+dependencies:
+  - layout_builder_classes:layout_builder_classes

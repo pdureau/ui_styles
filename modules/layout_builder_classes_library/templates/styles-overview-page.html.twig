@@ -1,0 +1,33 @@
+{#
+/**
+ * @file
+ * Styles page template, override this in your theme.
+ */
+#}
+
+{% if styles is not empty %}
+  <h2>{{ "Available styles"|t }}</h2>
+
+  {# List of available styles with anchor links. #}
+  <ul>
+    {% for style in styles %}
+      <li>
+        <a href="#{{ style.id }}">{{ style.label }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  {% for style in styles %}
+    <h3 id="{{ style.id }}">{{ style.label }} ({{ style.id }})</h3>
+    {% for id, label in style.options %}
+      {% set style_attributes = create_attribute().addClass(id).addClass(style.previewed_with) %}
+      <p{{ style_attributes }}>{{ label }} ({{ id }})</p>
+    {% endfor %}
+    <hr>
+  {% endfor %}
+{% endif %}
+
+
+

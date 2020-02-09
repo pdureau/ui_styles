@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Contains module file.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function layout_builder_classes_library_theme() {
+  return [
+    'styles_overview_page' => [
+      'variables' => ['styles' => NULL],
+    ],
+  ];
+}

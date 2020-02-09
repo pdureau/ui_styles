@@ -1,0 +1,7 @@
+layout_builder_classes_library.overview:
+  path: "/styles"
+  defaults:
+    _controller: '\Drupal\layout_builder_classes_library\Controller\StylesLibraryController::overview'
+    _title: "Styles library"
+  requirements:
+    _permission: "access patterns page"
