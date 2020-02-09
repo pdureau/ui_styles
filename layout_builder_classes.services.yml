@@ -1,7 +1,7 @@
 services:
   plugin.manager.style_plugin:
     class: Drupal\layout_builder_classes\StylePluginManager
-    arguments: ["@module_handler", "@cache.discovery"]
+    arguments: ["@module_handler", "@theme_handler", "@cache.discovery"]
   layout_builder_classes.route_subscriber:
     class: Drupal\layout_builder_classes\EventSubscriber\RouteSubscriber
     tags:
