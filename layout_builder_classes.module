@@ -68,7 +68,6 @@ function layout_builder_classes_form_layout_builder_configure_section_alter(&$fo
   if (!empty($styles)) {
     $formObject = $form_state->getFormObject();
     $config = $formObject->getLayout()->getConfiguration();
-    ksm('config', $config);
     $selected = $config['layout_builder_classes'] ?? [];
     _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
 

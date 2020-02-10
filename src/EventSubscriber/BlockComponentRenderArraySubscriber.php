@@ -67,7 +67,6 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
       $classes = $build['content']['#attributes']['class'] ?: [];
       $build['content']['#attributes']['class'] = array_merge($classes, $styles);
       $build['#attributes']['class'] = array_diff($build['#attributes']['class'], $styles);
-      unset($build['#layout_builder_style']);
     }
     elseif (isset($build['content']['#theme']) &&
       $build['content']['#theme'] === 'field') {
@@ -81,7 +80,6 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
         }
       }
       $build['#attributes']['class'] = array_diff($build['#attributes']['class'], $styles);
-      unset($build['#layout_builder_style']);
     }
     return $build;
   }

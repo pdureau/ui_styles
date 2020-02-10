@@ -20,7 +20,10 @@
   <hr>
 
   {% for style in styles %}
-    <h3 id="{{ style.id }}">{{ style.label }} ({{ style.id }})</h3>
+    <h3 id="{{ style.id }}">{{ style.label }}</h3>
+    {% if style.description %}
+    <p>{{ style.description }}</p>
+    {% endif %}
     {% for id, label in style.options %}
       {% set style_attributes = create_attribute().addClass(id).addClass(style.previewed_with) %}
       <p{{ style_attributes }}>{{ label }} ({{ id }})</p>

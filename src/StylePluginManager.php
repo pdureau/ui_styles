@@ -30,6 +30,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   protected $defaults = [
     // Add required and optional plugin properties.
     'id' => '',
+    'description' => '',
     'label' => '',
     'options' => [],
   ];
