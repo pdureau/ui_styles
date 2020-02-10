@@ -14,19 +14,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    * {@inheritdoc}
    */
   protected function alterRoutes(RouteCollection $collection) {
-    // Swap out Layout Builder's AddBlock and UpdateBlock
-    // forms with out own versions which add getters for some properties
-    // that we need access to in our form alter.
-    // @see https://drupal.org/i/3023334
-    // @see https://drupal.org/i/3044117
-    $addBlockRoute = $collection->get('layout_builder.add_block');
-    if ($addBlockRoute) {
-      $addBlockRoute->setDefault('_form', '\Drupal\layout_builder_classes\Form\AddBlockForm');
-    }
-    $updateBlockRoute = $collection->get('layout_builder.update_block');
-    if ($updateBlockRoute) {
-      $updateBlockRoute->setDefault('_form', '\Drupal\layout_builder_classes\Form\UpdateBlockForm');
-    }
+    // Needed until https://www.drupal.org/i/3044117 is in.
     $configureSectionRoute = $collection->get('layout_builder.configure_section');
     if ($configureSectionRoute) {
       $configureSectionRoute->setDefault('_form', '\Drupal\layout_builder_classes\Form\ConfigureSectionForm');

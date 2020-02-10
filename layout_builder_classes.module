@@ -14,16 +14,11 @@ use Drupal\Core\Form\FormStateInterface;
  */
 function layout_builder_classes_form_alter(&$form, FormStateInterface $formState) {
   if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
-    // Form object will be AddBlockForm or UpdateBlockForm, depending on
-    // the operation.
+    /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
     if (!empty($styles)) {
-      /** @var \Drupal\layout_builder\SectionComponent $component */
-      $component = $formObject
-        ->getSectionStorage()
-        ->getSection($formObject->getDelta())
-        ->getComponent($formObject->getUuid());
+      $component = $formObject->getCurrentComponent();
       $selected = $component->get('layout_builder_classes');
       _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
       // Our submit handler must execute before the default one, because the
@@ -41,12 +36,9 @@ function layout_builder_classes_form_alter(&$form, FormStateInterface $formState
  * which is later persisted to section storage by layout builder's base form.
  */
 function _layout_builder_classes_submit_block_form(array $form, FormStateInterface $formState) {
+    /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
-  /** @var \Drupal\layout_builder\SectionComponent $component */
-  $component = $formObject
-    ->getSectionStorage()
-    ->getSection($formObject->getDelta())
-    ->getComponent($formObject->getUuid());
+  $component = $formObject->getCurrentComponent();
   $selected = [];
   foreach ($form as $id => $element) {
     if (strpos($id, 'layout_builder_class_') === 0) {
