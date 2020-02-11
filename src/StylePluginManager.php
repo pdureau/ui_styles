@@ -68,7 +68,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
-    // You can add validation of the plugin definition here.
+    // TODO: Add validation of the plugin definition here.
     if (empty($definition['id'])) {
       throw new PluginException(sprintf('Example plugin property (%s) definition "is" is required.', $plugin_id));
     }
@@ -79,6 +79,23 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function providerExists($provider) {
     return $this->moduleHandler->moduleExists($provider) || $this->themeHandler->themeExists($provider);
+  }
+
+  /**
+   * Add classes to target element.
+   *
+   * TODO: Extend this to implement most of BlockComponentRenderArraySubscriber.
+   */
+  public function addClasses(array &$target_element, $selected, string $others = '') {
+    if (!$selected || !is_array($selected)) {
+      $selected = [];
+    }
+    $selected = array_values($selected);
+    $selected = array_filter($selected);
+    $target_element['#attributes'] = isset($target_element['#attributes']) ? $target_element['#attributes'] : [];
+    $target_element['#attributes']['class'] = isset($target_element['#attributes']['class']) ? $target_element['#attributes']['class'] : [];
+    $classes = $target_element['#attributes']['class'] ?: [];
+    $target_element['#attributes']['class'] = array_merge($classes, $selected);
   }
 
 }

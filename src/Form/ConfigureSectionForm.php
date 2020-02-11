@@ -22,4 +22,14 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm {
     return $this->layout;
   }
 
+  /**
+   * Get the layout section being modified.
+   *
+   * @return \Drupal\layout_builder\Section
+   *   The layout section.
+   */
+  public function getCurrentSection() {
+    return $this->sectionStorage->getSection($this->delta);
+  }
+
 }
