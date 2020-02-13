@@ -7,20 +7,10 @@ use Drupal\layout_builder\Form\ConfigureSectionForm as OriginalConfigureSectionF
 /**
  * Class ConfigureSectionForm.
  *
- * Extend the original form to expose the layout object.
- * See https://www.drupal.org/i/3044117
+ * Extend the original form to expose the current section object.
+ * May be related to https://www.drupal.org/i/3044117
  */
 class ConfigureSectionForm extends OriginalConfigureSectionForm {
-
-  /**
-   * Get the layout plugin being modified.
-   *
-   * @return \Drupal\Core\Layout\LayoutInterface|\Drupal\Core\Plugin\PluginFormInterface
-   *   The layout plugin object.
-   */
-  public function getLayout() {
-    return $this->layout;
-  }
 
   /**
    * Get the layout section being modified.

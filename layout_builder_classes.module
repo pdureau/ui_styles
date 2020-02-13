@@ -10,6 +10,12 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Render\Element;
 
+/*
+ *
+ * LAYOUT BUILDER COMPONENTS (BLOCKS)
+ *
+ */
+
 /**
  * Implements hook_form_alter().
  *
@@ -17,13 +23,15 @@ use Drupal\Core\Render\Element;
  */
 function layout_builder_classes_form_alter(&$form, FormStateInterface $formState) {
   if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
+    $styles_manager = \Drupal::service('plugin.manager.style_plugin');
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
     if (!empty($styles)) {
       $component = $formObject->getCurrentComponent();
-      $selected = $component->get('layout_builder_classes');
-      _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
+      $selected = $component->get('layout_builder_classes') ?: [];
+      $extra = $component->get('layout_builder_classes_extra') ?: '';
+      $styles_manager->alterForm($form, $styles, $selected, $extra);
       // Our submit handler must execute before the default one, because the
       // default handler stores the section & component data in the tempstore
       // and we need to update those objects before that happens.
@@ -51,7 +59,14 @@ function _layout_builder_classes_submit_block_form(array $form, FormStateInterfa
     }
   }
   $component->set('layout_builder_classes', $selected);
+  $component->set('layout_builder_classes_extra', $formState->getValue('_layout_builder_classes_extra'));
 }
+
+/*
+ *
+ * LAYOUT BUILDER SECTIONS (LAYOUTS)
+ *
+ */
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -59,13 +74,14 @@ function _layout_builder_classes_submit_block_form(array $form, FormStateInterfa
  * Modify the configuration form for layout builder sections (layouts).
  */
 function layout_builder_classes_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $styles_manager = \Drupal::service('plugin.manager.style_plugin');
   $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
   if (!empty($styles)) {
     $formObject = $form_state->getFormObject();
     $section = $formObject->getCurrentSection();
-    $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected');
-    _layout_builder_classes_add_style_selection_form_elements($form, $styles, $selected);
-
+    $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
+    $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
+    $styles_manager->alterForm($form, $styles, $selected, $extra);
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
@@ -92,38 +108,9 @@ function _layout_builder_classes_submit_section_form(array $form, FormStateInter
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
   $section->setThirdPartySetting('layout_builder_classes', 'selected', $selected);
+  $section->setThirdPartySetting('layout_builder_classes', 'extra', $formState->getValue('_layout_builder_classes_extra'));
 }
 
-/**
- * Add style selection form elements to an existing form.
- *
- * @param array $form
- *   The form array to add to.
- * @param array $styles
- *   The style options to make available.
- * @param mixed $selected
- *   The existing selected style(s), either a string or array.
- */
-function _layout_builder_classes_add_style_selection_form_elements(array &$form, array $styles, $selected) {
-  // Set form actions to a high weight, just so that we can make our form
-  // style element appear right before them.
-  $form['actions']['#weight'] = 100;
-  $selected = $selected ?: [];
-  foreach ($styles as $definition) {
-    $id = $definition['id'];
-    $element_name = 'layout_builder_class_' . $id;
-    $default = isset($selected[$id]) ? $selected[$id] : '';
-    $form[$element_name] = [
-      '#type' => 'select',
-      '#options' => $definition['options'],
-      '#title' => $definition['label'],
-      '#default_value' => $default,
-      '#required' => FALSE,
-      '#empty_option' => t('- None -'),
-      '#weight' => 90,
-    ];
-  }
-}
 
 /**
  * Implementation of hook_element_info_alter().
@@ -154,8 +141,9 @@ function _layout_builder_classes_layout_builder_prerender(array $element) {
   foreach (Element::children($layout_builder) as $index) {
     if (isset($layout_builder[$index]['layout-builder__section'])) {
       $section = $section_storage->getSection($delta);
-      $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected');
-      $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected);
+      $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
+      $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
+      $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
       $delta++;
     }
   }
@@ -179,8 +167,9 @@ function layout_builder_classes_entity_view_alter(array &$build, EntityInterface
     $layout_builder = & $build['_layout_builder'];
     foreach (Element::children($layout_builder) as $delta) {
       $section = $display->getSection($delta);
-      $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected');
-      $styles_manager->addClasses($layout_builder[$delta], $selected);
+      $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
+      $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
+      $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
     }
   }
 }

@@ -10,6 +10,7 @@ Heavily inspired by [drupal/layout\_builder\_styles](https://www.drupal.org/proj
 * styles are organized as groups of classes, because some styles should only allow one class to be chosen (see also: [#3075502](https://www.drupal.org/project/layout_builder_styles/issues/3075502))
 * with a preview page, like [ui_patterns_library](https://ui-patterns.readthedocs.io/en/8.x-1.x/content/patterns-definition.html), available there: /styles 
 * on rendering, classes are attached to the first render array inside the block, instead of being attached to the block wrapper
+* it is possible to add free extra classes too
 
 ## Example of a plugin declaration in the YML file
 
@@ -43,6 +44,6 @@ Where:
 
 ## A perfect combo with ui_patterns
 
-[ui\_patterns\_bootstrap](https://github.com/pdureau/ui_patterns_bootstrap) theme is a example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [layout\_builder\_classes](https://github.com/pdureau/layout_builder_classes) to implements Bootstrap 4 designs:
+[ui\_patterns\_bootstrap](https://github.com/pdureau/ui_patterns_bootstrap) theme is an example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [layout\_builder\_classes](https://github.com/pdureau/layout_builder_classes) to implements Bootstrap 4 designs:
 
 ![Overview](doc/schema.png)
