@@ -5,10 +5,10 @@
  * Contains module file.
  */
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 
 /*
  *
@@ -78,14 +78,15 @@ function layout_builder_classes_form_layout_builder_configure_section_alter(&$fo
   $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
   if (!empty($styles)) {
     $formObject = $form_state->getFormObject();
-    $section = $formObject->getCurrentSection();
-    $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
-    $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
-    $styles_manager->alterForm($form, $styles, $selected, $extra);
-    // Our submit handler must execute before the default one, because the
-    // default handler stores the section & component data in the tempstore
-    // and we need to update those objects before that happens.
-    array_unshift($form['#submit'], '_layout_builder_classes_submit_section_form');
+    if ($section = $formObject->getCurrentSection()) {
+      $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
+      $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
+      $styles_manager->alterForm($form, $styles, $selected, $extra);
+      // Our submit handler must execute before the default one, because the
+      // default handler stores the section & component data in the tempstore
+      // and we need to update those objects before that happens.
+      array_unshift($form['#submit'], '_layout_builder_classes_submit_section_form');
+    }
   }
 }
 
@@ -138,8 +139,9 @@ function _layout_builder_classes_layout_builder_prerender(array $element) {
   /** @var \Drupal\layout_builder\SectionStorageInterface $section_storage */
   $section_storage = $element['#section_storage'];
   $delta = 0;
+  $max = count($section_storage->getSections());
   foreach (Element::children($layout_builder) as $index) {
-    if (isset($layout_builder[$index]['layout-builder__section'])) {
+    if (isset($layout_builder[$index]['layout-builder__section']) && $delta < $max) {
       $section = $section_storage->getSection($delta);
       $selected = $section->getThirdPartySetting('layout_builder_classes', 'selected') ?: [];
       $extra = $section->getThirdPartySetting('layout_builder_classes', 'extra') ?: '';
@@ -161,9 +163,9 @@ function _layout_builder_classes_layout_builder_prerender(array $element) {
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  */
-function layout_builder_classes_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+function layout_builder_classes_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display) {
   $styles_manager = \Drupal::service('plugin.manager.style_plugin');
-  if (isset($build['_layout_builder'])) {
+  if ($display->isLayoutBuilderEnabled()) {
     $layout_builder = & $build['_layout_builder'];
     foreach (Element::children($layout_builder) as $delta) {
       $section = $display->getSection($delta);

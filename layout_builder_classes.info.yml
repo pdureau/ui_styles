@@ -1,6 +1,7 @@
 name: Layout Builder Classes
 description: Apply styles to blocks & sections in Layout Builder.
 core: 8.x
+core_version_requirement: ^8 || ^9
 type: module
 dependencies:
   - drupal:layout_builder

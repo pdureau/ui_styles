@@ -23,7 +23,7 @@ class StylesLibraryController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(StylePluginManagerInterface $styles_manager) {
+  final public function __construct(StylePluginManagerInterface $styles_manager) {
     $this->stylesManager = $styles_manager;
   }
 

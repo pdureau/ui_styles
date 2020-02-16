@@ -3,6 +3,7 @@
 namespace Drupal\layout_builder_classes\Form;
 
 use Drupal\layout_builder\Form\ConfigureSectionForm as OriginalConfigureSectionForm;
+use Drupal\layout_builder_classes\ConfigureSectionFormInterface;
 
 /**
  * Class ConfigureSectionForm.
@@ -10,16 +11,19 @@ use Drupal\layout_builder\Form\ConfigureSectionForm as OriginalConfigureSectionF
  * Extend the original form to expose the current section object.
  * May be related to https://www.drupal.org/i/3044117
  */
-class ConfigureSectionForm extends OriginalConfigureSectionForm {
+class ConfigureSectionForm extends OriginalConfigureSectionForm implements ConfigureSectionFormInterface {
 
   /**
-   * Get the layout section being modified.
-   *
-   * @return \Drupal\layout_builder\Section
-   *   The layout section.
+   * {@inheritdoc}
    */
   public function getCurrentSection() {
-    return $this->sectionStorage->getSection($this->delta);
+    // While adding a new section, we have this strange situation where delta is
+    // already incremeted, but section not yet added to storage.
+    $max = count($this->sectionStorage->getSections());
+    if ($this->delta < $max) {
+      return $this->sectionStorage->getSection($this->delta);
+    }
+    return NULL;
   }
 
 }

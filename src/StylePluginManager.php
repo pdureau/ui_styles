@@ -119,85 +119,86 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function addClasses(array &$target_element, $selected, $extra = '') {
-    // TODO: Extend this with most of BlockComponentRenderArraySubscriber.
-    // Prepare class attribute.
-    $target_element['#attributes'] = isset($target_element['#attributes']) ? $target_element['#attributes'] : [];
-    $target_element['#attributes']['class'] = isset($target_element['#attributes']['class']) ? $target_element['#attributes']['class'] : [];
-    // Prepare selected.
-    if (!$selected || !is_array($selected)) {
-      $selected = [];
-    }
-    $selected = array_values($selected);
-    // Add extra to selected.
+  public function addClasses(array &$element, $selected, $extra = '') {
+    $selected = is_array($selected) ? array_values($selected) : [];
     $extra = explode(' ', $extra);
-    $selected = array_merge($selected, $extra);
-    // Clean and set.
-    if (isset($target_element['#theme']) && $target_element['#theme'] === 'block') {
-      $selected = array_filter($selected);
-      $target_element = $this->addStyleToBlockContent($target_element, $selected);
+    $styles = array_merge($selected, $extra);
+    if (isset($element['#theme']) && $element['#theme'] === 'block') {
+      // We are in a block.
+      $inline = (isset($element['#base_plugin_id']) && $element['#base_plugin_id'] === 'inline_block');
+      $element['content'] = $this->addStyleToBlockContent($element['content'], $styles, $inline);
       // TODO: $build['#cache']['tags']?
     }
     else {
-      // Add already existing classes to selected.
-      $classes = $target_element['#attributes']['class'] ?: [];
-      $selected = array_merge($selected, $classes);
-      $selected = array_filter($selected);
-      $target_element['#attributes']['class'] = $selected;
+      // We are in a layout.
+      $element = $this->addStyleToWrapper($element, $styles);
     }
+  }
+
+  /**
+   * Add style to block or layout wrapper.
+   */
+  private function addStyleToWrapper(array $wrapper, array $styles) {
+    $wrapper['#attributes'] = isset($wrapper['#attributes']) ? $wrapper['#attributes'] : [];
+    $classes = isset($wrapper['#attributes']['class']) ? $wrapper['#attributes']['class'] : [];
+    $styles = array_merge($styles, $classes);
+    $styles = array_filter($styles);
+    $wrapper['#attributes']['class'] = $styles;
+    return $wrapper;
   }
 
   /**
    * Add style to block content instead of block wrapper.
    */
-  private function addStyleToBlockContent($build, $styles) {
-    if (isset($build['content']['#type']) &&
-      in_array($build['content']['#type'], ['pattern', 'html_tag', 'view'])) {
-      if (!isset($build['content']['#attributes']['class'])) {
-        $build['content']['#attributes'] = [
-          'class' => [],
-        ];
-      }
-      $classes = $build['content']['#attributes']['class'] ?: [];
-      $build['content']['#attributes']['class'] = array_merge($classes, $styles);
-      $build['#attributes']['class'] = array_diff($build['#attributes']['class'], $styles);
+  private function addStyleToBlockContent(array $content, array $styles, $inline = FALSE) {
+    $styles = array_filter($styles);
+    // Inline block.
+    if ($inline) {
+      $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
+      $classes = isset($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
+      $content['#attributes']['class'] = array_merge($classes, $styles);
     }
-    elseif (isset($build['content']['#theme']) &&
-      $build['content']['#theme'] === 'field') {
-      foreach (Element::children($build['content']) as $delta) {
-        if ($build['content']['#formatter'] === 'media_thumbnail') {
-          $build = $this->addStyleToFieldFormatterItem($build, $delta, $styles, '#item_attributes');
-        }
-        else {
-          // For everything else but #type=processed_text.
-          $build = $this->addStyleToFieldFormatterItem($build, $delta, $styles, '#attributes');
-        }
-      }
-      $build['#attributes']['class'] = array_diff($build['#attributes']['class'], $styles);
+    // Render element.
+    elseif (isset($content['#type']) && in_array($content['#type'], ['pattern', 'html_tag', 'view'])) {
+      $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
+      $classes = isset($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
+      $content['#attributes']['class'] = array_merge($classes, $styles);
     }
-    return $build;
+    // Field formatter.
+    elseif (isset($content['#theme']) && $content['#theme'] === 'field') {
+      if ($content['#formatter'] === 'media_thumbnail') {
+        $content = $this->addStyleToFieldFormatterItems($content, $styles, '#item_attributes');
+      }
+      else {
+        $content = $this->addStyleToFieldFormatterItems($content, $styles, '#attributes');
+      }
+    }
+    return $content;
   }
 
   /**
-   * Add style to field formatter item.
+   * Add style to field formatter items.
    */
-  private function addStyleToFieldFormatterItem($build, $delta, $styles, $attr_property) {
-    if (!isset($build['content'][$delta][$attr_property])) {
-      $build['content'][$delta][$attr_property] = [];
-    }
-    if (is_array($build['content'][$delta][$attr_property])) {
-      if (!isset($build['content'][$delta][$attr_property]['class'])) {
-        $build['content'][$delta][$attr_property] = [
-          'class' => [],
-        ];
+  private function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property) {
+    foreach (Element::children($content) as $delta) {
+      if (!isset($content[$delta][$attr_property])) {
+        $content[$delta][$attr_property] = [];
       }
-      $classes = $build['content'][$delta][$attr_property]['class'] ?: [];
-      $build['content'][$delta][$attr_property]['class'] = array_merge($classes, $styles);
+      // TODO: Simplify with AttributeHelper: https://www.drupal.org/node/3110716
+      if (is_array($content[$delta][$attr_property])) {
+        if (!isset($content[$delta][$attr_property]['class'])) {
+          $content[$delta][$attr_property] = [
+            'class' => [],
+          ];
+        }
+        $classes = $content[$delta][$attr_property]['class'] ?: [];
+        $content[$delta][$attr_property]['class'] = array_merge($classes, $styles);
+      }
+      elseif ($content[$delta][$attr_property] instanceof Attribute) {
+        $content[$delta][$attr_property]->addClass($styles);
+      }
     }
-    elseif ($build['content'][$delta][$attr_property] instanceof Attribute) {
-      $build['content'][$delta][$attr_property]->addClass($styles);
-    }
-    return $build;
+    return $content;
   }
 
 }
