@@ -26,7 +26,7 @@ function layout_builder_classes_form_alter(&$form, FormStateInterface $formState
     $styles_manager = \Drupal::service('plugin.manager.style_plugin');
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
-    $styles = \Drupal::service('plugin.manager.style_plugin')->getDefinitions();
+    $styles = $styles_manager->getDefinitions();
     if (!empty($styles)) {
       $component = $formObject->getCurrentComponent();
       $selected = $component->get('layout_builder_classes') ?: [];
