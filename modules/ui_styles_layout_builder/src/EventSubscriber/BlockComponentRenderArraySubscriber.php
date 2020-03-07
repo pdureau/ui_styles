@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ui_styles\EventSubscriber;
+namespace Drupal\ui_styles_layout_builder\EventSubscriber;
 
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

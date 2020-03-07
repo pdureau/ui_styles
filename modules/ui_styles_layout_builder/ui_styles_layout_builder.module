@@ -21,7 +21,7 @@ use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
  *
  * Modify the configuration form for layout builder components (blocks).
  */
-function ui_styles_form_alter(&$form, FormStateInterface $formState) {
+function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formState) {
   if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
@@ -35,7 +35,7 @@ function ui_styles_form_alter(&$form, FormStateInterface $formState) {
       // Our submit handler must execute before the default one, because the
       // default handler stores the section & component data in the tempstore
       // and we need to update those objects before that happens.
-      array_unshift($form['#submit'], '_ui_styles_submit_block_form');
+      array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
     }
   }
 }
@@ -46,15 +46,15 @@ function ui_styles_form_alter(&$form, FormStateInterface $formState) {
  * Persists the configured block style to the component configuration data,
  * which is later persisted to section storage by layout builder's base form.
  */
-function _ui_styles_submit_block_form(array $form, FormStateInterface $formState) {
+function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInterface $formState) {
   /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
   $selected = [];
   foreach ($form as $id => $element) {
-    if (strpos($id, 'layout_builder_class_') === 0) {
+    if (strpos($id, 'ui_styles_') === 0) {
       $value = $formState->getValue($id);
-      $id = str_replace('layout_builder_class_', '', $id);
+      $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
   }
@@ -73,7 +73,7 @@ function _ui_styles_submit_block_form(array $form, FormStateInterface $formState
  *
  * Modify the configuration form for layout builder sections (layouts).
  */
-function ui_styles_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
+function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
   $styles = \Drupal::service('plugin.manager.ui_styles')->getDefinitions();
   if (!empty($styles)) {
@@ -85,7 +85,7 @@ function ui_styles_form_layout_builder_configure_section_alter(&$form, FormState
       // Our submit handler must execute before the default one, because the
       // default handler stores the section & component data in the tempstore
       // and we need to update those objects before that happens.
-      array_unshift($form['#submit'], '_ui_styles_submit_section_form');
+      array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
     }
   }
 }
@@ -97,7 +97,7 @@ function ui_styles_form_layout_builder_configure_section_alter(&$form, FormState
  * array, which layout builder's ConfigureSectionForm will persist to section
  * storage.
  */
-function _ui_styles_submit_section_form(array $form, FormStateInterface $formState) {
+function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState) {
   $selected = [];
   foreach ($form as $id => $element) {
     if (strpos($id, 'layout_builder_class_') === 0) {
@@ -126,14 +126,14 @@ function _ui_styles_submit_section_form(array $form, FormStateInterface $formSta
  *
  * See also: https://www.drupal.org/project/drupal/issues/3080684 .
  */
-function ui_styles_element_info_alter(array &$types) {
-  $types['layout_builder']['#pre_render'][] = '_ui_styles_layout_builder_prerender';
+function ui_styles_layout_builder_element_info_alter(array &$types) {
+  $types['layout_builder']['#pre_render'][] = '_ui_styles_layout_builder_layout_builder_prerender';
 }
 
 /**
- * Callback from ui_styles_element_info_alter().
+ * Callback from ui_styles_layout_builder_element_info_alter().
  */
-function _ui_styles_layout_builder_prerender(array $element) {
+function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
   $layout_builder = $element['layout_builder'];
   /** @var \Drupal\layout_builder\SectionStorageInterface $section_storage */
@@ -163,7 +163,7 @@ function _ui_styles_layout_builder_prerender(array $element) {
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  */
-function ui_styles_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display) {
+function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display) {
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
   if ($display->isLayoutBuilderEnabled()) {
     $layout_builder = & $build['_layout_builder'];

@@ -1,5 +1,5 @@
-name: Layout Builder Classes Librray
-description: The library to browse styles from Layout Builder Classes module.
+name: UI Styles Librray
+description: Displays styles in a library page.
 core: 8.x
 type: module
 dependencies:

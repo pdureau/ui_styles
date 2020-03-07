@@ -1,8 +1,12 @@
 # UI Styles
 
-This module allow site builders to attach a style to apply to layout builder blocks and sections.
+This module allows:
 
-A "style" is just a list of concurrent CSS classes.
+- developpers to define styles (simple lists of concurrent CSS classes) from modules and themes
+- site builders to use those styles on blocks and section from Layout Builder interface (with `ui_styles_layout_builder`)
+- everyone to browse styles from a library page (with `ui_styles_library`)
+
+## Features
 
 Heavily inspired by [drupal/layout\_builder\_styles](https://www.drupal.org/project/layout_builder_styles) module, with those differences:
 
@@ -10,11 +14,11 @@ Heavily inspired by [drupal/layout\_builder\_styles](https://www.drupal.org/proj
 * styles are organized as groups of classes, because some styles should only allow one class to be chosen (see also: [#3075502](https://www.drupal.org/project/layout_builder_styles/issues/3075502))
 * with a preview page, like [ui_patterns_library](https://ui-patterns.readthedocs.io/en/8.x-1.x/content/patterns-definition.html), available there: /styles 
 * on rendering, classes are attached to the first render array inside the block, instead of being attached to the block wrapper
-* it is possible to add free extra classes too
+* it is possible to add free extra classes, using a simple text field, too
 
 ## Example of a plugin declaration in the YML file
 
-```
+```yaml
 colors_background_color:
   label: Background color
   description: Similar to the contextual text color classes, easily set the background of an element to any contextual class.
@@ -44,6 +48,6 @@ Where:
 
 ## A perfect combo with ui_patterns
 
-[ui\_patterns\_bootstrap](https://github.com/pdureau/ui_patterns_bootstrap) theme is an example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [layout\_builder\_classes](https://github.com/pdureau/ui_styles) to implements Bootstrap 4 designs:
+[ui\_bootstrap](https://github.com/pdureau/ui_bootstrap) theme is an example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [ui\_styles](https://github.com/pdureau/ui_styles) to implements Bootstrap 4 framework:
 
 ![Overview](doc/schema.png)

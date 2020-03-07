@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ui_styles;
+namespace Drupal\ui_styles_layout_builder;
 
 use Drupal\Core\Form\FormInterface;
 

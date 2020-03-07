@@ -2,12 +2,3 @@ services:
   plugin.manager.ui_styles:
     class: Drupal\ui_styles\StylePluginManager
     arguments: ["@module_handler", "@theme_handler", "@cache.discovery"]
-  ui_styles.route_subscriber:
-    class: Drupal\ui_styles\EventSubscriber\RouteSubscriber
-    tags:
-      - { name: "event_subscriber" }
-  ui_styles.render_block_component_subscriber:
-    class: Drupal\ui_styles\EventSubscriber\BlockComponentRenderArraySubscriber
-    arguments: ["@plugin.manager.ui_styles"]
-    tags:
-      - { name: event_subscriber }
