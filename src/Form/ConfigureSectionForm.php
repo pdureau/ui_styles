@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\layout_builder_classes\Form;
+namespace Drupal\ui_styles\Form;
 
 use Drupal\layout_builder\Form\ConfigureSectionForm as OriginalConfigureSectionForm;
-use Drupal\layout_builder_classes\ConfigureSectionFormInterface;
+use Drupal\ui_styles\ConfigureSectionFormInterface;
 
 /**
  * Class ConfigureSectionForm.

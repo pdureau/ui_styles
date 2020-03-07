@@ -8,9 +8,9 @@
 /**
  * Implements hook_theme().
  */
-function layout_builder_classes_library_theme() {
+function ui_styles_library_theme() {
   return [
-    'styles_overview_page' => [
+    'ui_styles_overview_page' => [
       'variables' => ['styles' => NULL],
     ],
   ];

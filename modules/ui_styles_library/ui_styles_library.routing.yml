@@ -1,0 +1,7 @@
+ui_styles_library.overview:
+  path: "/styles"
+  defaults:
+    _controller: '\Drupal\ui_styles_library\Controller\StylesLibraryController::overview'
+    _title: "Styles library"
+  requirements:
+    _access: "TRUE"

@@ -1,6 +1,6 @@
 {
-  "name": "drupal/layout_builder_classes",
-  "description": "Layout Builder Classes",
+  "name": "drupal/ui_styles",
+  "description": "UI Styles",
   "keywords": ["drupal", "web", "ui"],
   "type": "drupal-module",
   "license": "GPL-2.0-or-later"

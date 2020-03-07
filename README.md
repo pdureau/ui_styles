@@ -1,4 +1,4 @@
-# Layout Builder Classes
+# UI Styles
 
 This module allow site builders to attach a style to apply to layout builder blocks and sections.
 
@@ -44,6 +44,6 @@ Where:
 
 ## A perfect combo with ui_patterns
 
-[ui\_patterns\_bootstrap](https://github.com/pdureau/ui_patterns_bootstrap) theme is an example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [layout\_builder\_classes](https://github.com/pdureau/layout_builder_classes) to implements Bootstrap 4 designs:
+[ui\_patterns\_bootstrap](https://github.com/pdureau/ui_patterns_bootstrap) theme is an example of using both [ui\_patterns](https://www.drupal.org/project/ui_patterns) and [layout\_builder\_classes](https://github.com/pdureau/ui_styles) to implements Bootstrap 4 designs:
 
 ![Overview](doc/schema.png)

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\layout_builder_classes\EventSubscriber;
+namespace Drupal\ui_styles\EventSubscriber;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
@@ -17,7 +17,7 @@ class RouteSubscriber extends RouteSubscriberBase {
     // Needed until https://www.drupal.org/i/3044117 is in.
     $configureSectionRoute = $collection->get('layout_builder.configure_section');
     if ($configureSectionRoute) {
-      $configureSectionRoute->setDefault('_form', '\Drupal\layout_builder_classes\Form\ConfigureSectionForm');
+      $configureSectionRoute->setDefault('_form', '\Drupal\ui_styles\Form\ConfigureSectionForm');
     }
   }
 

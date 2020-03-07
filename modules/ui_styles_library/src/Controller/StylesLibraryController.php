@@ -1,22 +1,22 @@
 <?php
 
-namespace Drupal\layout_builder_classes_library\Controller;
+namespace Drupal\ui_styles_library\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\layout_builder_classes\StylePluginManagerInterface;
+use Drupal\ui_styles\StylePluginManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class StylesLibraryController.
  *
- * @package Drupal\layout_builder_classes\Controller
+ * @package Drupal\ui_styles\Controller
  */
 class StylesLibraryController extends ControllerBase {
 
   /**
    * Styles manager service.
    *
-   * @var \Drupal\layout_builder_classes\StylePluginManagerInterface
+   * @var \Drupal\ui_styles\StylePluginManagerInterface
    */
   protected $stylesManager;
 
@@ -31,7 +31,7 @@ class StylesLibraryController extends ControllerBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('plugin.manager.style_plugin'));
+    return new static($container->get('plugin.manager.ui_styles'));
   }
 
   /**
@@ -42,7 +42,7 @@ class StylesLibraryController extends ControllerBase {
    */
   public function overview() {
     return [
-      '#theme' => 'styles_overview_page',
+      '#theme' => 'ui_styles_overview_page',
       '#styles' => $this->stylesManager->getDefinitions(),
     ];
   }

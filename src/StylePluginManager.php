@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\layout_builder_classes;
+namespace Drupal\ui_styles;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -53,7 +53,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
-    $this->setCacheBackend($cache_backend, 'style_plugin', ['style_plugin']);
+    $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
   }
 
   /**
@@ -61,7 +61,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function getDiscovery() {
     if (!isset($this->discovery)) {
-      $this->discovery = new YamlDiscovery('style.plugin', $this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
+      $this->discovery = new YamlDiscovery('ui_styles', $this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
       $this->discovery->addTranslatableProperty('label', 'label_context');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
@@ -96,7 +96,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $selected = $selected ?: [];
     foreach ($styles as $definition) {
       $id = $definition['id'];
-      $element_name = 'layout_builder_class_' . $id;
+      $element_name = 'ui_styles_' . $id;
       $default = isset($selected[$id]) ? $selected[$id] : '';
       $form[$element_name] = [
         '#type' => 'select',
@@ -108,7 +108,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         '#weight' => 90,
       ];
     }
-    $form['_layout_builder_classes_extra'] = [
+    $form['_ui_styles_extra'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Extra classes'),
       '#description' => $this->t('You can add many values using spaces as separators'),

@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\layout_builder_classes\EventSubscriber;
+namespace Drupal\ui_styles\EventSubscriber;
 
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\layout_builder\LayoutBuilderEvents;
-use Drupal\layout_builder_classes\StylePluginManagerInterface;
+use Drupal\ui_styles\StylePluginManagerInterface;
 
 /**
  * Class BlockComponentRenderArraySubscriber.
@@ -15,14 +15,14 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
   /**
    * The style manager.
    *
-   * @var \Drupal\layout_builder_classes\StylePluginManagerInterface
+   * @var \Drupal\ui_styles\StylePluginManagerInterface
    */
   protected $styleManager;
 
   /**
    * Dependency injection.
    *
-   * @param \Drupal\layout_builder_classes\StylePluginManagerInterface $style_manager
+   * @param \Drupal\ui_styles\StylePluginManagerInterface $style_manager
    *   The style manager.
    */
   public function __construct(StylePluginManagerInterface $style_manager) {
@@ -52,8 +52,8 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
     if (empty($build)) {
       return;
     }
-    $selected = $event->getComponent()->get('layout_builder_classes') ?: [];
-    $extra = $event->getComponent()->get('layout_builder_classes_extra') ?: '';
+    $selected = $event->getComponent()->get('ui_styles') ?: [];
+    $extra = $event->getComponent()->get('ui_styles_extra') ?: '';
     $this->styleManager->addClasses($build, $selected, $extra);
     $event->setBuild($build);
   }
