@@ -159,7 +159,8 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $content['#attributes']['class'] = array_merge($classes, $styles);
     }
     // Render element.
-    elseif (isset($content['#type']) && in_array($content['#type'], ['pattern', 'html_tag', 'view'])) {
+    elseif (isset($content['#type']) &&
+      in_array($content['#type'], ['pattern', 'html_tag', 'view'])) {
       $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
       $classes = isset($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
       $content['#attributes']['class'] = array_merge($classes, $styles);
@@ -184,7 +185,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       if (!isset($content[$delta][$attr_property])) {
         $content[$delta][$attr_property] = [];
       }
-      // TODO: Simplify with AttributeHelper: https://www.drupal.org/node/3110716
+      // TODO: AttributeHelper https://www.drupal.org/node/3110716 in D8.9.
       if (is_array($content[$delta][$attr_property])) {
         if (!isset($content[$delta][$attr_property]['class'])) {
           $content[$delta][$attr_property] = [

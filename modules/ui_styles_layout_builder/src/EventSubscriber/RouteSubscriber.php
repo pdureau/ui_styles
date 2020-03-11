@@ -15,9 +15,9 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     // Needed until https://www.drupal.org/i/3044117 is in.
-    $configureSectionRoute = $collection->get('layout_builder.configure_section');
-    if ($configureSectionRoute) {
-      $configureSectionRoute->setDefault('_form', '\Drupal\ui_styles_layout_builder\Form\ConfigureSectionForm');
+    $configSectionRoute = $collection->get('layout_builder.configure_section');
+    if ($configSectionRoute) {
+      $configSectionRoute->setDefault('_form', '\Drupal\ui_styles_layout_builder\Form\ConfigureSectionForm');
     }
   }
 
