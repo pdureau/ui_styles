@@ -100,9 +100,9 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
 function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState) {
   $selected = [];
   foreach ($form as $id => $element) {
-    if (strpos($id, 'layout_builder_class_') === 0) {
+    if (strpos($id, 'ui_styles_') === 0) {
       $value = $formState->getValue($id);
-      $id = str_replace('layout_builder_class_', '', $id);
+      $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
   }
