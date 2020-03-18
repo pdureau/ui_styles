@@ -17,4 +17,12 @@ interface ConfigureSectionFormInterface extends FormInterface {
    */
   public function getCurrentSection();
 
+  /**
+   * Indicates whether the section is being added (false) or updated (true).
+   *
+   * @return bool
+   *   The section status: added (false) or updated (true).
+   */
+  public function isUpdate();
+
 }

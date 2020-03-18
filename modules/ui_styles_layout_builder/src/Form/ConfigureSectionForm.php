@@ -26,4 +26,11 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm implements Confi
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isUpdate() {
+    return $this->isUpdate;
+  }
+
 }

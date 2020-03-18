@@ -78,6 +78,11 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
   $styles = \Drupal::service('plugin.manager.ui_styles')->getDefinitions();
   if (!empty($styles)) {
     $formObject = $form_state->getFormObject();
+    // Alter form only on section update, not on section creation, because of
+    // the section delat shift.
+    if (!$formObject->isUpdate()) {
+      return;
+    }
     if ($section = $formObject->getCurrentSection()) {
       $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
       $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
