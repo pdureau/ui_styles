@@ -57,7 +57,7 @@ This module has no specific requirement.
 RECOMMENDED MODULE
 ------------
 
-[ui\_suite\_bootstrap](https://github.com/pdureau/ui_suite_bootstrap) is an example of a site-building friendly Drupal theme using [UI Styles](https://www.drupal.org/project/ui_styles) with [UI Patterns](https://www.drupal.org/project/ui_patterns), [Layout Options](https://www.drupal.org/project/layout_options) and [UI Examples](https://www.drupal.org/project/ui_examples) modules, to implements [Bootstrap](https://getbootstrap.com/) 4 framework:
+[ui\_suite\_bootstrap](https://github.com/pdureau/ui_suite_bootstrap) is an example of a site-building friendly Drupal theme using [UI Styles](https://www.drupal.org/project/ui_styles) with [UI Patterns](https://www.drupal.org/project/ui_patterns), [Layout Options](https://www.drupal.org/project/layout_options) and [UI Examples](https://www.drupal.org/project/ui_examples) modules, to implements [Bootstrap](https://getbootstrap.com/) 4:
 
 
 ![Overview](doc/schema.png)

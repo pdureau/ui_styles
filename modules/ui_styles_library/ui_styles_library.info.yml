@@ -1,6 +1,7 @@
-name: UI Styles Librray
+name: UI Styles Library
 description: Displays styles in a library page.
 core: 8.x
+core_version_requirement: ^8 || ^9
 type: module
 package: User interface
 dependencies:
