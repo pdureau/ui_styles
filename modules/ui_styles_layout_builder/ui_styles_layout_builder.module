@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 
 /*
@@ -172,11 +173,22 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
   if ($display->isLayoutBuilderEnabled()) {
     $layout_builder = & $build['_layout_builder'];
-    foreach (Element::children($layout_builder) as $delta) {
-      $section = $display->getSection($delta);
-      $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-      $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-      $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
+    $layout_field_name = OverridesSectionStorage::FIELD_NAME;
+    if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
+      foreach ($entity->get($layout_field_name) as $delta => $section_item) {
+        /* @var Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
+        $section = $section_item->get('section')->getValue();
+        $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+        $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
+        $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
+      }
+    }
+    else {
+      foreach ($display->getSections() as $delta => $section) {
+        $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+        $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
+        $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
+      }
     }
   }
 }
