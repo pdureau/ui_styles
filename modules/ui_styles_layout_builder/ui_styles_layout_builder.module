@@ -118,13 +118,12 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
   $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('_ui_styles_extra'));
 }
 
-
 /**
- * Implementation of hook_element_info_alter().
+ * Implements hook_element_info_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by 
+ * Because hook_preproces_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
- * (for example, this is not the case for layouts managed from 
+ * (for example, this is not the case for layouts managed from
  * ui_patterns_layout_builder module), we need to move up to the layout builder's
  * sections level:
  * - using hook_entity_view_alter() while rendering an entity
@@ -159,11 +158,11 @@ function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
 }
 
 /**
- * Implementation of hook_entity_view_alter().
+ * Implements hook_entity_view_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by 
+ * Because hook_preproces_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
- * (for example, this is not the case for layouts managed from 
+ * (for example, this is not the case for layouts managed from
  * ui_patterns_layout_builder module), we need to move up to the layout builder's
  * sections level:
  * - using hook_entity_view_alter() while rendering an entity
@@ -192,4 +191,3 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     }
   }
 }
-
