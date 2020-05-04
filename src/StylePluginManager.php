@@ -126,7 +126,15 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     if (isset($element['#theme']) && $element['#theme'] === 'block') {
       // We are in a block.
       $inline = (isset($element['#base_plugin_id']) && $element['#base_plugin_id'] === 'inline_block');
-      $element['content'] = $this->addStyleToBlockContent($element['content'], $styles, $inline);
+      // First, try to add styles to block content.
+      $content = $this->addStyleToBlockContent($element['content'], $styles, $inline);
+      if ($content) {
+        $element['content'] = $content;
+      }
+      // If it fails, add them to block wrapper.
+      else {
+        $element = $this->addStyleToWrapper($element, $styles);
+      }
       // TODO: $build['#cache']['tags']?
     }
     else {
@@ -152,6 +160,11 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   private function addStyleToBlockContent(array $content, array $styles, $inline = FALSE) {
     $styles = array_filter($styles);
+    // When render array doesn't accept #attributes property, add styles to
+    // wrapper.
+    if (isset($content['#markup'])) {
+      return NULL;
+    }
     // Inline block.
     if ($inline) {
       $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
@@ -174,6 +187,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         $content = $this->addStyleToFieldFormatterItems($content, $styles, '#attributes');
       }
     }
+    // All other cases: add to block wrapper instead of block content.
+    else {
+      return NULL;
+    }
     return $content;
   }
 
@@ -182,9 +199,23 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   private function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property) {
     foreach (Element::children($content) as $delta) {
+      // When render array doesn't accept #attributes property, add styles to
+      // wrapper.
+      if (isset($content[$delta]['#markup'])) {
+        return NULL;
+      }
+      $elements_without_attributes = [
+        'inline_template',
+        'processed_text',
+      ];
+      if (isset($content[$delta]['#type']) && in_array($content[$delta]['#type'], $elements_without_attributes)) {
+        return NULL;
+      }
+
       if (!isset($content[$delta][$attr_property])) {
         $content[$delta][$attr_property] = [];
       }
+
       // TODO: AttributeHelper https://www.drupal.org/node/3110716 in D8.9.
       if (is_array($content[$delta][$attr_property])) {
         if (!isset($content[$delta][$attr_property]['class'])) {
