@@ -9,8 +9,7 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
-use Drupal\Core\Template\Attribute;
-use Drupal\Core\Render\Element;
+use Drupal\ui_styles\Render\Element;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -120,115 +119,58 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * {@inheritdoc}
    */
   public function addClasses(array &$element, $selected, $extra = '') {
+
+    // Set styles classes.
     $selected = is_array($selected) ? array_values($selected) : [];
     $extra = explode(' ', $extra);
     $styles = array_merge($selected, $extra);
+    $styles = array_filter($styles);
+
+    // Blocks are special.
     if (isset($element['#theme']) && $element['#theme'] === 'block') {
-      // We are in a block.
-      $inline = (isset($element['#base_plugin_id']) && $element['#base_plugin_id'] === 'inline_block');
       // First, try to add styles to block content.
-      $content = $this->addStyleToBlockContent($element['content'], $styles, $inline);
+      $content = $this->addStyleToBlockContent($element['content'], $styles);
       if ($content) {
         $element['content'] = $content;
       }
       // If it fails, add them to block wrapper.
       else {
-        $element = $this->addStyleToWrapper($element, $styles);
+        $element = Element::addClasses($element, $styles);
       }
       // TODO: $build['#cache']['tags']?
     }
     else {
-      // We are in a layout.
-      $element = $this->addStyleToWrapper($element, $styles);
+      $element = Element::addClasses($element, $styles);
     }
-  }
-
-  /**
-   * Add style to block or layout wrapper.
-   */
-  private function addStyleToWrapper(array $wrapper, array $styles) {
-    $wrapper['#attributes'] = isset($wrapper['#attributes']) ? $wrapper['#attributes'] : [];
-    $classes = isset($wrapper['#attributes']['class']) ? $wrapper['#attributes']['class'] : [];
-    $styles = array_merge($styles, $classes);
-    $styles = array_filter($styles);
-    $wrapper['#attributes']['class'] = $styles;
-    return $wrapper;
   }
 
   /**
    * Add style to block content instead of block wrapper.
    */
-  private function addStyleToBlockContent(array $content, array $styles, $inline = FALSE) {
-    $styles = array_filter($styles);
-    // When render array doesn't accept #attributes property, add styles to
-    // wrapper.
-    if (isset($content['#markup'])) {
-      return NULL;
-    }
-    // Inline block.
-    if ($inline) {
-      $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
-      $classes = isset($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
-      $content['#attributes']['class'] = array_merge($classes, $styles);
-    }
-    // Render element.
-    elseif (isset($content['#type']) &&
-      in_array($content['#type'], ['pattern', 'html_tag', 'view'])) {
-      $content['#attributes'] = isset($content['#attributes']) ? $content['#attributes'] : [];
-      $classes = isset($content['#attributes']['class']) ? $content['#attributes']['class'] : [];
-      $content['#attributes']['class'] = array_merge($classes, $styles);
-    }
-    // Field formatter.
-    elseif (isset($content['#theme']) && $content['#theme'] === 'field') {
+  private function addStyleToBlockContent(array $content, array $styles) {
+    // Field formatters are special.
+    if (isset($content['#theme']) && $content['#theme'] === 'field') {
       if ($content['#formatter'] === 'media_thumbnail') {
-        $content = $this->addStyleToFieldFormatterItems($content, $styles, '#item_attributes');
+        return $this->addStyleToFieldFormatterItems($content, $styles, '#item_attributes');
       }
-      else {
-        $content = $this->addStyleToFieldFormatterItems($content, $styles, '#attributes');
-      }
+      return $this->addStyleToFieldFormatterItems($content, $styles);
     }
-    // All other cases: add to block wrapper instead of block content.
-    else {
+
+    if (!Element::isAcceptingAttributes($content)) {
       return NULL;
     }
-    return $content;
+    return Element::addClasses($content, $styles);
   }
 
   /**
    * Add style to field formatter items.
    */
-  private function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property) {
+  private function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property = '#attributes') {
     foreach (Element::children($content) as $delta) {
-      // When render array doesn't accept #attributes property, add styles to
-      // wrapper.
-      if (isset($content[$delta]['#markup'])) {
+      if (!Element::isAcceptingAttributes($content[$delta])) {
         return NULL;
       }
-      $elements_without_attributes = [
-        'inline_template',
-        'processed_text',
-      ];
-      if (isset($content[$delta]['#type']) && in_array($content[$delta]['#type'], $elements_without_attributes)) {
-        return NULL;
-      }
-
-      if (!isset($content[$delta][$attr_property])) {
-        $content[$delta][$attr_property] = [];
-      }
-
-      // TODO: AttributeHelper https://www.drupal.org/node/3110716 in D8.9.
-      if (is_array($content[$delta][$attr_property])) {
-        if (!isset($content[$delta][$attr_property]['class'])) {
-          $content[$delta][$attr_property] = [
-            'class' => [],
-          ];
-        }
-        $classes = $content[$delta][$attr_property]['class'] ?: [];
-        $content[$delta][$attr_property]['class'] = array_merge($classes, $styles);
-      }
-      elseif ($content[$delta][$attr_property] instanceof Attribute) {
-        $content[$delta][$attr_property]->addClass($styles);
-      }
+      $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);
     }
     return $content;
   }
