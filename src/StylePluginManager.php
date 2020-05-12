@@ -148,12 +148,26 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * Add style to block content instead of block wrapper.
    */
   private function addStyleToBlockContent(array $content, array $styles) {
+
     // Field formatters are special.
     if (isset($content['#theme']) && $content['#theme'] === 'field') {
       if ($content['#formatter'] === 'media_thumbnail') {
         return $this->addStyleToFieldFormatterItems($content, $styles, '#item_attributes');
       }
       return $this->addStyleToFieldFormatterItems($content, $styles);
+    }
+
+    // Embedded entity displays are special.
+    elseif (isset($content['#view_mode'])) {
+      // Let's deal only with single section layout builder for now.
+      if (isset($content['_layout_builder']) && count(Element::children($content['_layout_builder'])) === 1) {
+        $section = $content['_layout_builder'][0];
+        if (!Element::isAcceptingAttributes($section)) {
+          return NULL;
+        }
+        $content['_layout_builder'][0] = Element::addClasses($content['_layout_builder'][0], $styles);
+        return $content;
+      }
     }
 
     if (!Element::isAcceptingAttributes($content)) {

@@ -51,9 +51,12 @@ class Element extends CoreElement {
       $registry = \Drupal::service('theme.registry')->get();
       if (array_key_exists($element['#theme'], $registry)) {
         $theme_hook = $registry[$element['#theme']];
+        if (!array_key_exists('variables', $theme_hook)) {
+          $theme_hook = $registry[$theme_hook['base hook']];
+        }
         if (array_key_exists('variables', $theme_hook)) {
           return array_key_exists('attributes', $theme_hook['variables'])
-            ||  array_key_exists('item_attributes', $theme_hook['variables']);
+            || array_key_exists('item_attributes', $theme_hook['variables']);
         }
       }
     }
