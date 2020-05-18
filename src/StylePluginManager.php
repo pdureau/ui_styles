@@ -88,12 +88,12 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function alterForm(array &$form, array $styles, $selected, $extra = '') {
+  public function alterForm(array $form, $selected, $extra = '') {
     // Set form actions to a high weight, just so that we can make our form
     // style element appear right before them.
     $form['actions']['#weight'] = 100;
     $selected = $selected ?: [];
-    foreach ($styles as $definition) {
+    foreach ($this->getDefinitions() as $definition) {
       $id = $definition['id'];
       $element_name = 'ui_styles_' . $id;
       $default = isset($selected[$id]) ? $selected[$id] : '';
@@ -113,12 +113,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       '#description' => $this->t('You can add many values using spaces as separators'),
       '#default_value' => $extra ?: '',
     ];
+    return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function addClasses(array &$element, $selected, $extra = '') {
+  public function addClasses(array $element, $selected, $extra = '') {
 
     // Set styles classes.
     $selected = is_array($selected) ? array_values($selected) : [];
@@ -138,10 +139,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         $element = Element::addClasses($element, $styles);
       }
       // TODO: $build['#cache']['tags']?
+      return $element;
     }
-    else {
-      $element = Element::addClasses($element, $styles);
-    }
+
+    return Element::addClasses($element, $styles);
   }
 
   /**

@@ -48,57 +48,86 @@ class Element extends CoreElement {
     // Theme hooks.
     // See also: https://api.drupal.org/api/drupal/core!lib!Drupal!Core!Render!theme.api.php/group/themeable/.
     if (isset($element['#theme'])) {
-      $registry = \Drupal::service('theme.registry')->get();
-      if (array_key_exists($element['#theme'], $registry)) {
-        $theme_hook = $registry[$element['#theme']];
-        if (!array_key_exists('variables', $theme_hook)) {
-          $theme_hook = $registry[$theme_hook['base hook']];
-        }
-        if (array_key_exists('variables', $theme_hook)) {
-          return array_key_exists('attributes', $theme_hook['variables'])
-            || array_key_exists('item_attributes', $theme_hook['variables']);
-        }
-      }
+      return self::isThemeHookAcceptingAttributes($element);
     }
 
     // Render element plugins.
     // @see \Drupal\Core\Render\Element\ElementInterface.
     // See also: https://api.drupal.org/api/drupal/elements.
     elseif (isset($element['#type'])) {
-      // For performance reasons, check first with lists of known render
-      // elements.
-      $without_attributes = [
-        'inline_template',
-        'processed_text',
-        'link',
-      ];
-      if (in_array($element['#type'], $without_attributes)) {
-        return FALSE;
-      }
-      $with_attributes = [
-        'view',
-        'pattern',
-        'html_tag',
-      ];
-      if (in_array($element['#type'], $with_attributes)) {
-        return TRUE;
-      }
-
-      // If not in lists, do a resource hungry check, processing the render
-      // element.
-      $info = \Drupal::service('plugin.manager.element_info')->getInfo($element['#type']);
-      if (isset($info['#pre_render'])) {
-        foreach ($info['#pre_render'] as $callable) {
-          $element = self::doCallback('#pre_render', $callable, [$element]);
-        }
-      }
-      // Check again as theme hooks instead of render elements plugins.
-      if (isset($element['#theme'])) {
-        return self::isAcceptingAttributes($element);
-      }
+      return self::isRenderElementAcceptingAttributes($element);
     }
 
     // Other render arrays (#markup, #plain_text, #view_mode...)
+    return FALSE;
+  }
+
+  /**
+   * Check if theme hook render array accept #attributes property.
+   *
+   * @param array $element
+   *   A theme hook render array.
+   *
+   * @return bool
+   *   Attributes acceptance.
+   */
+  private static function isThemeHookAcceptingAttributes(array $element) {
+    $registry = \Drupal::service('theme.registry')->get();
+    if (array_key_exists($element['#theme'], $registry)) {
+      $theme_hook = $registry[$element['#theme']];
+      if (!array_key_exists('variables', $theme_hook) && array_key_exists('base hook', $theme_hook)) {
+        $theme_hook = $registry[$theme_hook['base hook']];
+      }
+      if (array_key_exists('variables', $theme_hook)) {
+        return array_key_exists('attributes', $theme_hook['variables'])
+          || array_key_exists('item_attributes', $theme_hook['variables']);
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if render element accept #attributes property.
+   *
+   * @param array $element
+   *   A render element.
+   *
+   * @return bool
+   *   Attributes acceptance.
+   */
+  private static function isRenderElementAcceptingAttributes(array $element) {
+    // For performance reasons, check first with lists of known render
+    // elements.
+    $without_attributes = [
+      'inline_template',
+      'processed_text',
+      'link',
+    ];
+    if (in_array($element['#type'], $without_attributes)) {
+      return FALSE;
+    }
+    $with_attributes = [
+      'view',
+      'pattern',
+      'html_tag',
+    ];
+    if (in_array($element['#type'], $with_attributes)) {
+      return TRUE;
+    }
+
+    // If not in lists, do a resource hungry check, processing the render
+    // element.
+    $info = \Drupal::service('plugin.manager.element_info')->getInfo($element['#type']);
+    if (isset($info['#pre_render'])) {
+      foreach ($info['#pre_render'] as $callable) {
+        $element = self::doCallback('#pre_render', $callable, [$element]);
+      }
+    }
+    // Check again as theme hooks instead of render elements plugins.
+    if (isset($element['#theme'])) {
+      return self::isThemeHookAcceptingAttributes($element);
+    }
+
     return FALSE;
   }
 

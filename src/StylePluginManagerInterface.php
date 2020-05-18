@@ -14,14 +14,15 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    *
    * @param array $form
    *   The form array to add to.
-   * @param array $styles
-   *   The style options to make available.
    * @param mixed $selected
    *   The selected class(es).
    * @param string $extra
    *   The optional free extra class(es).
+   *
+   * @return array
+   *   The modified form element.
    */
-  public function alterForm(array &$form, array $styles, $selected, $extra = '');
+  public function alterForm(array $form, $selected, $extra = '');
 
   /**
    * Add classes to target element.
@@ -32,7 +33,10 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    *   The selected class(es), as an array.
    * @param string $extra
    *   The free extra class(es), as a string.
+   *
+   * @return array
+   *   The modified render element.
    */
-  public function addClasses(array &$target_element, $selected, $extra = '');
+  public function addClasses(array $target_element, $selected, $extra = '');
 
 }

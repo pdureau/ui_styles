@@ -27,17 +27,14 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
-    $styles = $styles_manager->getDefinitions();
-    if (!empty($styles)) {
-      $component = $formObject->getCurrentComponent();
-      $selected = $component->get('ui_styles') ?: [];
-      $extra = $component->get('ui_styles_extra') ?: '';
-      $styles_manager->alterForm($form, $styles, $selected, $extra);
-      // Our submit handler must execute before the default one, because the
-      // default handler stores the section & component data in the tempstore
-      // and we need to update those objects before that happens.
-      array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
-    }
+    $component = $formObject->getCurrentComponent();
+    $selected = $component->get('ui_styles') ?: [];
+    $extra = $component->get('ui_styles_extra') ?: '';
+    $form = $styles_manager->alterForm($form, $selected, $extra);
+    // Our submit handler must execute before the default one, because the
+    // default handler stores the section & component data in the tempstore
+    // and we need to update those objects before that happens.
+    array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
   }
 }
 
@@ -75,24 +72,21 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
  * Modify the configuration form for layout builder sections (layouts).
  */
 function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-  $styles = \Drupal::service('plugin.manager.ui_styles')->getDefinitions();
-  if (!empty($styles)) {
-    $formObject = $form_state->getFormObject();
-    // Alter form only on section update, not on section creation, because of
-    // the section delat shift.
-    if (!$formObject->isUpdate()) {
-      return;
-    }
-    if ($section = $formObject->getCurrentSection()) {
-      $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-      $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-      $styles_manager->alterForm($form, $styles, $selected, $extra);
-      // Our submit handler must execute before the default one, because the
-      // default handler stores the section & component data in the tempstore
-      // and we need to update those objects before that happens.
-      array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
-    }
+  $formObject = $form_state->getFormObject();
+  // Alter form only on section update, not on section creation, because of
+  // the section delta shift.
+  if (!$formObject->isUpdate()) {
+    return;
+  }
+  if ($section = $formObject->getCurrentSection()) {
+    $styles_manager = \Drupal::service('plugin.manager.ui_styles');
+    $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+    $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
+    $form = $styles_manager->alterForm($form, $selected, $extra);
+    // Our submit handler must execute before the default one, because the
+    // default handler stores the section & component data in the tempstore
+    // and we need to update those objects before that happens.
+    array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
   }
 }
 
@@ -150,7 +144,8 @@ function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
       $section = $section_storage->getSection($delta);
       $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
       $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-      $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
+      $element['layout_builder'][$index]['layout-builder__section'] = 
+        $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
       $delta++;
     }
   }
@@ -169,8 +164,8 @@ function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
  * - using hook_element_info_alter() while previewing.
  */
 function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display) {
-  $styles_manager = \Drupal::service('plugin.manager.ui_styles');
   if ($display->isLayoutBuilderEnabled()) {
+    $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     $layout_builder = & $build['_layout_builder'];
     $layout_field_name = OverridesSectionStorage::FIELD_NAME;
     if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
@@ -179,14 +174,14 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
         $section = $section_item->get('section')->getValue();
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-        $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
+        $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
       }
     }
     else {
       foreach ($display->getSections() as $delta => $section) {
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-        $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
+        $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
       }
     }
   }

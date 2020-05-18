@@ -52,9 +52,11 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
     if (empty($build)) {
       return;
     }
+
     $selected = $event->getComponent()->get('ui_styles') ?: [];
     $extra = $event->getComponent()->get('ui_styles_extra') ?: '';
-    $this->styleManager->addClasses($build, $selected, $extra);
+    $build = $this->styleManager->addClasses($build, $selected, $extra);
+
     $event->setBuild($build);
   }
 
