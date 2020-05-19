@@ -168,8 +168,13 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     $layout_builder = & $build['_layout_builder'];
     $layout_field_name = OverridesSectionStorage::FIELD_NAME;
+    // Layout override: we are dealing with a content entity.
     if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
       foreach ($entity->get($layout_field_name) as $delta => $section_item) {
+        if (!$layout_builder[$delta]) {
+          // We may encounter some issue when manipulating the last section.
+          continue;
+        }
         /* @var Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
         $section = $section_item->get('section')->getValue();
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
@@ -177,6 +182,7 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
         $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
       }
     }
+    // Default layout: we are dealing with a config entity.
     else {
       foreach ($display->getSections() as $delta => $section) {
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
