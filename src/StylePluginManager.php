@@ -127,22 +127,24 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $styles = array_merge($selected, $extra);
     $styles = array_filter($styles);
 
-    // Blocks are special.
-    if (isset($element['#theme']) && $element['#theme'] === 'block') {
-      // First, try to add styles to block content.
-      $content = $this->addStyleToBlockContent($element['content'], $styles);
-      if ($content) {
-        $element['content'] = $content;
-      }
-      // If it fails, add them to block wrapper.
-      else {
-        $element = Element::addClasses($element, $styles);
-      }
-      // TODO: $build['#cache']['tags']?
+    if (count($styles) === 0) {
       return $element;
     }
 
-    return Element::addClasses($element, $styles);
+    // Blocks are special.
+    if (isset($element['#theme']) && $element['#theme'] === 'block') {
+      // Try to add styles to block content insted of wrapper.
+      $content = $this->addStyleToBlockContent($element['content'], $styles);
+      if ($content) {
+        $element['content'] = $content;
+        return $element;
+      }
+    }
+
+    if (Element::isAcceptingAttributes($element)) {
+      $element = Element::addClasses($element, $styles);
+    }
+    return $element;
   }
 
   /**
@@ -163,18 +165,18 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       // Let's deal only with single section layout builder for now.
       if (isset($content['_layout_builder']) && count(Element::children($content['_layout_builder'])) === 1) {
         $section = $content['_layout_builder'][0];
-        if (!Element::isAcceptingAttributes($section)) {
-          return NULL;
+        if (Element::isAcceptingAttributes($section)) {
+          $content['_layout_builder'][0] = Element::addClasses($section, $styles);
+          return $content;
         }
-        $content['_layout_builder'][0] = Element::addClasses($content['_layout_builder'][0], $styles);
-        return $content;
       }
     }
 
-    if (!Element::isAcceptingAttributes($content)) {
-      return NULL;
+    if (Element::isAcceptingAttributes($content)) {
+      return Element::addClasses($content, $styles);
     }
-    return Element::addClasses($content, $styles);
+    return NULL;
+
   }
 
   /**
@@ -184,6 +186,9 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     foreach (Element::children($content) as $delta) {
       if (!Element::isAcceptingAttributes($content[$delta])) {
         return NULL;
+      }
+      if (array_key_exists('#theme', $content[$delta]) && $content[$delta]['#theme'] === 'image_formatter') {
+        $attr_property = '#item_attributes';
       }
       $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);
     }
