@@ -28,9 +28,17 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $component = $formObject->getCurrentComponent();
+
+    // Block content.
     $selected = $component->get('ui_styles') ?: [];
     $extra = $component->get('ui_styles_extra') ?: '';
-    $form = $styles_manager->alterForm($form, $selected, $extra);
+    $form['ui_style'] = [
+      '#type' => 'details',
+      '#title' => t('Block content styles'),
+      '#open' => FALSE,
+    ];
+    $form['ui_style'] = $styles_manager->alterForm($form['ui_style'], $selected, $extra);
+
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
@@ -48,16 +56,21 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
+
+  // Block content.
   $selected = [];
-  foreach ($form as $id => $element) {
+  foreach ($form['ui_style'] as $id => $element) {
     if (strpos($id, 'ui_styles_') === 0) {
-      $value = $formState->getValue($id);
+      $value = $formState->getValue('ui_style')[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
   }
+  // Those values are flat for backward compatibility with initial design.
+  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
+  // move them to proper third_party_settings and wrap them in a bag.
   $component->set('ui_styles', $selected);
-  $component->set('ui_styles_extra', $formState->getValue('_ui_styles_extra'));
+  $component->set('ui_styles_extra', $formState->getValue('ui_style')['_ui_styles_extra']);
 }
 
 /*
@@ -80,9 +93,17 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
   }
   if ($section = $formObject->getCurrentSection()) {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
+
+   // Section content.
     $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
     $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-    $form = $styles_manager->alterForm($form, $selected, $extra);
+    $form['ui_style'] = [
+      '#type' => 'details',
+      '#title' => t('Section styles'),
+      '#open' => FALSE,
+    ];
+    $form['ui_style'] = $styles_manager->alterForm($form['ui_style'], $selected, $extra);
+
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
@@ -99,9 +120,9 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
  */
 function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState) {
   $selected = [];
-  foreach ($form as $id => $element) {
+  foreach ($form['ui_style'] as $id => $element) {
     if (strpos($id, 'ui_styles_') === 0) {
-      $value = $formState->getValue($id);
+      $value = $formState->getValue('ui_style')[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
