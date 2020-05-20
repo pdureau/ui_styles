@@ -45,6 +45,11 @@ class Element extends CoreElement {
    */
   public static function isAcceptingAttributes(array $element) {
 
+    // If already existing, we just go for it.
+    if (array_key_exists('#attributes', $element) || array_key_exists('#item_attributes', $element)) {
+      return TRUE;
+    }
+
     // Theme hooks.
     // See also: https://api.drupal.org/api/drupal/core!lib!Drupal!Core!Render!theme.api.php/group/themeable/.
     if (isset($element['#theme'])) {
@@ -58,7 +63,7 @@ class Element extends CoreElement {
       return self::isRenderElementAcceptingAttributes($element);
     }
 
-    // Other render arrays (#markup, #plain_text, #view_mode...)
+    // Other render arrays (#markup, #plain_text...)
     return FALSE;
   }
 

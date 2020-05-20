@@ -161,7 +161,8 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     }
 
     // Embedded entity displays are special.
-    elseif (isset($content['#view_mode'])) {
+    if (isset($content['#view_mode'])) {
+
       // Let's deal only with single section layout builder for now.
       if (isset($content['_layout_builder']) && count(Element::children($content['_layout_builder'])) === 1) {
         $section = $content['_layout_builder'][0];
@@ -170,6 +171,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
           return $content;
         }
       }
+      return FALSE;
     }
 
     if (Element::isAcceptingAttributes($content)) {
