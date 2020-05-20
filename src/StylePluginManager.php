@@ -11,6 +11,7 @@ use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\ui_styles\Render\Element;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * Provides the default style_plugin manager.
@@ -25,6 +26,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
+
+  /**
+   * The Messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * Provides default values for all style_plugin plugins.
@@ -48,11 +56,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *   The theme handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend) {
+  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend, MessengerInterface $messenger) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
+    $this->messenger = $messenger;
   }
 
   /**
@@ -142,8 +153,12 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     }
 
     if (Element::isAcceptingAttributes($element)) {
-      $element = Element::addClasses($element, $styles);
+      return Element::addClasses($element, $styles);
     }
+
+    $type = isset($element['#type']) ? $element['#type'] : 'render array';
+    $type = isset($element['#theme']) ? $element['#theme'] : $type;
+    $this->messenger->addWarning($this->t('UI Styles was not able to add attributes to @type.', ['@type' => $type]), TRUE);
     return $element;
   }
 

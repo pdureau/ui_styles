@@ -83,6 +83,15 @@ class Element extends CoreElement {
       if (!array_key_exists('variables', $theme_hook) && array_key_exists('base hook', $theme_hook)) {
         $theme_hook = $registry[$theme_hook['base hook']];
       }
+      // Some templates are specials. They have no theme variables, but they 
+      // accept attributes anyway.
+      $with_attributes = [
+        'layout',
+        'block',
+      ];
+      if (array_key_exists('template', $theme_hook) && in_array($theme_hook['template'], $with_attributes)) {
+        return TRUE;
+      }
       if (array_key_exists('variables', $theme_hook)) {
         return array_key_exists('attributes', $theme_hook['variables'])
           || array_key_exists('item_attributes', $theme_hook['variables']);
