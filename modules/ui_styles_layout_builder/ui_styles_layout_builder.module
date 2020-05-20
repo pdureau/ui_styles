@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 
@@ -28,6 +29,21 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $component = $formObject->getCurrentComponent();
+
+    // Block title.
+    $selected = $component->get('ui_styles_title') ?: [];
+    $extra = $component->get('ui_styles_title_extra') ?: '';
+    $form['ui_styles_title'] = [
+      '#type' => 'details',
+      '#title' => t('Block title styles'),
+      '#open' => FALSE,
+      '#states' => [
+        'invisible' => [
+          ':input[name="settings[label_display]"]' => ['checked' => FALSE],
+        ],
+      ],
+    ];
+    $form['ui_styles_title'] = $styles_manager->alterForm($form['ui_styles_title'], $selected, $extra);
 
     // Block content.
     $selected = $component->get('ui_styles') ?: [];
@@ -57,6 +73,20 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
 
+  // Block title.
+  foreach ($form['ui_styles_title'] as $id => $element) {
+    if (strpos($id, 'ui_styles_') === 0) {
+      $value = $formState->getValue('ui_styles_title')[$id];
+      $id = str_replace('ui_styles_', '', $id);
+      $selected[$id] = $value;
+    }
+  }
+  // Those values are flat for backward compatibility with initial design.
+  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
+  // move them to proper third_party_settings and wrap them in a bag.
+  $component->set('ui_styles_title', $selected);
+  $component->set('ui_styles_title_extra', $formState->getValue('ui_styles_title')['_ui_styles_extra']);
+
   // Block content.
   $selected = [];
   foreach ($form['ui_style'] as $id => $element) {
@@ -71,6 +101,21 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   // move them to proper third_party_settings and wrap them in a bag.
   $component->set('ui_styles', $selected);
   $component->set('ui_styles_extra', $formState->getValue('ui_style')['_ui_styles_extra']);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for blocks.
+ */
+function ui_styles_layout_builder_preprocess_block(array &$variables) {
+
+  // Block title.
+  if (!empty($variables['configuration']['label_display'])) {
+    $ui_style_title_attributes = isset($variables['configuration']['ui_style_title_attributes']) ? $variables['configuration']['ui_style_title_attributes'] : [];
+    $variables['title_attributes'] = AttributeHelper::mergeCollections(
+      $variables['title_attributes'],
+      $ui_style_title_attributes
+    );
+  }
 }
 
 /*
