@@ -136,7 +136,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $selected = is_array($selected) ? array_values($selected) : [];
     $extra = explode(' ', $extra);
     $styles = array_merge($selected, $extra);
-    $styles = array_filter($styles);
+    $styles = array_unique(array_filter($styles));
 
     if (count($styles) === 0) {
       return $element;
