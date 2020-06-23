@@ -236,6 +236,11 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     $layout_field_name = OverridesSectionStorage::FIELD_NAME;
     // Layout override: we are dealing with a content entity.
     if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
+      if ($build['#view_mode'] !== 'default' and $build['#view_mode'] !== 'full') {
+        // Layout Builder only supports customizing the Full/Default view mode.
+        // See also: https://www.drupal.org/project/drupal/issues/2907413.
+        return;
+      }
       foreach ($entity->get($layout_field_name) as $delta => $section_item) {
         if (!$layout_builder[$delta]) {
           // We may encounter some issue when manipulating the last section.
