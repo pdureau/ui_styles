@@ -22,7 +22,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified form element.
    */
-  public function alterForm(array $form, $selected, $extra = '');
+  public function alterForm(array $form, $selected = [], $extra = '');
 
   /**
    * Add classes to target element.
@@ -37,6 +37,6 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified render element.
    */
-  public function addClasses(array $target_element, $selected, $extra = '');
+  public function addClasses(array $target_element, $selected = [], $extra = '');
 
 }

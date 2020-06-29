@@ -13,6 +13,38 @@ use Drupal\Core\Render\Element\RenderCallbackInterface;
 class Element extends CoreElement {
 
   /**
+   * List of #type to consider without attributes.
+   *
+   * @var array
+   */
+  public static $typeWithoutAttributes = [
+    'inline_template',
+    'processed_text',
+    'link',
+  ];
+
+  /**
+   * List of #type to consider with attributes.
+   *
+   * @var array
+   */
+  public static $typeWithAttributes = [
+    'view',
+    'pattern',
+    'html_tag',
+  ];
+
+  /**
+   * List of #theme to consider with attributes.
+   *
+   * @var array
+   */
+  public static $themeWithAttributes = [
+    'layout',
+    'block',
+  ];
+
+  /**
    * Add HTML classes to render array.
    *
    * @param array $element
@@ -83,13 +115,9 @@ class Element extends CoreElement {
       if (!array_key_exists('variables', $theme_hook) && array_key_exists('base hook', $theme_hook)) {
         $theme_hook = $registry[$theme_hook['base hook']];
       }
-      // Some templates are specials. They have no theme variables, but they 
+      // Some templates are specials. They have no theme variables, but they
       // accept attributes anyway.
-      $with_attributes = [
-        'layout',
-        'block',
-      ];
-      if (array_key_exists('template', $theme_hook) && in_array($theme_hook['template'], $with_attributes)) {
+      if (array_key_exists('template', $theme_hook) && in_array($theme_hook['template'], self::$themeWithAttributes)) {
         return TRUE;
       }
       if (array_key_exists('variables', $theme_hook)) {
@@ -112,20 +140,10 @@ class Element extends CoreElement {
   private static function isRenderElementAcceptingAttributes(array $element) {
     // For performance reasons, check first with lists of known render
     // elements.
-    $without_attributes = [
-      'inline_template',
-      'processed_text',
-      'link',
-    ];
-    if (in_array($element['#type'], $without_attributes)) {
+    if (in_array($element['#type'], self::$typeWithoutAttributes)) {
       return FALSE;
     }
-    $with_attributes = [
-      'view',
-      'pattern',
-      'html_tag',
-    ];
-    if (in_array($element['#type'], $with_attributes)) {
+    if (in_array($element['#type'], self::$typeWithAttributes)) {
       return TRUE;
     }
 

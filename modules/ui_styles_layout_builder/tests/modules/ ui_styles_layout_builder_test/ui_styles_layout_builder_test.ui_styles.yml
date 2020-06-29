@@ -1,0 +1,7 @@
+test_class:
+  label: Test class
+  description: Test class
+  options:
+    test-class-section: Test
+    test-class-block: Test
+    test-class-title: Test

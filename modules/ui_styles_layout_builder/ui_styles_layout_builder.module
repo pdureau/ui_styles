@@ -130,6 +130,7 @@ function ui_styles_layout_builder_preprocess_block(array &$variables) {
  * Modify the configuration form for layout builder sections (layouts).
  */
 function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
+  /** @var \Drupal\ui_styles_layout_builder\Form\ConfigureSectionForm $formObject */
   $formObject = $form_state->getFormObject();
   // Alter form only on section update, not on section creation, because of
   // the section delta shift.
@@ -139,7 +140,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
   if ($section = $formObject->getCurrentSection()) {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
 
-   // Section content.
+    // Section content.
     $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
     $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
     $form['ui_style'] = [
@@ -172,6 +173,7 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
       $selected[$id] = $value;
     }
   }
+  /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
   $section->setThirdPartySetting('ui_styles', 'selected', $selected);
@@ -181,11 +183,11 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
 /**
  * Implements hook_element_info_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by
+ * Because hook_preprocess_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout builder's
- * sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout
+ * builder's sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  *
@@ -210,7 +212,7 @@ function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
       $section = $section_storage->getSection($delta);
       $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
       $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-      $element['layout_builder'][$index]['layout-builder__section'] = 
+      $element['layout_builder'][$index]['layout-builder__section'] =
         $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
       $delta++;
     }
@@ -221,11 +223,11 @@ function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
 /**
  * Implements hook_entity_view_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by
+ * Because hook_preprocess_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout builder's
- * sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout
+ * builder's sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  */
