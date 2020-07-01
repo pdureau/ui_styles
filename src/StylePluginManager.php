@@ -194,8 +194,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       return Element::addClasses($content, $styles);
     }
 
-    // @todo: check if this is needed, seems to never have a use case for this
-    // see UiStylesPluginManagerTest.
     return NULL;
 
   }
