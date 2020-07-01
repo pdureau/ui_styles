@@ -209,4 +209,5 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $assert_session->responseContains('test-class-title-extra');
     $assert_session->responseContains('test-class-extra');
   }
+
 }
