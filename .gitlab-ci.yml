@@ -157,3 +157,15 @@ variables:
 # Advanced usage with this file, see doc.
 # https://mog33.gitlab.io/gitlab-ci-drupal/advanced-usage
 ################################################################################
+
+stages:
+  - build
+  - tests
+  - metrics
+  - reports
+
+pages:
+  stage: reports
+  extends: .simple_dashboard
+  rules:
+    - when: always
