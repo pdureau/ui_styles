@@ -106,7 +106,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
 
     $this->drupalGet('node/' . $this->node->id());
     $assert_session->responseContains('test-class-section');
-    // $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-extra');
   }
 
   /**
@@ -156,7 +156,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
 
     $this->drupalGet('node/' . $this->node->id());
     $assert_session->responseNotContains('test-class-section');
-    // $assert_session->responseNotContains('test-class-extra');
+    $assert_session->responseNotContains('test-class-extra');
 
     $this->drupalGet('node/' . $this->node->id() . '/layout');
     // Add a style on section.
@@ -170,7 +170,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
 
     $this->drupalGet('node/' . $this->node->id());
     $assert_session->responseContains('test-class-section');
-    // $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-extra');
   }
 
   /**
