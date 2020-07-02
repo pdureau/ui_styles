@@ -10,6 +10,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\ui_styles\Render\Element;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Messenger\MessengerInterface;
 
@@ -54,14 +55,17 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *   The module handler.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   *   The string translation service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend, MessengerInterface $messenger) {
+  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationInterface $translation, CacheBackendInterface $cache_backend, MessengerInterface $messenger) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
+    $this->stringTranslation = $translation;
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
     $this->messenger = $messenger;
   }
@@ -99,7 +103,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function alterForm(array $form, $selected, $extra = '') {
+  public function alterForm(array $form, $selected = [], $extra = '') {
     // Set form actions to a high weight, just so that we can make our form
     // style element appear right before them.
     $form['actions']['#weight'] = 100;
@@ -130,10 +134,9 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function addClasses(array $element, $selected, $extra = '') {
+  public function addClasses(array $element, $selected = [], $extra = '') {
 
     // Set styles classes.
-    $selected = is_array($selected) ? array_values($selected) : [];
     $extra = explode(' ', $extra);
     $styles = array_merge($selected, $extra);
     $styles = array_unique(array_filter($styles));
@@ -144,7 +147,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
 
     // Blocks are special.
     if (isset($element['#theme']) && $element['#theme'] === 'block') {
-      // Try to add styles to block content insted of wrapper.
+      // Try to add styles to block content instead of wrapper.
       $content = $this->addStyleToBlockContent($element['content'], $styles);
       if ($content) {
         $element['content'] = $content;
@@ -166,7 +169,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * Add style to block content instead of block wrapper.
    */
   private function addStyleToBlockContent(array $content, array $styles) {
-
     // Field formatters are special.
     if (isset($content['#theme']) && $content['#theme'] === 'field') {
       if ($content['#formatter'] === 'media_thumbnail') {
@@ -174,7 +176,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       }
       return $this->addStyleToFieldFormatterItems($content, $styles);
     }
-
     // Embedded entity displays are special.
     if (isset($content['#view_mode'])) {
 
@@ -192,6 +193,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     if (Element::isAcceptingAttributes($content)) {
       return Element::addClasses($content, $styles);
     }
+
     return NULL;
 
   }

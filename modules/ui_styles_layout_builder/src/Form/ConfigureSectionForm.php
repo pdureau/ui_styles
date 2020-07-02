@@ -18,7 +18,7 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm implements Confi
    */
   public function getCurrentSection() {
     // While adding a new section, we have this strange situation where delta is
-    // already incremeted, but section not yet added to storage.
+    // already incremented, but section not yet added to storage.
     $max = count($this->sectionStorage->getSections());
     if ($this->delta < $max) {
       return $this->sectionStorage->getSection($this->delta);
