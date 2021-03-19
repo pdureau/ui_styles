@@ -7,7 +7,6 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
@@ -130,7 +129,6 @@ function ui_styles_layout_builder_preprocess_block(array &$variables) {
  * Modify the configuration form for layout builder sections (layouts).
  */
 function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\ui_styles_layout_builder\Form\ConfigureSectionForm $formObject */
   $formObject = $form_state->getFormObject();
   // Alter form only on section update, not on section creation, because of
   // the section delta shift.
@@ -140,7 +138,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
   if ($section = $formObject->getCurrentSection()) {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
 
-    // Section content.
+   // Section content.
     $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
     $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
     $form['ui_style'] = [
@@ -173,61 +171,39 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
       $selected[$id] = $value;
     }
   }
-  /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
   $section->setThirdPartySetting('ui_styles', 'selected', $selected);
-  $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('ui_style')['_ui_styles_extra']);
+  $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('_ui_styles_extra'));
 }
 
 /**
  * Implements hook_element_info_alter().
  *
- * Because hook_preprocess_layout() deals only with layouts rendered by
+ * Because hook_preproces_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout
- * builder's sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout builder's
+ * sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  *
  * See also: https://www.drupal.org/project/drupal/issues/3080684 .
  */
 function ui_styles_layout_builder_element_info_alter(array &$types) {
-  $types['layout_builder']['#pre_render'][] = '_ui_styles_layout_builder_layout_builder_prerender';
+  $types['layout_builder']['#pre_render'][] = 'Drupal\ui_styles_layout_builder\LayoutBuilderTrustedCallbacks::preRender';
 }
 
-/**
- * Callback from ui_styles_layout_builder_element_info_alter().
- */
-function _ui_styles_layout_builder_layout_builder_prerender(array $element) {
-  $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-  $layout_builder = $element['layout_builder'];
-  /** @var \Drupal\layout_builder\SectionStorageInterface $section_storage */
-  $section_storage = $element['#section_storage'];
-  $delta = 0;
-  $max = count($section_storage->getSections());
-  foreach (Element::children($layout_builder) as $index) {
-    if (isset($layout_builder[$index]['layout-builder__section']) && $delta < $max) {
-      $section = $section_storage->getSection($delta);
-      $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-      $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-      $element['layout_builder'][$index]['layout-builder__section'] =
-        $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
-      $delta++;
-    }
-  }
-  return $element;
-}
+
 
 /**
  * Implements hook_entity_view_alter().
  *
- * Because hook_preprocess_layout() deals only with layouts rendered by
+ * Because hook_preproces_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout
- * builder's sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout builder's
+ * sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  */
