@@ -174,7 +174,7 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
   $section->setThirdPartySetting('ui_styles', 'selected', $selected);
-  $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('_ui_styles_extra'));
+  $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('ui_style')['_ui_styles_extra']);
 }
 
 /**
