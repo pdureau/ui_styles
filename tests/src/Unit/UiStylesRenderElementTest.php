@@ -41,19 +41,19 @@ class UiStylesRenderElementTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->container = new ContainerBuilder();
 
     $this->themeRegistry = $this->getMockBuilder(Registry::class)
       ->disableOriginalConstructor()
-      ->setMethods(['get'])
+      ->onlyMethods(['get'])
       ->getMock();
 
     $this->elementInfoManager = $this->getMockBuilder(ElementInfoManager::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getInfo'])
+      ->onlyMethods(['getInfo'])
       ->getMock();
 
     $container = new ContainerBuilder();

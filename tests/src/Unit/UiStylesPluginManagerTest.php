@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\ui_styles\Unit;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -38,7 +39,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Messenger\MessengerInterface
    */
   protected $messenger;
 
@@ -63,14 +64,14 @@ class UiStylesPluginManagerTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     // Needed for Element::isAcceptingAttributes.
     $this->container = new ContainerBuilder();
 
     $themeRegistry = $this->getMockBuilder(Registry::class)
       ->disableOriginalConstructor()
-      ->setMethods(['get'])
+      ->onlyMethods(['get'])
       ->getMock();
     $themeRegistry->expects($this->any())
       ->method('get')
@@ -117,13 +118,16 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * Tests the processDefinition().
    *
    * @covers ::processDefinition
-   *
-   * @expectedException Drupal\Component\Plugin\Exception\PluginException
    */
   public function testProcessDefinitionWillReturnException() {
     $plugin_id = 'test';
     $definition = ['no_id' => $plugin_id];
-    $this->stylePluginManager->processDefinition($definition, $plugin_id);
+    try {
+      $this->stylePluginManager->processDefinition($definition, $plugin_id);
+    }
+    catch (PluginException $exception) {
+      $this->assertTrue(TRUE, 'The expected exception happened.');
+    }
   }
 
   /**
