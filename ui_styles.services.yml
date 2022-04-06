@@ -2,4 +2,8 @@ services:
   plugin.manager.ui_styles:
     class: Drupal\ui_styles\StylePluginManager
     arguments:
-      ["@module_handler", "@theme_handler", "@string_translation", "@cache.discovery", "@messenger"]
+      - '@module_handler'
+      - '@theme_handler'
+      - '@string_translation'
+      - '@cache.discovery'
+      - '@messenger'

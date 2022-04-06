@@ -1,15 +1,12 @@
 <?php
 
-/**
- * @file
- * Namespace Drupal\Tests\ui_styles\Kernel;.
- */
+declare(strict_types = 1);
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\ui_styles\Render\Element;
 
 /**
- * Class UiStylesRenderElementTest.
+ * Kernel tests for UI Styles Render element.
  *
  * @group ui_styles
  *
@@ -26,8 +23,8 @@ class UiStylesRenderElementTest extends KernelTestBase {
    * Test the isAcceptingAttributes().
    *
    * @covers ::isAcceptingAttributes
-   * @covers ::isThemeHookAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
+   * @covers ::isThemeHookAcceptingAttributes
    *
    * @dataProvider providerTestAttributes
    */
@@ -39,25 +36,57 @@ class UiStylesRenderElementTest extends KernelTestBase {
   /**
    * Data provider for testIsAcceptingAttributes().
    */
-  public function providerTestAttributes() {
+  public function providerTestAttributes(): array {
     $data = [
-      'already_exist' => [['#attributes' => ['class' => ['original-class']]], TRUE],
+      'already_exist' => [
+        [
+          '#attributes' => [
+            'class' => [
+              'original-class',
+            ],
+          ],
+        ],
+        TRUE,
+      ],
       // isThemeHookAcceptingAttributes.
       'theme_has_attributes' => [
-        ['#theme' => 'image', '#uri' => 'http://test.com/image.png'],
+        [
+          '#theme' => 'image',
+          '#uri' => 'http://test.com/image.png',
+        ],
         TRUE,
       ],
       'theme_no_attributes' => [
-        ['#theme' => 'page_title', '#title' => 'My title'],
+        [
+          '#theme' => 'page_title',
+          '#title' => 'My title',
+        ],
         FALSE,
       ],
-      'not_existing_theme' => [['#theme' => 'not_existing_theme'], FALSE],
+      'not_existing_theme' => [
+        [
+          '#theme' => 'not_existing_theme',
+        ],
+        FALSE,
+      ],
       'theme_base_hook' => [
-        ['#theme' => 'block__system_messages_block', 'block' => 'something'],
+        [
+          '#theme' => 'block__system_messages_block',
+          'block' => 'something',
+        ],
         TRUE,
       ],
-      // @todo: find a #theme with template to test.
-      'invalid_theme' => [['#not_valid_theme' => ['class' => ['original-class']]], FALSE],
+      // @todo find a #theme with template to test.
+      'invalid_theme' => [
+        [
+          '#not_valid_theme' => [
+            'class' => [
+              'original-class',
+            ],
+          ],
+        ],
+        FALSE,
+      ],
       // isRenderElementAcceptingAttributes second part.
       'type_with_theme_valid' => [
         [
@@ -66,22 +95,34 @@ class UiStylesRenderElementTest extends KernelTestBase {
           '#uri' => 'http://test.com/image.png',
         ],
         TRUE,
-      ]
-      ,
+      ],
       'type_with_theme_invalid' => [
-        ['#type' => 'html_tag', '#theme' => 'not_existing_theme'],
+        [
+          '#type' => 'html_tag',
+          '#theme' => 'not_existing_theme',
+        ],
         FALSE,
       ],
       // isRenderElementAcceptingAttributes doCallback.
-      // @todo: find a #type with #pre_render to test.
+      // @todo find a #type with #pre_render to test.
     ];
 
     // isRenderElementAcceptingAttributes first part.
     foreach (Element::$typeWithoutAttributes as $attributes) {
-      $data['type_without_attributes_' . $attributes] = [['#type' => $attributes], FALSE];
+      $data['type_without_attributes_' . $attributes] = [
+        [
+          '#type' => $attributes,
+        ],
+        FALSE,
+      ];
     }
     foreach (Element::$typeWithAttributes as $attributes) {
-      $data['type_with_attributes_' . $attributes] = [['#type' => $attributes], TRUE];
+      $data['type_with_attributes_' . $attributes] = [
+        [
+          '#type' => $attributes,
+        ],
+        TRUE,
+      ];
     }
 
     return $data;

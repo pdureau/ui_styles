@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\ui_styles\Functional;
 
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
@@ -9,6 +11,7 @@ use Drupal\Tests\BrowserTestBase;
  * Test the ui styles layout builder.
  *
  * @group ui_styles
+ * @group ui_styles_layout_builder
  */
 class UiStylesLayoutBuilderTest extends BrowserTestBase {
 
@@ -19,14 +22,16 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
+  // phpcs:disable
   /**
    * Disable schema validation when running tests.
    *
    * @var bool
    *
-   * @todo: Fix this by providing actual schema validation.
+   * @todo Fix this by providing actual schema validation.
    */
   protected $strictConfigSchema = FALSE;
+  // phpcs:enable
 
   /**
    * A test node to which comments will be posted.
@@ -75,16 +80,18 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     ]);
 
     // Enable layout builder on content type.
-    LayoutBuilderEntityViewDisplay::load('node.page.default')
-      ->enableLayoutBuilder()
-      ->setOverridable()
-      ->save();
+    $layout_builder_view_display = LayoutBuilderEntityViewDisplay::load('node.page.default');
+    if ($layout_builder_view_display != NULL) {
+      $layout_builder_view_display->enableLayoutBuilder()
+        ->setOverridable()
+        ->save();
+    }
   }
 
   /**
    * Tests to add classes with UI Styles on section.
    */
-  public function testUiStylesSection() {
+  public function testUiStylesSection(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -112,7 +119,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
   /**
    * Tests to add classes with UI Styles on block.
    */
-  public function testUiStylesBlock() {
+  public function testUiStylesBlock(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -146,7 +153,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
   /**
    * Tests to add classes with UI Styles on Section on content.
    */
-  public function testUiStylesSectionOverride() {
+  public function testUiStylesSectionOverride(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -176,7 +183,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
   /**
    * Tests to add classes with UI Styles on block on content.
    */
-  public function testUiStylesBlockOverride() {
+  public function testUiStylesBlockOverride(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

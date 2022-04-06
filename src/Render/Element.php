@@ -1,16 +1,28 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\ui_styles\Render;
 
 use Drupal\Core\Render\Element as CoreElement;
-use Drupal\Core\Template\AttributeHelper;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Template\AttributeHelper;
 
 /**
  * Provides helper methods for Drupal render elements.
  */
 class Element extends CoreElement {
+
+  /**
+   * The string searched for callback.
+   */
+  public const CALLBACK_NEEDLE = '::';
+
+  /**
+   * The length of the callback separator needle.
+   */
+  public const CALLBACK_NEEDLE_LENGTH = 2;
 
   /**
    * List of #type to consider without attributes.
@@ -58,7 +70,7 @@ class Element extends CoreElement {
    *   A render array.
    */
   public static function addClasses(array $element, array $classes, $attr_property = '#attributes') {
-    $element[$attr_property] = isset($element[$attr_property]) ? $element[$attr_property] : [];
+    $element[$attr_property] = $element[$attr_property] ?? [];
     $element[$attr_property] = AttributeHelper::mergeCollections(
       $element[$attr_property],
       ['class' => $classes]
@@ -78,7 +90,7 @@ class Element extends CoreElement {
   public static function isAcceptingAttributes(array $element) {
 
     // If already existing, we just go for it.
-    if (array_key_exists('#attributes', $element) || array_key_exists('#item_attributes', $element)) {
+    if (\array_key_exists('#attributes', $element) || \array_key_exists('#item_attributes', $element)) {
       return TRUE;
     }
 
@@ -91,7 +103,7 @@ class Element extends CoreElement {
     // Render element plugins.
     // @see \Drupal\Core\Render\Element\ElementInterface.
     // See also: https://api.drupal.org/api/drupal/elements.
-    elseif (isset($element['#type'])) {
+    if (isset($element['#type'])) {
       return self::isRenderElementAcceptingAttributes($element);
     }
 
@@ -110,19 +122,19 @@ class Element extends CoreElement {
    */
   private static function isThemeHookAcceptingAttributes(array $element) {
     $registry = \Drupal::service('theme.registry')->get();
-    if (array_key_exists($element['#theme'], $registry)) {
+    if (\array_key_exists($element['#theme'], $registry)) {
       $theme_hook = $registry[$element['#theme']];
-      if (!array_key_exists('variables', $theme_hook) && array_key_exists('base hook', $theme_hook)) {
+      if (!\array_key_exists('variables', $theme_hook) && \array_key_exists('base hook', $theme_hook)) {
         $theme_hook = $registry[$theme_hook['base hook']];
       }
       // Some templates are specials. They have no theme variables, but they
       // accept attributes anyway.
-      if (array_key_exists('template', $theme_hook) && in_array($theme_hook['template'], self::$themeWithAttributes)) {
+      if (\array_key_exists('template', $theme_hook) && \in_array($theme_hook['template'], self::$themeWithAttributes, TRUE)) {
         return TRUE;
       }
-      if (array_key_exists('variables', $theme_hook)) {
-        return array_key_exists('attributes', $theme_hook['variables'])
-          || array_key_exists('item_attributes', $theme_hook['variables']);
+      if (\array_key_exists('variables', $theme_hook)) {
+        return \array_key_exists('attributes', $theme_hook['variables'])
+          || \array_key_exists('item_attributes', $theme_hook['variables']);
       }
     }
     return FALSE;
@@ -140,10 +152,10 @@ class Element extends CoreElement {
   private static function isRenderElementAcceptingAttributes(array $element) {
     // For performance reasons, check first with lists of known render
     // elements.
-    if (in_array($element['#type'], self::$typeWithoutAttributes)) {
+    if (\in_array($element['#type'], self::$typeWithoutAttributes, TRUE)) {
       return FALSE;
     }
-    if (in_array($element['#type'], self::$typeWithAttributes)) {
+    if (\in_array($element['#type'], self::$typeWithAttributes, TRUE)) {
       return TRUE;
     }
 
@@ -156,7 +168,7 @@ class Element extends CoreElement {
       }
     }
     // Check again as theme hooks instead of render elements plugins.
-    if (isset($element['#theme'])) {
+    if (\is_array($element) && isset($element['#theme'])) {
       return self::isThemeHookAcceptingAttributes($element);
     }
 
@@ -179,18 +191,18 @@ class Element extends CoreElement {
    * @see \Drupal\Core\Security\TrustedCallbackInterface
    */
   protected static function doCallback($callback_type, $callback, array $args) {
-    if (is_string($callback)) {
-      $double_colon = strpos($callback, '::');
+    if (\is_string($callback)) {
+      $double_colon = \strpos($callback, self::CALLBACK_NEEDLE);
       if ($double_colon === FALSE) {
         // We don't deal with this situation.
-        // TODO: Do we need to deal with it? Check Drupal\Core\Render\Renderer.
+        // @todo Do we need to deal with it? Check Drupal\Core\Render\Renderer.
       }
       elseif ($double_colon > 0) {
-        $callback = explode('::', $callback, 2);
+        $callback = \explode(self::CALLBACK_NEEDLE, $callback, self::CALLBACK_NEEDLE_LENGTH);
       }
     }
 
-    $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. Support for this callback implementation is deprecated in 8.8.0 and will be removed in Drupal 9.0.0. See https://www.drupal.org/node/2966725', $callback_type, '%s');
+    $message = \sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. Support for this callback implementation is deprecated in 8.8.0 and will be removed in Drupal 9.0.0. See https://www.drupal.org/node/2966725', $callback_type, '%s');
 
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
@@ -198,6 +210,7 @@ class Element extends CoreElement {
     // - Helper classes that contain only callback methods can implement this
     //   instead of TrustedCallbackInterface.
     $callbackWrapper = new TrustedCallbackWrapper();
+    // @phpstan-ignore-next-line
     return $callbackWrapper->doTrustedCallback($callback, $args, $message, TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION, RenderCallbackInterface::class);
   }
 

@@ -15,7 +15,7 @@ Heavily inspired by [layout\_builder\_styles](https://www.drupal.org/project/lay
 
 * styles are plugin-based instead of being config-entity-based, to be created and managed by the themer (inside a YML file), and then only used by the site builder in the layout builder interface (see also: [#3107972](https://www.drupal.org/project/layout_builder_styles/issues/3107972))
 * styles are organized as groups of classes, because some styles should only allow one class to be chosen (see also: [#3075502](https://www.drupal.org/project/layout_builder_styles/issues/3075502))
-* with a preview page, like [ui_patterns_library](https://ui-patterns.readthedocs.io/en/8.x-1.x/content/patterns-definition.html), available there: /styles 
+* with a preview page, like [ui_patterns_library](https://ui-patterns.readthedocs.io/en/8.x-1.x/content/patterns-definition.html), available there: /styles
 * on rendering, classes are attached to the first render array inside the block, instead of being attached to the block wrapper
 * it is possible to add free extra classes, using a simple text field
 

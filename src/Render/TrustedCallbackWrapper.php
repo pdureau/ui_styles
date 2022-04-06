@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\ui_styles\Render;
 
 use Drupal\Core\Security\DoTrustedCallbackTrait;

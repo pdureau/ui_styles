@@ -5,6 +5,8 @@
  * Contains module file.
  */
 
+declare(strict_types = 1);
+
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\AttributeHelper;
@@ -22,7 +24,7 @@ use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
  *
  * Modify the configuration form for layout builder components (blocks).
  */
-function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formState) {
+function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $formState): void {
   if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
@@ -31,6 +33,7 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
 
     // Block title.
     $selected = $component->get('ui_styles_title') ?: [];
+    /** @var string $extra */
     $extra = $component->get('ui_styles_title_extra') ?: '';
     $form['ui_styles_title'] = [
       '#type' => 'details',
@@ -46,6 +49,7 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
 
     // Block content.
     $selected = $component->get('ui_styles') ?: [];
+    /** @var string $extra */
     $extra = $component->get('ui_styles_extra') ?: '';
     $form['ui_style'] = [
       '#type' => 'details',
@@ -67,15 +71,20 @@ function ui_styles_layout_builder_form_alter(&$form, FormStateInterface $formSta
  * Persists the configured block style to the component configuration data,
  * which is later persisted to section storage by layout builder's base form.
  */
-function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInterface $formState) {
+function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInterface $formState): void {
   /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
 
+  /** @var array $ui_styles_title */
+  $ui_styles_title = $formState->getValue('ui_styles_title');
+
   // Block title.
-  foreach ($form['ui_styles_title'] as $id => $element) {
+  $selected = [];
+  foreach (array_keys($form['ui_styles_title']) as $id) {
+    /** @var string $id */
     if (strpos($id, 'ui_styles_') === 0) {
-      $value = $formState->getValue('ui_styles_title')[$id];
+      $value = $ui_styles_title[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
@@ -84,13 +93,17 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
   // move them to proper third_party_settings and wrap them in a bag.
   $component->set('ui_styles_title', $selected);
-  $component->set('ui_styles_title_extra', $formState->getValue('ui_styles_title')['_ui_styles_extra']);
+  $component->set('ui_styles_title_extra', $ui_styles_title['_ui_styles_extra']);
 
   // Block content.
+  /** @var array $ui_style */
+  $ui_style = $formState->getValue('ui_style');
+
   $selected = [];
-  foreach ($form['ui_style'] as $id => $element) {
+  foreach (array_keys($form['ui_style']) as $id) {
+    /** @var string $id */
     if (strpos($id, 'ui_styles_') === 0) {
-      $value = $formState->getValue('ui_style')[$id];
+      $value = $ui_style[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
@@ -99,17 +112,16 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
   // move them to proper third_party_settings and wrap them in a bag.
   $component->set('ui_styles', $selected);
-  $component->set('ui_styles_extra', $formState->getValue('ui_style')['_ui_styles_extra']);
+  $component->set('ui_styles_extra', $ui_style['_ui_styles_extra']);
 }
 
 /**
- * Implements hook_preprocess_HOOK() for blocks.
+ * Implements hook_preprocess_HOOK() for 'block'.
  */
-function ui_styles_layout_builder_preprocess_block(array &$variables) {
-
+function ui_styles_layout_builder_preprocess_block(array &$variables): void {
   // Block title.
   if (!empty($variables['configuration']['label_display'])) {
-    $ui_style_title_attributes = isset($variables['configuration']['ui_style_title_attributes']) ? $variables['configuration']['ui_style_title_attributes'] : [];
+    $ui_style_title_attributes = $variables['configuration']['ui_style_title_attributes'] ?? [];
     $variables['title_attributes'] = AttributeHelper::mergeCollections(
       $variables['title_attributes'],
       $ui_style_title_attributes
@@ -124,22 +136,25 @@ function ui_styles_layout_builder_preprocess_block(array &$variables) {
  */
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for 'layout_builder_configure_section'.
  *
  * Modify the configuration form for layout builder sections (layouts).
  */
-function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$form, FormStateInterface $form_state, $form_id) {
+function ui_styles_layout_builder_form_layout_builder_configure_section_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  /** @var \Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface $formObject */
   $formObject = $form_state->getFormObject();
   // Alter form only on section update, not on section creation, because of
   // the section delta shift.
   if (!$formObject->isUpdate()) {
     return;
   }
-  if ($section = $formObject->getCurrentSection()) {
+  $section = $formObject->getCurrentSection();
+  if ($section) {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
 
-   // Section content.
+    // Section content.
     $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+    /** @var string $extra */
     $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
     $form['ui_style'] = [
       '#type' => 'details',
@@ -162,55 +177,61 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(&$
  * array, which layout builder's ConfigureSectionForm will persist to section
  * storage.
  */
-function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState) {
+function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState): void {
+  /** @var array $ui_style */
+  $ui_style = $formState->getValue('ui_style');
+
   $selected = [];
-  foreach ($form['ui_style'] as $id => $element) {
+  foreach (array_keys($form['ui_style']) as $id) {
+    /** @var string $id */
     if (strpos($id, 'ui_styles_') === 0) {
-      $value = $formState->getValue('ui_style')[$id];
+      $value = $ui_style[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
     }
   }
+  /** @var \Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface $formObject */
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
-  $section->setThirdPartySetting('ui_styles', 'selected', $selected);
-  $section->setThirdPartySetting('ui_styles', 'extra', $formState->getValue('ui_style')['_ui_styles_extra']);
+  if ($section != NULL) {
+    $section->setThirdPartySetting('ui_styles', 'selected', $selected);
+    $section->setThirdPartySetting('ui_styles', 'extra', $ui_style['_ui_styles_extra']);
+  }
 }
 
 /**
  * Implements hook_element_info_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by
+ * Because hook_preprocess_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout builder's
- * sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout
+ * builder's sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  *
  * See also: https://www.drupal.org/project/drupal/issues/3080684 .
  */
-function ui_styles_layout_builder_element_info_alter(array &$types) {
+function ui_styles_layout_builder_element_info_alter(array &$types): void {
   $types['layout_builder']['#pre_render'][] = 'Drupal\ui_styles_layout_builder\LayoutBuilderTrustedCallbacks::preRender';
 }
-
-
 
 /**
  * Implements hook_entity_view_alter().
  *
- * Because hook_preproces_layout() deals only with layouts rendered by
+ * Because hook_preprocess_layout() deals only with layouts rendered by
  * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
  * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout builder's
- * sections level:
+ * ui_patterns_layout_builder module), we need to move up to the layout
+ * builder's sections level:
  * - using hook_entity_view_alter() while rendering an entity
  * - using hook_element_info_alter() while previewing.
  */
-function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display) {
+function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display): void {
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
   if ($display->isLayoutBuilderEnabled()) {
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-    $layout_builder = & $build['_layout_builder'];
+    $layout_builder = &$build['_layout_builder'];
     $layout_field_name = OverridesSectionStorage::FIELD_NAME;
     // Layout override: we are dealing with a content entity.
     if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
@@ -220,13 +241,15 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
         return;
       }
       foreach ($entity->get($layout_field_name) as $delta => $section_item) {
+        /** @var Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
         if (!$layout_builder[$delta]) {
           // We may encounter some issue when manipulating the last section.
           continue;
         }
-        /* @var Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
+        /** @var \Drupal\layout_builder\Section $section */
         $section = $section_item->get('section')->getValue();
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+        /** @var string $extra */
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
         $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
       }
@@ -235,6 +258,7 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     else {
       foreach ($display->getSections() as $delta => $section) {
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+        /** @var string $extra */
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
         $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
       }

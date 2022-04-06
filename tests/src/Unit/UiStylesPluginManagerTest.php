@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\ui_styles\Unit;
 
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\StylePluginManager;
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
-use Drupal\Core\Theme\Registry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class UiStylesPluginManagerTest.
+ * Test the UI Styles plugin manager.
  *
  * @group ui_styles
  *
@@ -42,6 +44,13 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * @var \Drupal\Core\Messenger\MessengerInterface
    */
   protected $messenger;
+
+  /**
+   * The container.
+   *
+   * @var \Symfony\Component\DependencyInjection\TaggedContainerInterface
+   */
+  protected $container;
 
   /**
    * A list of styles definitions.
@@ -85,7 +94,9 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     // Set up for this class.
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler */
     $moduleHandler = $this->prophesize(ModuleHandlerInterface::class)->reveal();
+    /** @var \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler */
     $themeHandler = $this->prophesize(ThemeHandlerInterface::class)->reveal();
     $cache = $this->createMock(CacheBackendInterface::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
@@ -95,7 +106,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     $this->discovery = $this->createMock(DiscoveryInterface::class);
     $this->discovery->expects($this->any())
       ->method('getDefinitions')
-      ->will($this->returnValue($this->styles));
+      ->willReturn($this->styles);
 
     $reflection_property = new \ReflectionProperty($this->stylePluginManager, 'discovery');
     $reflection_property->setAccessible(TRUE);
@@ -107,7 +118,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    *
    * @covers ::__construct
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $this->assertInstanceOf(
       StylePluginManager::class,
       $this->stylePluginManager
@@ -119,7 +130,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    *
    * @covers ::processDefinition
    */
-  public function testProcessDefinitionWillReturnException() {
+  public function testProcessDefinitionWillReturnException(): void {
     $plugin_id = 'test';
     $definition = ['no_id' => $plugin_id];
     try {
@@ -135,7 +146,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    *
    * @covers ::processDefinition
    */
-  public function testProcessDefinition() {
+  public function testProcessDefinition(): void {
     $plugin_id = 'test';
     $definition = ['id' => $plugin_id];
 
@@ -153,13 +164,16 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    *
    * @covers ::alterForm
    */
-  public function testAlterForm() {
+  public function testAlterForm(): void {
     $form = [
       'actions' => ['#weight' => 1],
     ];
     $extra = 'has_extra';
 
-    $form = $this->stylePluginManager->alterForm($form, ['test1' => 'opt2', 'test2' => 'opt3'], $extra);
+    $form = $this->stylePluginManager->alterForm($form, [
+      'test1' => 'opt2',
+      'test2' => 'opt3',
+    ], $extra);
 
     $this->assertSame($form['actions']['#weight'], 100);
     $this->assertSame($form['_ui_styles_extra']['#default_value'], 'has_extra');
@@ -180,7 +194,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * @covers ::addStyleToBlockContent
    * @covers ::addStyleToFieldFormatterItems
    */
-  public function testAddClasses() {
+  public function testAddClasses(): void {
     $element = [
       '#attributes' => [
         'class' => [
@@ -259,7 +273,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
         '#theme' => 'field',
         '#formatter' => 'media_thumbnail',
         'test' => [
-            // Not allowed #attributes tag.
+          // Not allowed #attributes tag.
           '#type' => 'inline_template',
           '#no_attributes' => [
             'class' => ['original-class'],

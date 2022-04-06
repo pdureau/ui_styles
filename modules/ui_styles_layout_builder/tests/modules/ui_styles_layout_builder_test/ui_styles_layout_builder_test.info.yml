@@ -1,0 +1,4 @@
+name: 'UI Styles Layout Builder Test'
+type: module
+description: 'Provides testing styles.'
+package: 'Testing'

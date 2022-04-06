@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\ui_styles\Unit;
 
 use Drupal\Core\Render\ElementInfoManager;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class UiStylesRenderElementTest.
+ * Unit tests for UI Styles Render element.
  *
  * @group ui_styles
  *
@@ -20,14 +23,14 @@ class UiStylesRenderElementTest extends UnitTestCase {
   /**
    * The theme registry.
    *
-   * @var \Drupal\Core\Theme\Registry
+   * @var \Drupal\Core\Theme\Registry|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $themeRegistry;
 
   /**
    * The element info plugin manager.
    *
-   * @var \Drupal\Core\Render\ElementInfoManager
+   * @var \Drupal\Core\Render\ElementInfoManager|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $elementInfoManager;
 
@@ -67,7 +70,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    *
    * @covers ::addClasses
    */
-  public function testAddClasses() {
+  public function testAddClasses(): void {
     $element = [
       '#attributes' => [
         'class' => [
@@ -86,7 +89,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    *
    * @covers ::isAcceptingAttributes
    */
-  public function testIsAcceptingAttributesReturnFalse() {
+  public function testIsAcceptingAttributesReturnFalse(): void {
     $this->themeRegistry->expects($this->any())
       ->method('get')
       ->willReturn([
@@ -107,7 +110,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isThemeHookAcceptingAttributes
    */
-  public function testThemeIsAcceptingAttributesReturnFalse() {
+  public function testThemeIsAcceptingAttributesReturnFalse(): void {
     $this->themeRegistry->expects($this->any())
       ->method('get')
       ->willReturn([
@@ -128,7 +131,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isThemeHookAcceptingAttributes
    */
-  public function testThemeIsAcceptingAttributes() {
+  public function testThemeIsAcceptingAttributes(): void {
     $this->themeRegistry->expects($this->any())
       ->method('get')
       ->willReturn([
@@ -149,7 +152,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isThemeHookAcceptingAttributes
    */
-  public function testThemeIsAcceptingAttributesBaseHook() {
+  public function testThemeIsAcceptingAttributesBaseHook(): void {
     $this->themeRegistry->expects($this->once())
       ->method('get')
       ->willReturn([
@@ -174,7 +177,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isThemeHookAcceptingAttributes
    */
-  public function testThemeIsAcceptingAttributesTemplate() {
+  public function testThemeIsAcceptingAttributesTemplate(): void {
     foreach (Element::$themeWithAttributes as $attributes) {
       $this->themeRegistry->expects($this->any())
         ->method('get')
@@ -191,7 +194,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
         '#theme' => 'valid_theme',
       ];
       $result = Element::isAcceptingAttributes($element);
-      $this->assertTrue($result, sprintf('Element with #theme valid from template %s must be true', $attributes));
+      $this->assertTrue($result, \sprintf('Element with #theme valid from template %s must be true', $attributes));
     }
   }
 
@@ -201,11 +204,12 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
    */
-  public function testRenderIsAcceptingAttributesReturnFalse() {
+  public function testRenderIsAcceptingAttributesReturnFalse(): void {
+    $element = [];
     foreach (Element::$typeWithoutAttributes as $attributes) {
       $element['#type'] = $attributes;
       $result = Element::isAcceptingAttributes($element);
-      $this->assertFalse($result, sprintf('Element #type %s must be false.', $attributes));
+      $this->assertFalse($result, \sprintf('Element #type %s must be false.', $attributes));
     }
   }
 
@@ -215,22 +219,23 @@ class UiStylesRenderElementTest extends UnitTestCase {
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
    */
-  public function testRenderIsAcceptingAttributesReturnTrue() {
+  public function testRenderIsAcceptingAttributesReturnTrue(): void {
+    $element = [];
     foreach (Element::$typeWithAttributes as $attributes) {
       $element['#type'] = $attributes;
       $result = Element::isAcceptingAttributes($element);
-      $this->assertTrue($result, sprintf('Element #type %s must be true.', $attributes));
+      $this->assertTrue($result, \sprintf('Element #type %s must be true.', $attributes));
     }
   }
 
   /**
    * Test isRenderElementAcceptingAttributes() with #pre_render and doCallback.
    *
+   * @covers ::doCallback
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
-   * @covers ::doCallback
    */
-  public function testRenderIsAcceptingAttributesDoCallbackValid() {
+  public function testRenderIsAcceptingAttributesDoCallbackValid(): void {
     $this->themeRegistry->expects($this->any())
       ->method('get')
       ->willReturn([
@@ -251,11 +256,11 @@ class UiStylesRenderElementTest extends UnitTestCase {
   /**
    * Test isRenderElementAcceptingAttributes() with #pre_render and doCallback.
    *
+   * @covers ::doCallback
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
-   * @covers ::doCallback
    */
-  public function testRenderIsAcceptingAttributesDoCallbackNotValid() {
+  public function testRenderIsAcceptingAttributesDoCallbackNotValid(): void {
     $this->themeRegistry->expects($this->once())
       ->method('get')
       ->willReturn([
@@ -276,11 +281,11 @@ class UiStylesRenderElementTest extends UnitTestCase {
   /**
    * Test isRenderElementAcceptingAttributes() with #pre_render and doCallback.
    *
+   * @covers ::doCallback
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
-   * @covers ::doCallback
    */
-  public function testRenderIsAcceptingAttributesDoCallbackNotValidTheme() {
+  public function testRenderIsAcceptingAttributesDoCallbackNotValidTheme(): void {
     $element = [
       '#type' => 'not_in_list_not_valid_theme',
     ];
@@ -296,26 +301,37 @@ class UiStylesRenderElementTest extends UnitTestCase {
 /**
  * Dummy test class for doCallback.
  */
-class DoCallbackTest {
+class DoCallbackTest implements TrustedCallbackInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks(): array {
+    return [
+      'myCallbackValidTest',
+      'myCallbackNotValidTest',
+      'myCallbackNotValidThemeTest',
+    ];
+  }
 
   /**
    * Test valid theme.
    */
-  public static function myCallbackValidTest() {
+  public static function myCallbackValidTest(): array {
     return ['#theme' => 'valid_theme'];
   }
 
   /**
    * Test not valid theme.
    */
-  public static function myCallbackNotValidTest() {
+  public static function myCallbackNotValidTest(): array {
     return ['#theme' => 'no_valid_theme'];
   }
 
   /**
    * Test not valid theme key.
    */
-  public static function myCallbackNotValidThemeTest() {
+  public static function myCallbackNotValidThemeTest(): array {
     return ['#not_valid' => 'no_valid_theme'];
   }
 

@@ -1,5 +1,5 @@
-name: UI Styles
-description: Define styles from modules and themes.
-core_version_requirement: ^8.8 || ^9
-package: User interface
+name: 'UI Styles'
 type: module
+description: 'Define styles from modules and themes.'
+core_version_requirement: ^8.8 || ^9 || ^10
+package: 'User interface'

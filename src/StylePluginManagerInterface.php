@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\ui_styles;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -22,7 +24,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified form element.
    */
-  public function alterForm(array $form, $selected = [], $extra = '');
+  public function alterForm(array $form, $selected = [], $extra = ''): array;
 
   /**
    * Add classes to target element.
@@ -37,6 +39,6 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified render element.
    */
-  public function addClasses(array $target_element, $selected = [], $extra = '');
+  public function addClasses(array $target_element, $selected = [], $extra = ''): array;
 
 }

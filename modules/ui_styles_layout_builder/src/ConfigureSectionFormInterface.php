@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\ui_styles_layout_builder;
 
 use Drupal\Core\Form\FormInterface;
@@ -23,6 +25,6 @@ interface ConfigureSectionFormInterface extends FormInterface {
    * @return bool
    *   The section status: added (false) or updated (true).
    */
-  public function isUpdate();
+  public function isUpdate(): bool;
 
 }

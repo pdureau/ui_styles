@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\ui_styles_library\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -7,9 +9,7 @@ use Drupal\ui_styles\StylePluginManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class StylesLibraryController.
- *
- * @package Drupal\ui_styles\Controller
+ * Generates styles library.
  */
 class StylesLibraryController extends ControllerBase {
 
@@ -30,7 +30,7 @@ class StylesLibraryController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): self {
     return new static($container->get('plugin.manager.ui_styles'));
   }
 
