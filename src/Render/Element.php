@@ -69,7 +69,7 @@ class Element extends CoreElement {
    * @return array
    *   A render array.
    */
-  public static function addClasses(array $element, array $classes, $attr_property = '#attributes') {
+  public static function addClasses(array $element, array $classes, $attr_property = '#attributes'): array {
     $element[$attr_property] = $element[$attr_property] ?? [];
     $element[$attr_property] = AttributeHelper::mergeCollections(
       $element[$attr_property],

@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\ui_styles\Unit;
 
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\StylePluginManager;
@@ -94,23 +94,22 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     // Set up for this class.
-    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler */
-    $moduleHandler = $this->prophesize(ModuleHandlerInterface::class)->reveal();
-    /** @var \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler */
-    $themeHandler = $this->prophesize(ThemeHandlerInterface::class)->reveal();
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $moduleHandler */
+    $moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $moduleHandler->expects($this->any())
+      ->method('getModuleDirectories')
+      ->willReturn([]);
+
+    /** @var \Drupal\Core\Extension\ThemeHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $themeHandler */
+    $themeHandler = $this->createMock(ThemeHandlerInterface::class);
+    $themeHandler->expects($this->any())
+      ->method('getThemeDirectories')
+      ->willReturn([]);
+
     $cache = $this->createMock(CacheBackendInterface::class);
     $this->messenger = $this->createMock(MessengerInterface::class);
 
-    $this->stylePluginManager = new StylePluginManager($moduleHandler, $themeHandler, $this->getStringTranslationStub(), $cache, $this->messenger);
-
-    $this->discovery = $this->createMock(DiscoveryInterface::class);
-    $this->discovery->expects($this->any())
-      ->method('getDefinitions')
-      ->willReturn($this->styles);
-
-    $reflection_property = new \ReflectionProperty($this->stylePluginManager, 'discovery');
-    $reflection_property->setAccessible(TRUE);
-    $reflection_property->setValue($this->stylePluginManager, $this->discovery);
+    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $this->getStringTranslationStub(), $cache, $this->messenger, $this->styles);
   }
 
   /**
@@ -435,3 +434,20 @@ class UiStylesPluginManagerTest extends UnitTestCase {
   }
 
 }
+
+// phpcs:disable
+// @phpstan-ignore-next-line
+class DummyStylePluginManager extends StylePluginManager {
+  private array $styles;
+
+  // @phpstan-ignore-next-line
+  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationInterface $translation, CacheBackendInterface $cache_backend, MessengerInterface $messenger, array $styles) {
+    parent::__construct($module_handler, $theme_handler, $translation, $cache_backend, $messenger);
+    $this->styles = $styles;
+  }
+
+  public function getDefinitions(): array {
+    return $this->styles;
+  }
+};
+// phpcs:enable

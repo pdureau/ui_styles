@@ -157,8 +157,11 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     // Blocks are special.
     if (isset($element['#theme']) && $element['#theme'] === 'block') {
       // Try to add styles to block content instead of wrapper.
-      $element['content'] = $this->addStyleToBlockContent($element['content'], $styles);
-      return $element;
+      $content = $this->addStyleToBlockContent($element['content'], $styles);
+      if ($content) {
+        $element['content'] = $content;
+        return $element;
+      }
     }
 
     if (Element::isAcceptingAttributes($element)) {
