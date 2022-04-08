@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Installation file for UI Styles Library module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Add new permission to access the library to all roles.
+ */
+function ui_styles_library_update_8101(): void {
+  $roles = \user_roles();
+  if (!empty($roles)) {
+    foreach (\array_keys($roles) as $rid) {
+      \user_role_grant_permissions($rid, ['access_ui_styles_library']);
+    }
+  }
+}

@@ -4,5 +4,4 @@ ui_styles_library.overview:
     _controller: '\Drupal\ui_styles_library\Controller\StylesLibraryController::overview'
     _title: 'Styles library'
   requirements:
-    # A permission will be added in a dedicated issue.
-    _access: 'TRUE'
+    _permission: 'access_ui_styles_library'
