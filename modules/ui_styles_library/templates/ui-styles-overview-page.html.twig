@@ -26,7 +26,14 @@
     {% endif %}
     {% for id, label in style.options %}
       {% set style_attributes = create_attribute().addClass(id).addClass(style.previewed_with) %}
-      <p{{ style_attributes }}>{{ label }} ({{ id }})</p>
+      {% set previewed_as = style.previewed_as ?: 'inside' %}
+
+      {% if previewed_as == 'aside' %}
+        <p>{{ label }} ({{ id }})</p>
+        <div {{ style_attributes }}></div>
+      {% else %}
+        <p{{ style_attributes }}>{{ label }} ({{ id }})</p>
+      {% endif %}
     {% endfor %}
     <hr>
   {% endfor %}

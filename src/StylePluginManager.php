@@ -44,8 +44,8 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   protected $defaults = [
     // Add required and optional plugin properties.
     'id' => '',
-    'description' => '',
     'label' => '',
+    'description' => '',
     'options' => [],
   ];
 
@@ -78,6 +78,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   protected function getDiscovery() {
     $this->discovery = new YamlDiscovery('ui_styles', $this->moduleHandler->getModuleDirectories() + $this->themeHandler->getThemeDirectories());
     $this->discovery->addTranslatableProperty('label', 'label_context');
+    $this->discovery->addTranslatableProperty('description', 'description_context');
     $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     return $this->discovery;
   }

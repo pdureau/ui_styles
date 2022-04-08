@@ -48,6 +48,7 @@ Where:
 * 'description' is only used in the library
 * 'options' is the list of all classes and labels of the style
 * 'previewed_with' is a list of classes used in the library to pimp the preview
+* 'previewed_as' (optional) can be `inside` (default) or `aside` for styles not intended to be applied on <p> tag and having side effects.
 
 REQUIREMENTS
 ------------
