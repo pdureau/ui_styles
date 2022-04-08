@@ -50,6 +50,14 @@ Where:
 * 'previewed_with' is a list of classes used in the library to pimp the preview
 * 'previewed_as' (optional) can be `inside` (default) or `aside` for styles not intended to be applied on <p> tag and having side effects.
 
+You can disable a plugin by declaring a plugin with the same ID and if your
+module has a higher weight than the module declaring the plugin, example:
+
+```yaml
+colors_background_color:
+  enabled: false
+```
+
 REQUIREMENTS
 ------------
 

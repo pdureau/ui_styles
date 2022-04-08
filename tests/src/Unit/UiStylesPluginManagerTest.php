@@ -150,10 +150,11 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     $definition = ['id' => $plugin_id];
 
     $expected = $definition + [
-        'description' => '',
-        'label' => '',
-        'options' => [],
-      ];
+      'enabled' => TRUE,
+      'label' => '',
+      'description' => '',
+      'options' => [],
+    ];
     $this->stylePluginManager->processDefinition($definition, $plugin_id);
     $this->assertSame($definition, $expected);
   }

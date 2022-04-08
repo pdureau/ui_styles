@@ -1,0 +1,4 @@
+name: 'UI Styles Test'
+type: module
+description: 'Provides test plugin.'
+package: 'Testing'

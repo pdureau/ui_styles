@@ -44,6 +44,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   protected $defaults = [
     // Add required and optional plugin properties.
     'id' => '',
+    'enabled' => TRUE,
     'label' => '',
     'description' => '',
     'options' => [],
@@ -81,6 +82,22 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $this->discovery->addTranslatableProperty('description', 'description_context');
     $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     return $this->discovery;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
+   */
+  protected function alterDefinitions(&$definitions) {
+    foreach ($definitions as $definition_key => $definition_info) {
+      if (isset($definition_info['enabled']) && !$definition_info['enabled']) {
+        unset($definitions[$definition_key]);
+        continue;
+      }
+    }
+
+    parent::alterDefinitions($definitions);
   }
 
   /**

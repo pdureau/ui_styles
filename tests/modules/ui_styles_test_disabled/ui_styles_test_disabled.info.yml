@@ -1,0 +1,4 @@
+name: 'UI Styles Test Disabled'
+type: module
+description: 'Disables test plugin.'
+package: 'Testing'

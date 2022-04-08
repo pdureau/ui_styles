@@ -1,0 +1,6 @@
+test:
+  enabled: true
+  label: 'Test'
+  description: 'Test plugin.'
+  options:
+    test: 'Test'
