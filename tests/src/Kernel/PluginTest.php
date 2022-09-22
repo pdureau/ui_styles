@@ -18,7 +18,7 @@ class PluginTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'ui_styles',
     'ui_styles_test',
   ];

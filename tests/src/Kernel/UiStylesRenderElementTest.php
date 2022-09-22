@@ -17,7 +17,7 @@ class UiStylesRenderElementTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['system', 'block'];
+  protected static $modules = ['system', 'block'];
 
   /**
    * Test the isAcceptingAttributes().

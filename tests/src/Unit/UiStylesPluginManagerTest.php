@@ -78,10 +78,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     // Needed for Element::isAcceptingAttributes.
     $this->container = new ContainerBuilder();
 
-    $themeRegistry = $this->getMockBuilder(Registry::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['get'])
-      ->getMock();
+    $themeRegistry = $this->createMock(Registry::class);
     $themeRegistry->expects($this->any())
       ->method('get')
       ->willReturn([

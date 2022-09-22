@@ -49,15 +49,9 @@ class UiStylesRenderElementTest extends UnitTestCase {
 
     $this->container = new ContainerBuilder();
 
-    $this->themeRegistry = $this->getMockBuilder(Registry::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['get'])
-      ->getMock();
+    $this->themeRegistry = $this->createMock(Registry::class);
 
-    $this->elementInfoManager = $this->getMockBuilder(ElementInfoManager::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getInfo'])
-      ->getMock();
+    $this->elementInfoManager = $this->createMock(ElementInfoManager::class);
 
     $container = new ContainerBuilder();
     $container->set('theme.registry', $this->themeRegistry);
