@@ -48,7 +48,10 @@ Where:
 * 'description' is only used in the library
 * 'options' is the list of all classes and labels of the style
 * 'previewed_with' is a list of classes used in the library to pimp the preview
-* 'previewed_as' (optional) can be `inside` (default) or `aside` for styles not intended to be applied on <p> tag and having side effects.
+* 'previewed_as' (optional) can be:
+  * `inside`: default
+  * `aside`: for styles not intended to be applied on <p> tag and having side effects
+  * `hidden`: when the style may have side effects on the whole styles library
 
 You can disable a plugin by declaring a plugin with the same ID and if your
 module has a higher weight than the module declaring the plugin, example:
