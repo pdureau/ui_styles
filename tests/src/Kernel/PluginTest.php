@@ -43,9 +43,9 @@ class PluginTest extends KernelTestBase {
         'enabled' => TRUE,
       ],
     ];
-    foreach ($expectations as $example_id => $expected_example_structure) {
-      foreach ($expected_example_structure as $key => $value) {
-        $this->assertEquals($value, $definitions[$example_id][$key]);
+    foreach ($expectations as $plugin_id => $expected_plugin_structure) {
+      foreach ($expected_plugin_structure as $key => $value) {
+        $this->assertEquals($value, $definitions[$plugin_id][$key]);
       }
     }
   }
@@ -58,16 +58,16 @@ class PluginTest extends KernelTestBase {
 
     // Test when the module overriding the definition is executed before.
     \module_set_weight('ui_styles_test_disabled', -1);
-    /** @var \Drupal\ui_styles\StylePluginManagerInterface $examples_manager */
-    $examples_manager = $this->container->get('plugin.manager.ui_styles');
-    $this->assertArrayHasKey('test', $examples_manager->getDefinitions());
+    /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
+    $styles_manager = $this->container->get('plugin.manager.ui_styles');
+    $this->assertArrayHasKey('test', $styles_manager->getDefinitions());
 
     // Test when the module overriding the definition is executed after.
     \module_set_weight('ui_styles_test_disabled', 1);
     \drupal_flush_all_caches();
-    /** @var \Drupal\ui_styles\StylePluginManagerInterface $examples_manager */
-    $examples_manager = $this->container->get('plugin.manager.ui_styles');
-    $this->assertArrayNotHasKey('test', $examples_manager->getDefinitions());
+    /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
+    $styles_manager = $this->container->get('plugin.manager.ui_styles');
+    $this->assertArrayNotHasKey('test', $styles_manager->getDefinitions());
   }
 
 }
