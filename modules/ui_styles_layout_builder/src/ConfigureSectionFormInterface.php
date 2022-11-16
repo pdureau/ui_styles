@@ -27,4 +27,12 @@ interface ConfigureSectionFormInterface extends FormInterface {
    */
   public function isUpdate(): bool;
 
+  /**
+   * Get the layout plugin being modified.
+   *
+   * @return \Drupal\Core\Layout\LayoutInterface|\Drupal\Core\Plugin\PluginFormInterface
+   *   The layout plugin object.
+   */
+  public function getLayout();
+
 }

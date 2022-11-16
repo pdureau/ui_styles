@@ -24,9 +24,9 @@ class PluginTest extends KernelTestBase {
   ];
 
   /**
-   * Tests that examples can be provided by YAML files.
+   * Tests that plugins can be provided by YAML files.
    */
-  public function testDetectedExamples(): void {
+  public function testDetectedPlugins(): void {
     /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
     $styles_manager = $this->container->get('plugin.manager.ui_styles');
     /** @var array $definitions */
@@ -51,7 +51,7 @@ class PluginTest extends KernelTestBase {
   }
 
   /**
-   * Test that it is possible to override an already declared example.
+   * Test that it is possible to override an already declared plugin.
    */
   public function testOverridingDefinition(): void {
     $this->enableModules(['ui_styles_test_disabled']);

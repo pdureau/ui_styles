@@ -37,4 +37,11 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm implements Confi
     return $this->isUpdate;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLayout() {
+    return $this->layout;
+  }
+
 }
