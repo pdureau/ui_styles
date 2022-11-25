@@ -9,10 +9,10 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\StylePluginManager;
+use Drupal\ui_styles_test\DummyStylePluginManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -279,9 +279,12 @@ class UiStylesPluginManagerTest extends UnitTestCase {
       ],
     ];
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
-    $this->assertContains('original-class', $newElement['content']['test']['#no_attributes']['class']);
-    $this->assertNotContains('added-class', $newElement['content']['test']['#no_attributes']['class']);
-    $this->assertNotContains('extra-class', $newElement['content']['test']['#no_attributes']['class']);
+    // The content had been wrapped in a div.
+    $this->assertContains('original-class', $newElement['content']['test']['element']['#no_attributes']['class']);
+    $this->assertNotContains('added-class', $newElement['content']['test']['element']['#no_attributes']['class']);
+    $this->assertNotContains('extra-class', $newElement['content']['test']['element']['#no_attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['test']['#item_attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['test']['#item_attributes']['class']);
 
     // Test addStyleToBlockContent > #theme:block > #theme:not field.
     $element = [
@@ -432,21 +435,3 @@ class UiStylesPluginManagerTest extends UnitTestCase {
   }
 
 }
-
-// phpcs:disable
-// @phpstan-ignore-next-line
-class DummyStylePluginManager extends StylePluginManager {
-  private array $styles;
-
-  // @phpstan-ignore-next-line
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationInterface $translation, CacheBackendInterface $cache_backend, MessengerInterface $messenger, array $styles) {
-    parent::__construct($module_handler, $theme_handler, $translation, $cache_backend, $messenger);
-    $this->styles = $styles;
-  }
-
-  public function getDefinitions(): array {
-    return $this->styles;
-  }
-
-}
-// phpcs:enable

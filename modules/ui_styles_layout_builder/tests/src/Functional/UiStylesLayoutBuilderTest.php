@@ -48,8 +48,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     'block',
     'block_content',
     'node',
-    'ui_styles_layout_builder_test',
     'ui_styles_layout_builder',
+    'ui_styles_layout_builder_test',
   ];
 
   /**
@@ -112,8 +112,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-section');
     $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-section');
   }
 
   /**
@@ -130,24 +130,37 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     // Add styles on block.
     $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
 
+    // Title block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Title');
-
     $page->checkField('edit-settings-label-display');
-
     $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-extra');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
     $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title');
+    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
     $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-block');
-
     $page->pressButton('Add block');
+
+    // Body field block.
+    $page->clickLink('Add block in Section 1');
+    $page->clickLink('Body');
+    $page->checkField('edit-settings-label-display');
+    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-title-extra');
+    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-field-title');
+    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-body-extra');
+    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-body-field');
+    $page->pressButton('Add block');
+
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-title');
-    $assert_session->responseContains('test-class-block');
     $assert_session->responseContains('test-class-title-extra');
+    $assert_session->responseContains('test-class-title');
     $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-block');
+    $assert_session->responseContains('test-class-body-title-extra');
+    $assert_session->responseContains('test-class-body-field-title');
+    $assert_session->responseContains('test-class-body-extra');
+    $assert_session->responseContains('test-class-body-field');
   }
 
   /**
@@ -162,8 +175,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $this->drupalLogin($user);
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseNotContains('test-class-section');
     $assert_session->responseNotContains('test-class-extra');
+    $assert_session->responseNotContains('test-class-section');
 
     $this->drupalGet('node/' . $this->node->id() . '/layout');
     // Add a style on section.
@@ -176,8 +189,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-section');
     $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-section');
   }
 
   /**
@@ -192,29 +205,43 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $this->drupalLogin($user);
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseNotContains('test-class-block');
+    $assert_session->responseNotContains('test-class-title-extra');
     $assert_session->responseNotContains('test-class-title');
+    $assert_session->responseNotContains('test-class-extra');
+    $assert_session->responseNotContains('test-class-block');
 
     $this->drupalGet('node/' . $this->node->id() . '/layout');
-    // Add styles on block.
+    // Title block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Title');
-
     $page->checkField('edit-settings-label-display');
-
     $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-extra');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
     $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title');
+    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
     $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-block');
-
     $page->pressButton('Add block');
+
+    // Body field block.
+    $page->clickLink('Add block in Section 1');
+    $page->clickLink('Body');
+    $page->checkField('edit-settings-label-display');
+    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-title-extra');
+    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-field-title');
+    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-body-extra');
+    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-body-field');
+    $page->pressButton('Add block');
+
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-title');
-    $assert_session->responseContains('test-class-block');
     $assert_session->responseContains('test-class-title-extra');
+    $assert_session->responseContains('test-class-title');
     $assert_session->responseContains('test-class-extra');
+    $assert_session->responseContains('test-class-block');
+    $assert_session->responseContains('test-class-body-title-extra');
+    $assert_session->responseContains('test-class-body-field-title');
+    $assert_session->responseContains('test-class-body-extra');
+    $assert_session->responseContains('test-class-body-field');
   }
 
 }

@@ -5,3 +5,5 @@ test_class:
     test-class-section: Test
     test-class-block: Test
     test-class-title: Test
+    test-class-body-field: Test
+    test-class-body-field-title: Test

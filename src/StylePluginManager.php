@@ -173,13 +173,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     }
 
     // Blocks are special.
-    if (isset($element['#theme']) && $element['#theme'] === 'block') {
+    if (isset($element['#theme'])
+      && $element['#theme'] === 'block'
+      && isset($element['content'])
+      && !empty($element['content'])
+    ) {
       // Try to add styles to block content instead of wrapper.
-      $content = $this->addStyleToBlockContent($element['content'], $styles);
-      if ($content) {
-        $element['content'] = $content;
-        return $element;
-      }
+      $element['content'] = $this->addStyleToBlockContent($element['content'], $styles);
+      return $element;
     }
 
     if (Element::isAcceptingAttributes($element)) {
@@ -195,9 +196,9 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   }
 
   /**
-   * Add style to block content instead of block wrapper.
+   * Add styles to block content instead of block wrapper.
    */
-  private function addStyleToBlockContent(array $content, array $styles): array {
+  protected function addStyleToBlockContent(array $content, array $styles): array {
     // Field formatters are special.
     if (isset($content['#theme']) && $content['#theme'] === 'field') {
       if ($content['#formatter'] === 'media_thumbnail') {
@@ -205,9 +206,9 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       }
       return $this->addStyleToFieldFormatterItems($content, $styles);
     }
+
     // Embedded entity displays are special.
     if (isset($content['#view_mode'])) {
-
       // Let's deal only with single section layout builder for now.
       if (isset($content['_layout_builder']) && \count(Element::children($content['_layout_builder'])) === 1) {
         $section = $content['_layout_builder'][0];
@@ -218,21 +219,18 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       return $content;
     }
 
-    if (Element::isAcceptingAttributes($content)) {
-      return Element::addClasses($content, $styles);
-    }
+    Element::wrapElementIfNotAcceptingAttributes($content);
 
-    return $content;
+    return Element::addClasses($content, $styles);
   }
 
   /**
    * Add style to field formatter items.
    */
-  private function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property = '#attributes'): array {
+  protected function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property = '#attributes'): array {
     foreach (Element::children($content) as $delta) {
-      if (!Element::isAcceptingAttributes($content[$delta])) {
-        return $content;
-      }
+      Element::wrapElementIfNotAcceptingAttributes($content[$delta]);
+
       if (\array_key_exists('#theme', $content[$delta]) && $content[$delta]['#theme'] === 'image_formatter') {
         $attr_property = '#item_attributes';
       }

@@ -79,6 +79,36 @@ class Element extends CoreElement {
   }
 
   /**
+   * Wrap in a div container if not accepting attributes.
+   *
+   * @param array $element
+   *   A render array.
+   */
+  public static function wrapElementIfNotAcceptingAttributes(array &$element): void {
+    if (!Element::isAcceptingAttributes($element)) {
+      $element = Element::wrapElement($element);
+    }
+  }
+
+  /**
+   * Wrap in a div container to be able to receive classes.
+   *
+   * @param array $element
+   *   A render array.
+   *
+   * @return array
+   *   A render array.
+   */
+  public static function wrapElement(array $element): array {
+    $element = [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      'element' => $element,
+    ];
+    return $element;
+  }
+
+  /**
    * Check if render array accept #attributes property.
    *
    * @param array $element
@@ -120,7 +150,7 @@ class Element extends CoreElement {
    * @return bool
    *   Attributes acceptance.
    */
-  private static function isThemeHookAcceptingAttributes(array $element) {
+  protected static function isThemeHookAcceptingAttributes(array $element) {
     $registry = \Drupal::service('theme.registry')->get();
     if (\array_key_exists($element['#theme'], $registry)) {
       $theme_hook = $registry[$element['#theme']];
@@ -149,7 +179,7 @@ class Element extends CoreElement {
    * @return bool
    *   Attributes acceptance.
    */
-  private static function isRenderElementAcceptingAttributes(array $element) {
+  protected static function isRenderElementAcceptingAttributes(array $element) {
     // For performance reasons, check first with lists of known render
     // elements.
     if (\in_array($element['#type'], self::$typeWithoutAttributes, TRUE)) {

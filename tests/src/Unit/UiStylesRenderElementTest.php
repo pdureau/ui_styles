@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Drupal\Tests\ui_styles\Unit;
 
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Render\Element;
@@ -242,7 +241,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\Tests\ui_styles\Unit\DoCallbackTest::myCallbackValidTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackValidTest']]);
     $result = Element::isAcceptingAttributes($element);
     $this->assertTrue($result, 'Element with #pre_render, #type not with/without and valid doCallback must be true.');
   }
@@ -267,7 +266,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\Tests\ui_styles\Unit\DoCallbackTest::myCallbackNotValidTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackNotValidTest']]);
     $result = Element::isAcceptingAttributes($element);
     $this->assertFalse($result, 'Element with #pre_render, #type not valid and not valid doCallback must be false.');
   }
@@ -285,48 +284,9 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\Tests\ui_styles\Unit\DoCallbackTest::myCallbackNotValidThemeTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackNotValidThemeTest']]);
     $result = Element::isAcceptingAttributes($element);
     $this->assertFalse($result, 'Element with #pre_render, #type not valid theme and not valid doCallback must be false.');
-  }
-
-}
-
-/**
- * Dummy test class for doCallback.
- */
-class DoCallbackTest implements TrustedCallbackInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks(): array {
-    return [
-      'myCallbackValidTest',
-      'myCallbackNotValidTest',
-      'myCallbackNotValidThemeTest',
-    ];
-  }
-
-  /**
-   * Test valid theme.
-   */
-  public static function myCallbackValidTest(): array {
-    return ['#theme' => 'valid_theme'];
-  }
-
-  /**
-   * Test not valid theme.
-   */
-  public static function myCallbackNotValidTest(): array {
-    return ['#theme' => 'no_valid_theme'];
-  }
-
-  /**
-   * Test not valid theme key.
-   */
-  public static function myCallbackNotValidThemeTest(): array {
-    return ['#not_valid' => 'no_valid_theme'];
   }
 
 }
