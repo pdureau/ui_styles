@@ -17,9 +17,9 @@ use Drupal\ui_styles\StylePluginManager;
 class DummyStylePluginManager extends StylePluginManager {
 
   /**
-   * @var array
-   *
    * The list of styles.
+   *
+   * @var array
    */
   protected array $styles;
 

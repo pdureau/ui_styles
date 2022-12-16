@@ -100,12 +100,11 @@ class Element extends CoreElement {
    *   A render array.
    */
   public static function wrapElement(array $element): array {
-    $element = [
+    return [
       '#type' => 'html_tag',
       '#tag' => 'div',
       'element' => $element,
     ];
-    return $element;
   }
 
   /**

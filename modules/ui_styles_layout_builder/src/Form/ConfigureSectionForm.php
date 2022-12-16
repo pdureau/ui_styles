@@ -29,7 +29,7 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm implements Confi
    * {@inheritdoc}
    */
   public function getCurrentSection(): Section {
-    if (method_exists(get_parent_class($this), 'getCurrentSection')) {
+    if (\method_exists(\get_parent_class($this), 'getCurrentSection')) {
       return parent::getCurrentSection();
     }
 

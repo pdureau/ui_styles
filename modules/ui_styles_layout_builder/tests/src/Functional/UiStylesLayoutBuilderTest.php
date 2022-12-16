@@ -41,6 +41,13 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
   protected $node;
 
   /**
+   * The user used in the tests.
+   *
+   * @var \Drupal\user\UserInterface
+   */
+  protected $user;
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
@@ -57,6 +64,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->user = $this->drupalCreateUser([], NULL, TRUE);
 
     $this->drupalPlaceBlock('local_tasks_block');
 
@@ -95,9 +103,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    $user = $this->drupalCreateUser([], NULL, TRUE);
-
-    $this->drupalLogin($user);
+    $this->drupalLogin($this->user);
 
     // Add a class on a section.
     $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
@@ -120,47 +126,11 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    * Tests to add classes with UI Styles on block.
    */
   public function testUiStylesBlock(): void {
-    $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
-
-    $user = $this->drupalCreateUser([], NULL, TRUE);
-
-    $this->drupalLogin($user);
+    $this->drupalLogin($this->user);
 
     // Add styles on block.
     $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
-
-    // Title block.
-    $page->clickLink('Add block in Section 1');
-    $page->clickLink('Title');
-    $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-extra');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-block');
-    $page->pressButton('Add block');
-
-    // Body field block.
-    $page->clickLink('Add block in Section 1');
-    $page->clickLink('Body');
-    $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-title-extra');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-field-title');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-body-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-body-field');
-    $page->pressButton('Add block');
-
-    $page->pressButton('Save layout');
-
-    $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-title-extra');
-    $assert_session->responseContains('test-class-title');
-    $assert_session->responseContains('test-class-extra');
-    $assert_session->responseContains('test-class-block');
-    $assert_session->responseContains('test-class-body-title-extra');
-    $assert_session->responseContains('test-class-body-field-title');
-    $assert_session->responseContains('test-class-body-extra');
-    $assert_session->responseContains('test-class-body-field');
+    $this->addBlocksAndCheck();
   }
 
   /**
@@ -170,9 +140,7 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    $user = $this->drupalCreateUser([], NULL, TRUE);
-
-    $this->drupalLogin($user);
+    $this->drupalLogin($this->user);
 
     $this->drupalGet('node/' . $this->node->id());
     $assert_session->responseNotContains('test-class-extra');
@@ -198,11 +166,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    */
   public function testUiStylesBlockOverride(): void {
     $assert_session = $this->assertSession();
-    $page = $this->getSession()->getPage();
 
-    $user = $this->drupalCreateUser([], NULL, TRUE);
-
-    $this->drupalLogin($user);
+    $this->drupalLogin($this->user);
 
     $this->drupalGet('node/' . $this->node->id());
     $assert_session->responseNotContains('test-class-title-extra');
@@ -211,6 +176,16 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $assert_session->responseNotContains('test-class-block');
 
     $this->drupalGet('node/' . $this->node->id() . '/layout');
+    $this->addBlocksAndCheck();
+  }
+
+  /**
+   * Add blocks in Layout Builder and check for CSS classes.
+   */
+  protected function addBlocksAndCheck(): void {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
     // Title block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Title');
