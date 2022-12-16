@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\ui_styles_layout_builder\Form;
 
 use Drupal\layout_builder\Form\ConfigureSectionForm as OriginalConfigureSectionForm;
+use Drupal\layout_builder\Section;
 use Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface;
 
 /**
@@ -18,16 +19,32 @@ use Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface;
 class ConfigureSectionForm extends OriginalConfigureSectionForm implements ConfigureSectionFormInterface {
 
   /**
+   * The section being configured.
+   *
+   * @var \Drupal\layout_builder\Section
+   */
+  protected $section;
+
+  /**
    * {@inheritdoc}
    */
-  public function getCurrentSection() {
-    // While adding a new section, we have this strange situation where delta is
-    // already incremented, but section not yet added to storage.
-    $max = \count($this->sectionStorage->getSections());
-    if ($this->delta < $max) {
-      return $this->sectionStorage->getSection($this->delta);
+  public function getCurrentSection(): Section {
+    if (method_exists(get_parent_class($this), 'getCurrentSection')) {
+      return parent::getCurrentSection();
     }
-    return NULL;
+
+    // Copy getCurrentSection method from Core 9.5 and adapt to previous core
+    // versions available methods and attributes.
+    if (!isset($this->section)) {
+      if ($this->isUpdate) {
+        $this->section = $this->sectionStorage->getSection($this->delta);
+      }
+      else {
+        $this->section = new Section($this->layout->getPluginId());
+      }
+    }
+
+    return $this->section;
   }
 
   /**
