@@ -1,7 +1,7 @@
 name: 'UI Styles Layout Builder'
 type: module
 description: 'Apply styles to blocks & sections in Layout Builder.'
-core_version_requirement: ^8 || ^9 || ^10
+core_version_requirement: ^9 || ^10
 package: 'User interface'
 dependencies:
   - drupal:layout_builder
