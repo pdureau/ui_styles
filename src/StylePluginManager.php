@@ -200,6 +200,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     // is not accepting attributes.
     $type = $element['#type'] ?? 'render array';
     $type = $element['#theme'] ?? $type;
+    // Case of views for example.
+    if (\is_array($type)) {
+      $type = \end($type);
+    }
     $this->messenger->addWarning($this->t('UI Styles was not able to add attributes to @type.', ['@type' => $type]), TRUE);
     return $element;
   }
