@@ -51,9 +51,10 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'layout_builder',
     'block',
     'block_content',
+    'field_ui',
+    'layout_builder',
     'node',
     'ui_styles_layout_builder',
     'ui_styles_layout_builder_test',
