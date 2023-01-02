@@ -1,0 +1,12 @@
+layout_builder.section.third_party.ui_styles:
+  type: mapping
+  mapping:
+    selected:
+      label: 'List of selected styles'
+      type: sequence
+      sequence:
+        type: string
+        label: 'Style value'
+    extra:
+      label: 'Extra style'
+      type: string

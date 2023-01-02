@@ -22,17 +22,6 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    */
   protected $defaultTheme = 'stark';
 
-  // phpcs:disable
-  /**
-   * Disable schema validation when running tests.
-   *
-   * @var bool
-   *
-   * @todo Fix this by providing actual schema validation.
-   */
-  protected $strictConfigSchema = FALSE;
-  // phpcs:enable
-
   /**
    * A test node to which comments will be posted.
    *
