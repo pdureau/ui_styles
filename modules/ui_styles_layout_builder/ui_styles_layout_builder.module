@@ -83,7 +83,9 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   $selected = [];
   foreach (array_keys($form['ui_styles_title']) as $id) {
     /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0) {
+    if (strpos($id, 'ui_styles_') === 0
+      && !empty($ui_styles_title[$id])
+    ) {
       $value = $ui_styles_title[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
@@ -102,7 +104,9 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   $selected = [];
   foreach (array_keys($form['ui_style']) as $id) {
     /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0) {
+    if (strpos($id, 'ui_styles_') === 0
+      && !empty($ui_style[$id])
+    ) {
       $value = $ui_style[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
@@ -182,7 +186,9 @@ function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInt
   $selected = [];
   foreach (array_keys($form['ui_style']) as $id) {
     /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0) {
+    if (strpos($id, 'ui_styles_') === 0
+      && !empty($ui_style[$id])
+    ) {
       $value = $ui_style[$id];
       $id = str_replace('ui_styles_', '', $id);
       $selected[$id] = $value;
