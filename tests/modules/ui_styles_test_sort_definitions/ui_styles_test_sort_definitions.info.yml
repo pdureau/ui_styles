@@ -1,0 +1,4 @@
+name: 'UI Styles Test Sort Definitions'
+type: module
+description: 'Provides test plugins to test sorting definitions.'
+package: 'Testing'

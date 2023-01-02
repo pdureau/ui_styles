@@ -13,6 +13,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\ui_styles\Render\Element;
 
@@ -82,6 +83,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $this->discovery->addTranslatableProperty('description', 'description_context');
     $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     return $this->discovery;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSortedDefinitions(): array {
+    $definitions = $this->getDefinitions();
+    return $this->sortDefinitions($definitions);
   }
 
   /**
@@ -237,6 +246,49 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);
     }
     return $content;
+  }
+
+  /**
+   * Sort definitions by label then ID.
+   *
+   * @param array $definitions
+   *   The plugin definitions.
+   *
+   * @return array
+   *   The sorted definitions.
+   */
+  protected function sortDefinitions(array $definitions) {
+    // Sort by label ignoring parenthesis.
+    \uasort($definitions, static function ($item1, $item2) {
+      $sort_result = 0;
+
+      if (isset($item1['label'], $item2['label'])) {
+        $label1 = $item1['label'];
+        if ($label1 instanceof TranslatableMarkup) {
+          $label1 = $label1->render();
+        }
+        $label2 = $item2['label'];
+        if ($label2 instanceof TranslatableMarkup) {
+          $label2 = $label2->render();
+        }
+
+        // Ignore parenthesis.
+        $label1 = \str_replace(['(', ')'], '', $label1);
+        $label2 = \str_replace(['(', ')'], '', $label2);
+        $sort_result = $label1 <=> $label2;
+      }
+
+      // Fallback to plugin ID.
+      if ($sort_result === 0) {
+        // In case the plugin ID starts with an underscore.
+        $id1 = \str_replace('_', '', $item1['id']);
+        $id2 = \str_replace('_', '', $item2['id']);
+        $sort_result = $id1 <=> $id2;
+      }
+      return $sort_result;
+    });
+
+    return $definitions;
   }
 
 }

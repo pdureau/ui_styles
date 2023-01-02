@@ -1,0 +1,24 @@
+a:
+  label: '(Label 2)'
+  options:
+    test: 'Test'
+
+b:
+  label: 'Label 2'
+  options:
+    test: 'Test'
+
+c:
+  label: 'Label 1'
+  options:
+    test: 'Test'
+
+d:
+  label: 'Label 3'
+  options:
+    test: 'Test'
+
+e:
+  label: 'Label 1'
+  options:
+    test: 'Test'

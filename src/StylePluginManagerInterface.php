@@ -12,6 +12,14 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 interface StylePluginManagerInterface extends PluginManagerInterface {
 
   /**
+   * Get the sorted list of styles.
+   *
+   * @return array
+   *   The sorted list of styles.
+   */
+  public function getSortedDefinitions(): array;
+
+  /**
    * Add style selection form elements to an existing form.
    *
    * @param array $form

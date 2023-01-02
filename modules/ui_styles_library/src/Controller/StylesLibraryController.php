@@ -43,7 +43,7 @@ class StylesLibraryController extends ControllerBase {
   public function overview() {
     return [
       '#theme' => 'ui_styles_overview_page',
-      '#styles' => $this->stylesManager->getDefinitions(),
+      '#styles' => $this->stylesManager->getSortedDefinitions(),
     ];
   }
 
