@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\StylePluginManager;
@@ -37,13 +36,6 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
    */
   protected $discovery;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * The container.
@@ -104,9 +96,8 @@ class UiStylesPluginManagerTest extends UnitTestCase {
       ->willReturn([]);
 
     $cache = $this->createMock(CacheBackendInterface::class);
-    $this->messenger = $this->createMock(MessengerInterface::class);
 
-    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $this->getStringTranslationStub(), $cache, $this->messenger, $this->styles);
+    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $this->getStringTranslationStub(), $cache, $this->styles);
   }
 
   /**
@@ -219,7 +210,9 @@ class UiStylesPluginManagerTest extends UnitTestCase {
       ],
     ];
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
-    $this->assertContains('original-class', $newElement['#no_attributes']['class']);
+    $this->assertContains('original-class', $newElement['element']['#no_attributes']['class']);
+    $this->assertContains('added-class', $newElement['#attributes']['class']);
+    $this->assertContains('extra-class', $newElement['#attributes']['class']);
 
     // Test addStyleToBlockContent > #theme:block > #theme:field.
     $element = [

@@ -7,12 +7,13 @@ namespace Drupal\ui_styles_test;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\ui_styles\StylePluginManager;
 
 /**
  * Plugin manager used for tests.
+ *
+ * @phpstan-ignore-next-line
  */
 class DummyStylePluginManager extends StylePluginManager {
 
@@ -25,16 +26,17 @@ class DummyStylePluginManager extends StylePluginManager {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore-next-line
    */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
     TranslationInterface $translation,
     CacheBackendInterface $cache_backend,
-    MessengerInterface $messenger,
     array $styles
   ) {
-    parent::__construct($module_handler, $theme_handler, $translation, $cache_backend, $messenger);
+    parent::__construct($module_handler, $theme_handler, $translation, $cache_backend);
     $this->styles = $styles;
   }
 

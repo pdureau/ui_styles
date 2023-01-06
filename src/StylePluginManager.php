@@ -8,7 +8,6 @@ use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
@@ -29,13 +28,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
-
-  /**
-   * The Messenger service.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * Provides default values for all style_plugin plugins.
@@ -62,16 +54,18 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *   The string translation service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, TranslationInterface $translation, CacheBackendInterface $cache_backend, MessengerInterface $messenger) {
+  public function __construct(
+    ModuleHandlerInterface $module_handler,
+    ThemeHandlerInterface $theme_handler,
+    TranslationInterface $translation,
+    CacheBackendInterface $cache_backend
+  ) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
     $this->stringTranslation = $translation;
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
     $this->alterInfo('ui_styles_styles');
-    $this->messenger = $messenger;
   }
 
   /**
@@ -192,20 +186,8 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       return $element;
     }
 
-    if (Element::isAcceptingAttributes($element)) {
-      return Element::addClasses($element, $styles);
-    }
-
-    // This case should not happen, it means the render array is not a block or
-    // is not accepting attributes.
-    $type = $element['#type'] ?? 'render array';
-    $type = $element['#theme'] ?? $type;
-    // Case of views for example.
-    if (\is_array($type)) {
-      $type = \end($type);
-    }
-    $this->messenger->addWarning($this->t('UI Styles was not able to add attributes to @type.', ['@type' => $type]), TRUE);
-    return $element;
+    Element::wrapElementIfNotAcceptingAttributes($element);
+    return Element::addClasses($element, $styles);
   }
 
   /**

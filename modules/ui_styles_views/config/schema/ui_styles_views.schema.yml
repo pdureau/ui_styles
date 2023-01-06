@@ -1,0 +1,12 @@
+views.display_extender.ui_styles:
+  type: views_display_extender
+  mapping:
+    exposed_form_options:
+      type: ui_styles.selected_mapping
+      label: 'Exposed form styles'
+    style_options:
+      type: ui_styles.selected_mapping
+      label: 'Style styles'
+    pager_options:
+      type: ui_styles.selected_mapping
+      label: 'Pager styles'

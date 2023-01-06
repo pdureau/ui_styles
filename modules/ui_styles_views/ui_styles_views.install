@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Contains install file.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_install().
+ */
+function ui_styles_views_install(): void {
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  /** @var array $display_extenders */
+  $display_extenders = $config->get('display_extenders') ?: [];
+  $display_extenders[] = 'ui_styles';
+  $config->set('display_extenders', $display_extenders);
+  $config->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ui_styles_views_uninstall(): void {
+  $config = \Drupal::service('config.factory')->getEditable('views.settings');
+  /** @var array $display_extenders */
+  $display_extenders = $config->get('display_extenders') ?: [];
+  $key = array_search('ui_styles', $display_extenders);
+  if ($key !== FALSE) {
+    unset($display_extenders[$key]);
+    $config->set('display_extenders', $display_extenders);
+    $config->save();
+  }
+}

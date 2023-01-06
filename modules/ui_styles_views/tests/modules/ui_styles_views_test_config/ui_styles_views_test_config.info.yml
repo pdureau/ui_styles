@@ -1,0 +1,4 @@
+name: 'UI Styles Views Test Config'
+type: module
+description: 'Provides testing views.'
+package: 'Testing'

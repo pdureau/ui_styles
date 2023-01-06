@@ -117,7 +117,6 @@ class Element extends CoreElement {
    *   Attributes acceptance.
    */
   public static function isAcceptingAttributes(array $element) {
-
     // If already existing, we just go for it.
     if (\array_key_exists('#attributes', $element) || \array_key_exists('#item_attributes', $element)) {
       return TRUE;
@@ -150,13 +149,14 @@ class Element extends CoreElement {
    *   Attributes acceptance.
    */
   protected static function isThemeHookAcceptingAttributes(array $element) {
+    $theme = self::getTheme($element);
     $registry = \Drupal::service('theme.registry')->get();
-    if (\array_key_exists($element['#theme'], $registry)) {
-      $theme_hook = $registry[$element['#theme']];
+    if (\array_key_exists($theme, $registry)) {
+      $theme_hook = $registry[$theme];
       if (!\array_key_exists('variables', $theme_hook) && \array_key_exists('base hook', $theme_hook)) {
         $theme_hook = $registry[$theme_hook['base hook']];
       }
-      // Some templates are specials. They have no theme variables, but they
+      // Some templates are special. They have no theme variables, but they
       // accept attributes anyway.
       if (\array_key_exists('template', $theme_hook) && \in_array($theme_hook['template'], self::$themeWithAttributes, TRUE)) {
         return TRUE;
@@ -202,6 +202,31 @@ class Element extends CoreElement {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Get theme of render array.
+   *
+   * @param array $element
+   *   A render array.
+   *
+   * @return string
+   *   The theme's machine name.
+   */
+  protected static function getTheme(array $element): string {
+    if (!isset($element['#theme'])) {
+      return '';
+    }
+
+    if (!\is_array($element['#theme'])) {
+      return $element['#theme'];
+    }
+
+    // Some #theme values are an array of suggestions.
+    // Most of the time, the last item is the original theme hook.
+    $theme = \end($element['#theme']);
+    // Anyway, lets be sure it is not a suggestion.
+    return \explode('__', $theme)[0];
   }
 
   /**

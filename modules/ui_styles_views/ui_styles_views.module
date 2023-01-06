@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Contains module file.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_preprocess_views_view().
+ */
+function ui_styles_views_preprocess_views_view(array &$variables): void {
+  $view = $variables['view'];
+  $current_display = $view->getDisplay();
+  $extenders = $current_display->getExtenders();
+  if (!isset($extenders['ui_styles'])) {
+    return;
+  }
+
+  /** @var \Drupal\ui_styles_views\Plugin\views\display_extender\Styles $styles_extender */
+  $styles_extender = $extenders['ui_styles'];
+  /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
+  $styles_manager = \Drupal::service('plugin.manager.ui_styles');
+
+  // Add styles to the view exposed form.
+  if (\is_array($variables['exposed'])) {
+    $selected = $styles_extender->getSelectedStyles('exposed_form_options');
+    $extra = $styles_extender->getExtraStyles('exposed_form_options');
+    $variables['exposed'] = $styles_manager->addClasses($variables['exposed'], $selected, $extra);
+  }
+
+  // Add styles to the view style (aka 'format').
+  if (\is_array($variables['rows'])) {
+    $selected = $styles_extender->getSelectedStyles('style_options');
+    $extra = $styles_extender->getExtraStyles('style_options');
+    $has_grouping = $view->getStyle()->usesGrouping();
+    if ($has_grouping && \array_key_first($variables['rows']) === 0) {
+      foreach (\array_keys($variables['rows']) as $group_index) {
+        $variables['rows'][$group_index] = $styles_manager->addClasses($variables['rows'][$group_index], $selected, $extra);
+      }
+    }
+    else {
+      $variables['rows'] = $styles_manager->addClasses($variables['rows'], $selected, $extra);
+    }
+  }
+
+  // Add styles to the view pager.
+  if (\is_array($variables['pager'])) {
+    $selected = $styles_extender->getSelectedStyles('pager_options');
+    $extra = $styles_extender->getExtraStyles('pager_options');
+    $variables['pager'] = $styles_manager->addClasses($variables['pager'], $selected, $extra);
+  }
+
+}

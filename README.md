@@ -5,8 +5,9 @@
 This module allows:
 
 - developers to define styles (simple lists of concurrent CSS classes) from modules and themes
-- site builders to use those styles on blocks and section from Layout Builder interface (with `ui_styles_layout_builder`)
-- everyone to browse styles from a library page (with `ui_styles_library`)
+- site builders to use those styles on blocks and section from Layout Builder (with `ui_styles_layout_builder` sub-module)
+- site builders to use those styles on style format, pager and exposed form from Views (with `ui_styles_views` sub-module)
+- everyone to browse styles from a library page (with `ui_styles_library` sub-module)
 
 ## Features
 
@@ -49,7 +50,7 @@ Where:
 * 'previewed_with' is a list of classes used in the library to pimp the preview
 * 'previewed_as' (optional) can be:
   * `inside`: default
-  * `aside`: for styles not intended to be applied on <p> tag and having side effects
+  * `aside`: for styles not intended to be applied on `p` tag and having side effects
   * `hidden`: when the style may have side effects on the whole styles library
 
 You can disable a plugin by declaring a plugin with the same ID and if your

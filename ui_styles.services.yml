@@ -6,4 +6,3 @@ services:
       - '@theme_handler'
       - '@string_translation'
       - '@cache.discovery'
-      - '@messenger'

@@ -1,0 +1,12 @@
+ui_styles.selected_mapping:
+  type: mapping
+  mapping:
+    selected:
+      type: sequence
+      label: 'Selected styles'
+      sequence:
+        type: string
+        label: 'Style value'
+    extra:
+      type: string
+      label: 'Extra classes'

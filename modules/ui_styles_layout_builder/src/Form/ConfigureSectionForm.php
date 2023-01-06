@@ -35,11 +35,13 @@ class ConfigureSectionForm extends OriginalConfigureSectionForm implements Confi
 
     // Copy getCurrentSection method from Core 9.5 and adapt to previous core
     // versions available methods and attributes.
+    // @phpstan-ignore-next-line
     if (!isset($this->section)) {
       if ($this->isUpdate) {
         $this->section = $this->sectionStorage->getSection($this->delta);
       }
       else {
+        // @phpstan-ignore-next-line
         $this->section = new Section($this->layout->getPluginId());
       }
     }
