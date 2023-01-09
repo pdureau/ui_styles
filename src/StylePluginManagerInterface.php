@@ -12,9 +12,27 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 interface StylePluginManagerInterface extends PluginManagerInterface {
 
   /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\ui_styles\Definition\StyleDefinition|null
+   *   The plugin definition. NULL if not found.
+   *
+   * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+   */
+  public function getDefinition($plugin_id, $exception_on_invalid = TRUE);
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Drupal\ui_styles\Definition\StyleDefinition[]
+   *   The plugins definitions.
+   */
+  public function getDefinitions();
+
+  /**
    * Get the sorted list of styles.
    *
-   * @return array
+   * @return \Drupal\ui_styles\Definition\StyleDefinition[]
    *   The sorted list of styles.
    */
   public function getSortedDefinitions(): array;
@@ -24,7 +42,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    *
    * @param array $form
    *   The form array to add to.
-   * @param mixed $selected
+   * @param array $selected
    *   The selected class(es).
    * @param string $extra
    *   The optional free extra class(es).
@@ -32,7 +50,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified form element.
    */
-  public function alterForm(array $form, $selected = [], $extra = ''): array;
+  public function alterForm(array $form, array $selected = [], string $extra = ''): array;
 
   /**
    * Add classes to target element.

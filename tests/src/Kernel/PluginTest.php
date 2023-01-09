@@ -29,7 +29,6 @@ class PluginTest extends KernelTestBase {
   public function testDetectedPlugins(): void {
     /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
     $styles_manager = $this->container->get('plugin.manager.ui_styles');
-    /** @var array $definitions */
     $definitions = $styles_manager->getDefinitions();
 
     $this->assertEquals(1, \count($definitions), 'There is one style detected.');
@@ -44,8 +43,9 @@ class PluginTest extends KernelTestBase {
       ],
     ];
     foreach ($expectations as $plugin_id => $expected_plugin_structure) {
+      $definition_as_array = $definitions[$plugin_id]->toArray();
       foreach ($expected_plugin_structure as $key => $value) {
-        $this->assertEquals($value, $definitions[$plugin_id][$key]);
+        $this->assertEquals($value, $definition_as_array[$key]);
       }
     }
   }

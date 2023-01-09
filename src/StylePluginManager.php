@@ -14,10 +14,14 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\ui_styles\Definition\StyleDefinition;
 use Drupal\ui_styles\Render\Element;
 
 /**
- * Provides the default style_plugin manager.
+ * Provides the default style plugin manager.
+ *
+ * @method \Drupal\ui_styles\Definition\StyleDefinition|null getDefinition($plugin_id, $exception_on_invalid = TRUE)
+ * @method \Drupal\ui_styles\Definition\StyleDefinition[] getDefinitions()
  */
 class StylePluginManager extends DefaultPluginManager implements StylePluginManagerInterface {
   use StringTranslationTrait;
@@ -27,7 +31,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
-  protected $themeHandler;
+  protected ThemeHandlerInterface $themeHandler;
 
   /**
    * Provides default values for all style_plugin plugins.
@@ -93,10 +97,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @phpstan-ignore-next-line
    */
   protected function alterDefinitions(&$definitions) {
-    foreach ($definitions as $definition_key => $definition_info) {
-      if (isset($definition_info['enabled']) && !$definition_info['enabled']) {
+    /** @var \Drupal\ui_skins\Definition\CssVariableDefinition[] $definitions */
+    foreach ($definitions as $definition_key => $definition) {
+      if (!$definition->isEnabled()) {
         unset($definitions[$definition_key]);
-        continue;
       }
     }
 
@@ -109,11 +113,16 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @phpstan-ignore-next-line
    */
   public function processDefinition(&$definition, $plugin_id): void {
+    // Call parent first to set defaults while still manipulating an array.
+    // Otherwise, as there is currently no derivative system among CSS variable
+    // plugins, there is no deriver or class attributes.
     parent::processDefinition($definition, $plugin_id);
-    // @todo Add validation of the plugin definition here.
+
     if (empty($definition['id'])) {
       throw new PluginException(\sprintf('Style plugin property (%s) definition "id" is required.', $plugin_id));
     }
+
+    $definition = new StyleDefinition($definition);
   }
 
   /**
@@ -128,23 +137,18 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function alterForm(array $form, $selected = [], $extra = ''): array {
+  public function alterForm(array $form, array $selected = [], string $extra = ''): array {
     // Set form actions to a high weight, just so that we can make our form
     // style element appear right before them.
     $form['actions']['#weight'] = (int) 100;
-    $selected = $selected ?: [];
     foreach ($this->getDefinitions() as $definition) {
-      /** @var array $definition */
-      /** @var string $id */
-      $id = $definition['id'];
+      $id = $definition->id();
       $element_name = 'ui_styles_' . $id;
-      // @todo Test if possible to force $selected type to array.
-      // @phpstan-ignore-next-line
       $default = $selected[$id] ?? '';
       $form[$element_name] = [
         '#type' => 'select',
-        '#options' => $definition['options'],
-        '#title' => $definition['label'],
+        '#options' => $definition->getOptions(),
+        '#title' => $definition->getLabel(),
         '#default_value' => $default,
         '#required' => FALSE,
         '#empty_option' => $this->t('- None -'),
@@ -237,7 +241,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * Sort definitions by label then ID.
    *
-   * @param array $definitions
+   * @param \Drupal\ui_styles\Definition\StyleDefinition[] $definitions
    *   The plugin definitions.
    *
    * @return array
@@ -245,30 +249,26 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function sortDefinitions(array $definitions) {
     // Sort by label ignoring parenthesis.
-    \uasort($definitions, static function ($item1, $item2) {
-      $sort_result = 0;
-
-      if (isset($item1['label'], $item2['label'])) {
-        $label1 = $item1['label'];
-        if ($label1 instanceof TranslatableMarkup) {
-          $label1 = $label1->render();
-        }
-        $label2 = $item2['label'];
-        if ($label2 instanceof TranslatableMarkup) {
-          $label2 = $label2->render();
-        }
-
-        // Ignore parenthesis.
-        $label1 = \str_replace(['(', ')'], '', $label1);
-        $label2 = \str_replace(['(', ')'], '', $label2);
-        $sort_result = $label1 <=> $label2;
+    \uasort($definitions, static function (StyleDefinition $item1, StyleDefinition $item2) {
+      $label1 = $item1->getLabel();
+      if ($label1 instanceof TranslatableMarkup) {
+        $label1 = $label1->render();
       }
+      $label2 = $item2->getLabel();
+      if ($label2 instanceof TranslatableMarkup) {
+        $label2 = $label2->render();
+      }
+
+      // Ignore parenthesis.
+      $label1 = \str_replace(['(', ')'], '', $label1);
+      $label2 = \str_replace(['(', ')'], '', $label2);
+      $sort_result = $label1 <=> $label2;
 
       // Fallback to plugin ID.
       if ($sort_result === 0) {
         // In case the plugin ID starts with an underscore.
-        $id1 = \str_replace('_', '', $item1['id']);
-        $id2 = \str_replace('_', '', $item2['id']);
+        $id1 = \str_replace('_', '', $item1->id());
+        $id2 = \str_replace('_', '', $item2->id());
         $sort_result = $id1 <=> $id2;
       }
       return $sort_result;

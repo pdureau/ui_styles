@@ -32,6 +32,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $component = $formObject->getCurrentComponent();
 
     // Block title.
+    /** @var array $selected */
     $selected = $component->get('ui_styles_title') ?: [];
     /** @var string $extra */
     $extra = $component->get('ui_styles_title_extra') ?: '';
@@ -48,6 +49,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $form['ui_styles_title'] = $styles_manager->alterForm($form['ui_styles_title'], $selected, $extra);
 
     // Block content.
+    /** @var array $selected */
     $selected = $component->get('ui_styles') ?: [];
     /** @var string $extra */
     $extra = $component->get('ui_styles_extra') ?: '';
@@ -156,6 +158,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
 
   // Section content.
+  /** @var array $selected */
   $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
   /** @var string $extra */
   $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';

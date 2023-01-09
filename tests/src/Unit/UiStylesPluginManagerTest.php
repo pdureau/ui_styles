@@ -10,6 +10,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
+use Drupal\ui_styles\Definition\StyleDefinition;
 use Drupal\ui_styles\StylePluginManager;
 use Drupal\ui_styles_test\DummyStylePluginManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -137,14 +138,16 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     $plugin_id = 'test';
     $definition = ['id' => $plugin_id];
 
-    $expected = $definition + [
+    $expected = new StyleDefinition($definition + [
       'enabled' => TRUE,
       'label' => '',
       'description' => '',
       'options' => [],
-    ];
+    ]);
+
+    /** @var \Drupal\ui_styles\Definition\StyleDefinition $definition */
     $this->stylePluginManager->processDefinition($definition, $plugin_id);
-    $this->assertSame($definition, $expected);
+    $this->assertSame($definition->toArray(), $expected->toArray());
   }
 
   /**

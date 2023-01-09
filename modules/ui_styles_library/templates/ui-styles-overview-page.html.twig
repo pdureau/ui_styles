@@ -25,8 +25,8 @@
     <p>{{ style.description }}</p>
     {% endif %}
     {% for id, label in style.options %}
-      {% set style_attributes = create_attribute().addClass(id).addClass(style.previewed_with) %}
-      {% set previewed_as = style.previewed_as ?: 'inside' %}
+      {% set style_attributes = create_attribute().addClass(id).addClass(style.getPreviewedWith()) %}
+      {% set previewed_as = style.getPreviewedAs() %}
 
       {% if previewed_as == 'aside' %}
         <p>{{ label }} ({{ id }})</p>

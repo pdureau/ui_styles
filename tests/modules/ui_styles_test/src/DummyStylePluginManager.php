@@ -44,7 +44,11 @@ class DummyStylePluginManager extends StylePluginManager {
    * {@inheritdoc}
    */
   public function getDefinitions(): array {
-    return $this->styles;
+    $definitions = $this->styles;
+    foreach ($definitions as $plugin_id => &$definition) {
+      $this->processDefinition($definition, $plugin_id);
+    }
+    return $definitions;
   }
 
 }
