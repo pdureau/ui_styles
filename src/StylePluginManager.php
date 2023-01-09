@@ -138,9 +138,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * {@inheritdoc}
    */
   public function alterForm(array $form, array $selected = [], string $extra = ''): array {
-    // Set form actions to a high weight, just so that we can make our form
-    // style element appear right before them.
-    $form['actions']['#weight'] = (int) 100;
     foreach ($this->getDefinitions() as $definition) {
       $id = $definition->id();
       $element_name = 'ui_styles_' . $id;
@@ -152,7 +149,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         '#default_value' => $default,
         '#required' => FALSE,
         '#empty_option' => $this->t('- None -'),
-        '#weight' => (int) 90,
       ];
     }
     $form['_ui_styles_extra'] = [

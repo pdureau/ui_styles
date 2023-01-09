@@ -156,9 +156,7 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * @covers ::alterForm
    */
   public function testAlterForm(): void {
-    $form = [
-      'actions' => ['#weight' => 1],
-    ];
+    $form = [];
     $extra = 'has_extra';
 
     $form = $this->stylePluginManager->alterForm($form, [
@@ -166,7 +164,6 @@ class UiStylesPluginManagerTest extends UnitTestCase {
       'test2' => 'opt3',
     ], $extra);
 
-    $this->assertSame($form['actions']['#weight'], 100);
     $this->assertSame($form['_ui_styles_extra']['#default_value'], 'has_extra');
     $this->assertArrayHasKey('ui_styles_test1', $form);
     $this->assertArrayHasKey('ui_styles_test2', $form);

@@ -47,7 +47,7 @@ Where:
 * 'label' is used in the library and the layout builder forms
 * 'description' is only used in the library
 * 'options' is the list of all classes and labels of the style
-* 'previewed_with' is a list of classes used in the library to pimp the preview
+* 'previewed_with' (optional) is a list of classes used in the library to pimp the preview
 * 'previewed_as' (optional) can be:
   * `inside`: default
   * `aside`: for styles not intended to be applied on `p` tag and having side effects
@@ -67,14 +67,13 @@ This module has no specific requirement.
 
 ## Recommended Module
 
-[ui\_suite\_bootstrap](https://github.com/pdureau/ui_suite_bootstrap) is an example of a site-building friendly Drupal theme using [UI Styles](https://www.drupal.org/project/ui_styles) with [UI Patterns](https://www.drupal.org/project/ui_patterns), [Layout Options](https://www.drupal.org/project/layout_options) and [UI Examples](https://www.drupal.org/project/ui_examples) modules, to implements [Bootstrap](https://getbootstrap.com/) 4:
+[ui\_suite\_bootstrap](https://www.drupal.org/project/ui_suite_bootstrap) is an example of a site-building friendly Drupal theme using [UI Styles](https://www.drupal.org/project/ui_styles) with [UI Patterns](https://www.drupal.org/project/ui_patterns), [Layout Options](https://www.drupal.org/project/layout_options) and [UI Examples](https://www.drupal.org/project/ui_examples) modules, to implements [Bootstrap](https://getbootstrap.com/) 4:
 
 ![Overview](doc/schema.png)
 
 ## Installation
 
-Install as you would normally install a contributed Drupal module. Visit
-   https://www.drupal.org/node/1897420 for further information.
+Install and enable this module like any other Drupal module.
 
 ## Configuration
 

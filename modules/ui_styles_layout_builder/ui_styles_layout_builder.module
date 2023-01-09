@@ -64,6 +64,10 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
     array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
+
+    // Set form actions to a high weight, just so that we can make our form
+    // style element appear right before them.
+    $form['actions']['#weight'] = (int) 100;
   }
 }
 
@@ -173,6 +177,10 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   // default handler stores the section & component data in the tempstore
   // and we need to update those objects before that happens.
   array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
+
+  // Set form actions to a high weight, just so that we can make our form
+  // style element appear right before them.
+  $form['actions']['#weight'] = (int) 100;
 }
 
 /**
