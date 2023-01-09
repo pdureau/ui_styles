@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\ui_styles_test;
 
+use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -32,11 +33,13 @@ class DummyStylePluginManager extends StylePluginManager {
   public function __construct(
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
-    TranslationInterface $translation,
     CacheBackendInterface $cache_backend,
+    TransliterationInterface $transliteration,
+    TranslationInterface $translation,
     array $styles
   ) {
-    parent::__construct($module_handler, $theme_handler, $translation, $cache_backend);
+    parent::__construct($module_handler, $theme_handler, $cache_backend, $transliteration);
+    $this->stringTranslation = $translation;
     $this->styles = $styles;
   }
 

@@ -34,6 +34,7 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
     foreach (Element::children($layout_builder) as $index) {
       if (isset($layout_builder[$index]['layout-builder__section']) && $delta < $max) {
         $section = $section_storage->getSection($delta);
+        /** @var array $selected */
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
         /** @var string $extra */
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';

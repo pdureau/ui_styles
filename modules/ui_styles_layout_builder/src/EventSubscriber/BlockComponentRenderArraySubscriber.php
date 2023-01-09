@@ -65,6 +65,7 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
       '#type' => 'html_tag',
       '#tag' => 'span',
     ];
+    /** @var array $selected */
     $selected = $component->get('ui_styles_title') ?: [];
     /** @var string $extra */
     $extra = $component->get('ui_styles_title_extra') ?: '';
@@ -73,6 +74,7 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
     $build['#configuration']['ui_style_title_attributes'] = $dummy['#attributes'] ?? [];
 
     // Block content.
+    /** @var array $selected */
     $selected = $component->get('ui_styles') ?: [];
     /** @var string $extra */
     $extra = $component->get('ui_styles_extra') ?: '';

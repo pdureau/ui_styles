@@ -5,15 +5,16 @@ declare(strict_types = 1);
 namespace Drupal\ui_styles;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\ui_styles\Definition\StyleDefinition;
 use Drupal\ui_styles\Render\Element;
 
@@ -32,6 +33,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected ThemeHandlerInterface $themeHandler;
+
+  /**
+   * The transliteration service.
+   *
+   * @var \Drupal\Component\Transliteration\TransliterationInterface
+   */
+  protected TransliterationInterface $transliteration;
 
   /**
    * Provides default values for all style_plugin plugins.
@@ -54,20 +62,20 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *   The module handler.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The string translation service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
+   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
+   *   The transliteration service.
    */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
-    TranslationInterface $translation,
-    CacheBackendInterface $cache_backend
+    CacheBackendInterface $cache_backend,
+    TransliterationInterface $transliteration
   ) {
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
-    $this->stringTranslation = $translation;
+    $this->transliteration = $transliteration;
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
     $this->alterInfo('ui_styles_styles');
   }
@@ -141,15 +149,31 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     foreach ($this->getDefinitions() as $definition) {
       $id = $definition->id();
       $element_name = 'ui_styles_' . $id;
-      $default = $selected[$id] ?? '';
-      $form[$element_name] = [
+      $plugin_element = [
         '#type' => 'select',
         '#options' => $definition->getOptions(),
         '#title' => $definition->getLabel(),
-        '#default_value' => $default,
+        '#default_value' => $selected[$id] ?? '',
         '#required' => FALSE,
         '#empty_option' => $this->t('- None -'),
       ];
+
+      // Create group if it does not exist yet.
+      if ($definition->hasGroup()) {
+        $group_key = $this->getMachineName($definition->getGroup());
+        if (!isset($form[$group_key])) {
+          $form[$group_key] = [
+            '#type' => 'details',
+            '#title' => $definition->getGroup(),
+            '#open' => FALSE,
+          ];
+        }
+
+        $form[$group_key][$element_name] = $plugin_element;
+      }
+      else {
+        $form[$element_name] = $plugin_element;
+      }
     }
     $form['_ui_styles_extra'] = [
       '#type' => 'textfield',
@@ -163,11 +187,9 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function addClasses(array $element, $selected = [], $extra = ''): array {
+  public function addClasses(array $element, array $selected = [], string $extra = ''): array {
     // Set styles classes.
     $extra = \explode(' ', $extra);
-    // @todo Test if possible to force $selected type to array.
-    // @phpstan-ignore-next-line
     $styles = \array_merge($selected, $extra);
     $styles = \array_unique(\array_filter($styles));
 
@@ -271,6 +293,25 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     });
 
     return $definitions;
+  }
+
+  /**
+   * Generates a machine name from a string.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $string
+   *   The string to convert.
+   *
+   * @return string
+   *   The converted string.
+   *
+   * @see \Drupal\Core\Block\BlockBase::getMachineNameSuggestion()
+   * @see \Drupal\system\MachineNameController::transliterate()
+   */
+  protected function getMachineName($string): string {
+    $transliterated = $this->transliteration->transliterate($string, LanguageInterface::LANGCODE_DEFAULT, '_');
+    $transliterated = \mb_strtolower($transliterated);
+    $transliterated = \preg_replace('@[^a-z0-9_.]+@', '_', $transliterated);
+    return $transliterated ?? '';
   }
 
 }

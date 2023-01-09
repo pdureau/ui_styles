@@ -4,5 +4,5 @@ services:
     arguments:
       - '@module_handler'
       - '@theme_handler'
-      - '@string_translation'
       - '@cache.discovery'
+      - '@transliteration'

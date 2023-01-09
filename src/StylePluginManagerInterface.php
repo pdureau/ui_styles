@@ -57,7 +57,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    *
    * @param array $target_element
    *   The render element to add to.
-   * @param mixed $selected
+   * @param array $selected
    *   The selected class(es), as an array.
    * @param string $extra
    *   The free extra class(es), as a string.
@@ -65,6 +65,6 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
    * @return array
    *   The modified render element.
    */
-  public function addClasses(array $target_element, $selected = [], $extra = ''): array;
+  public function addClasses(array $target_element, array $selected = [], string $extra = ''): array;
 
 }

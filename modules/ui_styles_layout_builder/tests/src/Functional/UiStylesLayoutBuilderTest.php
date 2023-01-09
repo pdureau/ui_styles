@@ -101,8 +101,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-section');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-extra');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-section');
 
     $page->pressButton('Update');
     $page->pressButton('Save layout');
@@ -140,8 +140,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-section');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-extra');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-section');
 
     $page->pressButton('Update');
     $page->pressButton('Save layout');
@@ -182,8 +182,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $page->checkField('edit-settings-label-display');
     $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-extra');
     $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-block');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-extra');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-block');
     $page->pressButton('Add block');
 
     // Body field block.
@@ -192,8 +192,8 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $page->checkField('edit-settings-label-display');
     $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-title-extra');
     $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-field-title');
-    $page->fillField('ui_style[_ui_styles_extra]', 'test-class-body-extra');
-    $page->selectFieldOption('ui_style[ui_styles_test_class]', 'test-class-body-field');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-body-extra');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-body-field');
     $page->pressButton('Add block');
 
     $page->pressButton('Save layout');

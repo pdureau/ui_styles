@@ -12,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\ui_styles\UiStylesUtility;
 
 /*
  *
@@ -53,12 +54,12 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $selected = $component->get('ui_styles') ?: [];
     /** @var string $extra */
     $extra = $component->get('ui_styles_extra') ?: '';
-    $form['ui_style'] = [
+    $form['ui_styles'] = [
       '#type' => 'details',
       '#title' => t('Block content styles'),
       '#open' => FALSE,
     ];
-    $form['ui_style'] = $styles_manager->alterForm($form['ui_style'], $selected, $extra);
+    $form['ui_styles'] = $styles_manager->alterForm($form['ui_styles'], $selected, $extra);
 
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
@@ -82,47 +83,23 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
 
+  // Block title.
   /** @var array $ui_styles_title */
   $ui_styles_title = $formState->getValue('ui_styles_title');
-
-  // Block title.
-  $selected = [];
-  foreach (array_keys($form['ui_styles_title']) as $id) {
-    /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0
-      && !empty($ui_styles_title[$id])
-    ) {
-      $value = $ui_styles_title[$id];
-      $id = str_replace('ui_styles_', '', $id);
-      $selected[$id] = $value;
-    }
-  }
   // Those values are flat for backward compatibility with initial design.
   // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
   // move them to proper third_party_settings and wrap them in a bag.
-  $component->set('ui_styles_title', $selected);
+  $component->set('ui_styles_title', UiStylesUtility::extractSelectedStyles($ui_styles_title));
   $component->set('ui_styles_title_extra', $ui_styles_title['_ui_styles_extra']);
 
   // Block content.
-  /** @var array $ui_style */
-  $ui_style = $formState->getValue('ui_style');
-
-  $selected = [];
-  foreach (array_keys($form['ui_style']) as $id) {
-    /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0
-      && !empty($ui_style[$id])
-    ) {
-      $value = $ui_style[$id];
-      $id = str_replace('ui_styles_', '', $id);
-      $selected[$id] = $value;
-    }
-  }
+  /** @var array $ui_styles */
+  $ui_styles = $formState->getValue('ui_styles');
   // Those values are flat for backward compatibility with initial design.
   // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
   // move them to proper third_party_settings and wrap them in a bag.
-  $component->set('ui_styles', $selected);
-  $component->set('ui_styles_extra', $ui_style['_ui_styles_extra']);
+  $component->set('ui_styles', UiStylesUtility::extractSelectedStyles($ui_styles));
+  $component->set('ui_styles_extra', $ui_styles['_ui_styles_extra']);
 }
 
 /**
@@ -166,12 +143,12 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
   /** @var string $extra */
   $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-  $form['ui_style'] = [
+  $form['ui_styles'] = [
     '#type' => 'details',
     '#title' => t('Section styles'),
     '#open' => FALSE,
   ];
-  $form['ui_style'] = $styles_manager->alterForm($form['ui_style'], $selected, $extra);
+  $form['ui_styles'] = $styles_manager->alterForm($form['ui_styles'], $selected, $extra);
 
   // Our submit handler must execute before the default one, because the
   // default handler stores the section & component data in the tempstore
@@ -191,25 +168,14 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
  * storage.
  */
 function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState): void {
-  /** @var array $ui_style */
-  $ui_style = $formState->getValue('ui_style');
-
-  $selected = [];
-  foreach (array_keys($form['ui_style']) as $id) {
-    /** @var string $id */
-    if (strpos($id, 'ui_styles_') === 0
-      && !empty($ui_style[$id])
-    ) {
-      $value = $ui_style[$id];
-      $id = str_replace('ui_styles_', '', $id);
-      $selected[$id] = $value;
-    }
-  }
   /** @var \Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface $formObject */
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
-  $section->setThirdPartySetting('ui_styles', 'selected', $selected);
-  $section->setThirdPartySetting('ui_styles', 'extra', $ui_style['_ui_styles_extra']);
+
+  /** @var array $ui_styles */
+  $ui_styles = $formState->getValue('ui_styles');
+  $section->setThirdPartySetting('ui_styles', 'selected', UiStylesUtility::extractSelectedStyles($ui_styles));
+  $section->setThirdPartySetting('ui_styles', 'extra', $ui_styles['_ui_styles_extra']);
 }
 
 /**
@@ -261,6 +227,7 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
         }
         /** @var \Drupal\layout_builder\Section $section */
         $section = $section_item->get('section')->getValue();
+        /** @var array $selected */
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
         /** @var string $extra */
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
@@ -270,6 +237,7 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     // Default layout: we are dealing with a config entity.
     else {
       foreach ($display->getSections() as $delta => $section) {
+        /** @var array $selected */
         $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
         /** @var string $extra */
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';

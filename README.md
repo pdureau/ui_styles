@@ -23,6 +23,7 @@ Heavily inspired by [layout\_builder\_styles](https://www.drupal.org/project/lay
 
 ```yaml
 colors_background_color:
+  group: Background
   label: Background color
   description: Similar to the contextual text color classes, easily set the background of an element to any contextual class.
   options:
@@ -46,6 +47,7 @@ Where:
 * `colors_background_color` is the plugin ID
 * 'label' is used in the library and the layout builder forms
 * 'description' is only used in the library
+* 'group' (optional) to group styles in the forms
 * 'options' is the list of all classes and labels of the style
 * 'previewed_with' (optional) is a list of classes used in the library to pimp the preview
 * 'previewed_as' (optional) can be:

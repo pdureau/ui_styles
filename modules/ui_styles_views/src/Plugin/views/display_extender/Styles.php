@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\ui_styles_views\Plugin\views\display_extender;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\ui_styles\UiStylesUtility;
 use Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -83,22 +84,9 @@ class Styles extends DisplayExtenderPluginBase {
       return;
     }
 
-    /** @var array $form_state_values */
     $form_state_values = $form_state->cleanValues()->getValues();
     foreach ($form_state_values as $section_id => $values) {
-      $selected = [];
-      foreach ($values as $id => $value) {
-        if (empty($value)) {
-          continue;
-        }
-
-        /** @var string $id */
-        if (\strpos($id, 'ui_styles_') === 0) {
-          $id = \str_replace('ui_styles_', '', $id);
-          $selected[$id] = $value;
-        }
-      }
-      $this->options[$section_id]['selected'] = $selected;
+      $this->options[$section_id]['selected'] = UiStylesUtility::extractSelectedStyles($values);
       $this->options[$section_id]['extra'] = $values['_ui_styles_extra'];
     }
   }

@@ -20,6 +20,7 @@ class StyleDefinition extends PluginDefinition {
     'id' => '',
     'label' => '',
     'description' => '',
+    'group' => '',
     'options' => [],
     'previewed_with' => [],
     'previewed_as' => 'inside',
@@ -88,6 +89,39 @@ class StyleDefinition extends PluginDefinition {
   public function setDescription($description) {
     $this->definition['description'] = $description;
     return $this;
+  }
+
+  /**
+   * Getter.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string
+   *   Property value.
+   */
+  public function getGroup() {
+    return $this->definition['group'];
+  }
+
+  /**
+   * Setter.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $group
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setGroup($group) {
+    $this->definition['group'] = $group;
+    return $this;
+  }
+
+  /**
+   * If the plugin is in a group.
+   *
+   * @return bool
+   *   TRUE if a group is defined.
+   */
+  public function hasGroup(): bool {
+    return !empty($this->getGroup());
   }
 
   /**

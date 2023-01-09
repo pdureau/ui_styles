@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\Tests\ui_styles\Unit;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -98,7 +99,9 @@ class UiStylesPluginManagerTest extends UnitTestCase {
 
     $cache = $this->createMock(CacheBackendInterface::class);
 
-    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $this->getStringTranslationStub(), $cache, $this->styles);
+    $transliteration = $this->createMock(TransliterationInterface::class);
+
+    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $cache, $transliteration, $this->getStringTranslationStub(), $this->styles);
   }
 
   /**

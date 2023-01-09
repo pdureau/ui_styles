@@ -25,6 +25,7 @@ class StyleDefinitionTest extends UnitTestCase {
    *   The attribute's value.
    *
    * @covers ::getDescription
+   * @covers ::getGroup
    * @covers ::getLabel
    * @covers ::getOptions
    * @covers ::getPreviewedAs
@@ -53,6 +54,7 @@ class StyleDefinitionTest extends UnitTestCase {
       ['id', 'id', 'plugin_id'],
       ['getLabel', 'label', 'Plugin label'],
       ['getDescription', 'description', 'Plugin description.'],
+      ['getGroup', 'group', 'Plugin group'],
       ['getOptions', 'options', ['my-class' => 'My class']],
       ['getPreviewedWith', 'previewed_with', ['my-class']],
       ['getPreviewedAs', 'previewed_as', 'inside'],
