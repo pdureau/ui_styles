@@ -4,12 +4,13 @@ declare(strict_types = 1);
 
 namespace Drupal\ui_styles;
 
+use Drupal\Component\Plugin\CategorizingPluginManagerInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 
 /**
- * Defines an interface for style_plugin managers.
+ * Defines an interface for style plugin managers.
  */
-interface StylePluginManagerInterface extends PluginManagerInterface {
+interface StylePluginManagerInterface extends PluginManagerInterface, CategorizingPluginManagerInterface {
 
   /**
    * {@inheritdoc}
@@ -30,12 +31,30 @@ interface StylePluginManagerInterface extends PluginManagerInterface {
   public function getDefinitions();
 
   /**
-   * Get the sorted list of styles.
+   * {@inheritdoc}
+   *
+   * @param \Drupal\ui_styles\Definition\StyleDefinition[]|null $definitions
+   *   (optional) The plugin definitions to sort. If omitted, all plugin
+   *   definitions are used.
    *
    * @return \Drupal\ui_styles\Definition\StyleDefinition[]
-   *   The sorted list of styles.
+   *   The sorted definitions.
+   *
+   * @phpstan-ignore-next-line
    */
-  public function getSortedDefinitions(): array;
+  public function getSortedDefinitions(?array $definitions = NULL): array;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param \Drupal\ui_styles\Definition\StyleDefinition[]|null $definitions
+   *   (optional) The plugin definitions to group. If omitted, all plugin
+   *   definitions are used.
+   *
+   * @return \Drupal\ui_styles\Definition\StyleDefinition[][]
+   *   The sorted definitions grouped by category.
+   */
+  public function getGroupedDefinitions(?array $definitions = NULL): array;
 
   /**
    * Add style selection form elements to an existing form.

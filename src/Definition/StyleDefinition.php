@@ -18,13 +18,14 @@ class StyleDefinition extends PluginDefinition {
    */
   protected array $definition = [
     'id' => '',
+    'enabled' => TRUE,
     'label' => '',
     'description' => '',
-    'group' => '',
+    'category' => '',
     'options' => [],
     'previewed_with' => [],
     'previewed_as' => 'inside',
-    'enabled' => TRUE,
+    'weight' => 0,
     'additional' => [],
     'provider' => '',
   ];
@@ -97,31 +98,31 @@ class StyleDefinition extends PluginDefinition {
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string
    *   Property value.
    */
-  public function getGroup() {
-    return $this->definition['group'];
+  public function getCategory() {
+    return $this->definition['category'];
   }
 
   /**
    * Setter.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $group
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $category
    *   Property value.
    *
    * @return $this
    */
-  public function setGroup($group) {
-    $this->definition['group'] = $group;
+  public function setCategory($category) {
+    $this->definition['category'] = $category;
     return $this;
   }
 
   /**
-   * If the plugin is in a group.
+   * If the plugin is in a category.
    *
    * @return bool
-   *   TRUE if a group is defined.
+   *   TRUE if a category is defined.
    */
-  public function hasGroup(): bool {
-    return !empty($this->getGroup());
+  public function hasCategory(): bool {
+    return !empty($this->getCategory());
   }
 
   /**
@@ -201,6 +202,29 @@ class StyleDefinition extends PluginDefinition {
    */
   public function isEnabled(): bool {
     return $this->definition['enabled'];
+  }
+
+  /**
+   * Getter.
+   *
+   * @return int
+   *   Property value.
+   */
+  public function getWeight(): int {
+    return $this->definition['weight'];
+  }
+
+  /**
+   * Setter.
+   *
+   * @param int $weight
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setWeight(int $weight) {
+    $this->definition['weight'] = $weight;
+    return $this;
   }
 
   /**

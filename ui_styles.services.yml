@@ -2,7 +2,7 @@ services:
   plugin.manager.ui_styles:
     class: Drupal\ui_styles\StylePluginManager
     arguments:
+      - '@cache.discovery'
       - '@module_handler'
       - '@theme_handler'
-      - '@cache.discovery'
       - '@transliteration'

@@ -24,13 +24,14 @@ class StyleDefinitionTest extends UnitTestCase {
    * @param mixed $value
    *   The attribute's value.
    *
+   * @covers ::getCategory
    * @covers ::getDescription
-   * @covers ::getGroup
    * @covers ::getLabel
    * @covers ::getOptions
    * @covers ::getPreviewedAs
    * @covers ::getPreviewedWith
    * @covers ::getProvider
+   * @covers ::getWeight
    * @covers ::id
    * @covers ::isEnabled
    *
@@ -54,12 +55,13 @@ class StyleDefinitionTest extends UnitTestCase {
       ['id', 'id', 'plugin_id'],
       ['getLabel', 'label', 'Plugin label'],
       ['getDescription', 'description', 'Plugin description.'],
-      ['getGroup', 'group', 'Plugin group'],
+      ['getCategory', 'category', 'Plugin category'],
       ['getOptions', 'options', ['my-class' => 'My class']],
       ['getPreviewedWith', 'previewed_with', ['my-class']],
       ['getPreviewedAs', 'previewed_as', 'inside'],
       ['getPreviewedAs', 'previewed_as', 'aside'],
       ['getPreviewedAs', 'previewed_as', 'hidden'],
+      ['getWeight', 'weight', 10],
       ['isEnabled', 'enabled', FALSE],
       ['isEnabled', 'enabled', TRUE],
     ];

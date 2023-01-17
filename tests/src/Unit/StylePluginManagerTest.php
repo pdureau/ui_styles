@@ -9,6 +9,7 @@ use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Definition\StyleDefinition;
@@ -17,27 +18,13 @@ use Drupal\ui_styles_test\DummyStylePluginManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Test the UI Styles plugin manager.
+ * Test the style plugin manager.
  *
  * @group ui_styles
  *
  * @coversDefaultClass \Drupal\ui_styles\StylePluginManager
  */
-class UiStylesPluginManagerTest extends UnitTestCase {
-
-  /**
-   * The Style plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManager
-   */
-  protected $stylePluginManager;
-
-  /**
-   * The plugin discovery.
-   *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
-   */
-  protected $discovery;
+class StylePluginManagerTest extends UnitTestCase {
 
   /**
    * The container.
@@ -45,6 +32,20 @@ class UiStylesPluginManagerTest extends UnitTestCase {
    * @var \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   protected $container;
+
+  /**
+   * The string translation service.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  protected TranslationInterface $stringTranslation;
+
+  /**
+   * The Style plugin manager.
+   *
+   * @var \Drupal\ui_styles_test\DummyStylePluginManager
+   */
+  protected DummyStylePluginManager $stylePluginManager;
 
   /**
    * A list of styles definitions.
@@ -98,10 +99,12 @@ class UiStylesPluginManagerTest extends UnitTestCase {
       ->willReturn([]);
 
     $cache = $this->createMock(CacheBackendInterface::class);
+    $this->stringTranslation = $this->getStringTranslationStub();
 
     $transliteration = $this->createMock(TransliterationInterface::class);
 
-    $this->stylePluginManager = new DummyStylePluginManager($moduleHandler, $themeHandler, $cache, $transliteration, $this->getStringTranslationStub(), $this->styles);
+    $this->stylePluginManager = new DummyStylePluginManager($cache, $moduleHandler, $themeHandler, $transliteration, $this->stringTranslation);
+    $this->stylePluginManager->setStyles($this->styles);
   }
 
   /**
@@ -141,16 +144,225 @@ class UiStylesPluginManagerTest extends UnitTestCase {
     $plugin_id = 'test';
     $definition = ['id' => $plugin_id];
 
-    $expected = new StyleDefinition($definition + [
-      'enabled' => TRUE,
-      'label' => '',
-      'description' => '',
-      'options' => [],
-    ]);
+    $expected = new StyleDefinition($definition);
+    $expected->setCategory($this->stringTranslation->translate('Other'));
 
     /** @var \Drupal\ui_styles\Definition\StyleDefinition $definition */
     $this->stylePluginManager->processDefinition($definition, $plugin_id);
-    $this->assertSame($definition->toArray(), $expected->toArray());
+    $this->assertInstanceOf(StyleDefinition::class, $definition);
+    $this->assertEquals($definition->toArray(), $expected->toArray());
+  }
+
+  /**
+   * @covers ::getCategories
+   */
+  public function testGetCategories(): void {
+    $this->stylePluginManager->setStyles([
+      'id_1' => [
+        'id' => 'id_1',
+        'category' => 'Cat 1',
+      ],
+      'id_2' => [
+        'id' => 'id_2',
+        'category' => 'Cat 2',
+      ],
+      'id_3' => [
+        'id' => 'id_3',
+      ],
+    ]);
+    $expected = [
+      'Cat 1',
+      'Cat 2',
+      'Other',
+    ];
+    $categories = $this->stylePluginManager->getCategories();
+    $this->assertEquals($expected, $categories);
+  }
+
+  /**
+   * @covers ::getSortedDefinitions
+   */
+  public function testGetSortedDefinitions(): void {
+    $this->stylePluginManager->setStyles([
+      'id_z1z2' => [
+        'category' => 'Z',
+        'weight' => 1,
+        'label' => '(Z)',
+        'id' => 'id_z1z2',
+      ],
+      'id_z1z1' => [
+        'category' => 'Z',
+        'weight' => 1,
+        'label' => 'Z',
+        'id' => 'id_z1z1',
+      ],
+      'id_z1a2' => [
+        'category' => 'Z',
+        'weight' => 1,
+        'label' => '(A)',
+        'id' => 'id_z1a2',
+      ],
+      'id_z1a1' => [
+        'category' => 'Z',
+        'weight' => 1,
+        'label' => 'A',
+        'id' => 'id_z1a1',
+      ],
+      'id_z0z2' => [
+        'category' => 'Z',
+        'weight' => 0,
+        'label' => '(Z)',
+        'id' => 'id_z0z2',
+      ],
+      'id_z0z1' => [
+        'category' => 'Z',
+        'weight' => 0,
+        'label' => 'Z',
+        'id' => 'id_z0z1',
+      ],
+      'id_z0a2' => [
+        'category' => 'Z',
+        'weight' => 0,
+        'label' => '(A)',
+        'id' => 'id_z0a2',
+      ],
+      'id_z0a1' => [
+        'category' => 'Z',
+        'weight' => 0,
+        'label' => 'A',
+        'id' => 'id_z0a1',
+      ],
+      'id_a1z2' => [
+        'category' => 'A',
+        'weight' => 1,
+        'label' => '(Z)',
+        'id' => 'id_a1z2',
+      ],
+      'id_a1z1' => [
+        'category' => 'A',
+        'weight' => 1,
+        'label' => 'Z',
+        'id' => 'id_a1z1',
+      ],
+      'id_a1a2' => [
+        'category' => 'A',
+        'weight' => 1,
+        'label' => '(A)',
+        'id' => 'id_a1a2',
+      ],
+      'id_a1a1' => [
+        'category' => 'A',
+        'weight' => 1,
+        'label' => 'A',
+        'id' => 'id_a1a1',
+      ],
+      'id_a0z2' => [
+        'category' => 'A',
+        'weight' => 0,
+        'label' => '(Z)',
+        'id' => 'id_a0z2',
+      ],
+      'id_a0z1' => [
+        'category' => 'A',
+        'weight' => 0,
+        'label' => 'Z',
+        'id' => 'id_a0z1',
+      ],
+      'id_a0a2' => [
+        'category' => 'A',
+        'weight' => 0,
+        'label' => '(A)',
+        'id' => 'id_a0a2',
+      ],
+      'id_a0a1' => [
+        'category' => 'A',
+        'weight' => 0,
+        'label' => 'A',
+        'id' => 'id_a0a1',
+      ],
+    ]);
+
+    $expected = [
+      'id_a0a1',
+      'id_a0a2',
+      'id_a0z1',
+      'id_a0z2',
+      'id_a1a1',
+      'id_a1a2',
+      'id_a1z1',
+      'id_a1z2',
+      'id_z0a1',
+      'id_z0a2',
+      'id_z0z1',
+      'id_z0z2',
+      'id_z1a1',
+      'id_z1a2',
+      'id_z1z1',
+      'id_z1z2',
+    ];
+
+    $sorted_definitions = $this->stylePluginManager->getSortedDefinitions();
+    $this->assertEquals($expected, \array_keys($sorted_definitions));
+    $this->assertContainsOnlyInstancesOf(StyleDefinition::class, $sorted_definitions);
+  }
+
+  /**
+   * @covers ::getGroupedDefinitions
+   */
+  public function testGetGroupedDefinitions(): void {
+    $this->stylePluginManager->setStyles([
+      'cat_1_1_b' => [
+        'id' => 'cat_1_1_b',
+        'category' => 'Cat 1',
+        'label' => 'B',
+        'weight' => 1,
+      ],
+      'cat_1_1_a' => [
+        'id' => 'cat_1_1_a',
+        'category' => 'Cat 1',
+        'label' => 'A',
+        'weight' => 1,
+      ],
+      'cat_1_0_a' => [
+        'id' => 'cat_1_0_a',
+        'category' => 'Cat 1',
+        'label' => 'A',
+        'weight' => 0,
+      ],
+      'cat_2_0_a' => [
+        'id' => 'cat_1_0_a',
+        'category' => 'Cat 2',
+        'label' => 'A',
+        'weight' => 0,
+      ],
+      'no_category' => [
+        'id' => 'no_category',
+        'label' => 'B',
+        'weight' => 0,
+      ],
+    ]);
+
+    $category_expected = [
+      'Cat 1' => [
+        'cat_1_0_a',
+        'cat_1_1_a',
+        'cat_1_1_b',
+      ],
+      'Cat 2' => [
+        'cat_2_0_a',
+      ],
+      'Other' => [
+        'no_category',
+      ],
+    ];
+
+    $definitions = $this->stylePluginManager->getGroupedDefinitions();
+    $this->assertEquals(\array_keys($category_expected), \array_keys($definitions));
+    foreach ($category_expected as $category => $expected) {
+      $this->assertArrayHasKey($category, $definitions);
+      $this->assertEquals($expected, \array_keys($definitions[$category]));
+      $this->assertContainsOnlyInstancesOf(StyleDefinition::class, $definitions[$category]);
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ class DummyStylePluginManager extends StylePluginManager {
    *
    * @var array
    */
-  protected array $styles;
+  protected array $styles = [];
 
   /**
    * {@inheritdoc}
@@ -31,16 +31,14 @@ class DummyStylePluginManager extends StylePluginManager {
    * @phpstan-ignore-next-line
    */
   public function __construct(
+    CacheBackendInterface $cache_backend,
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
-    CacheBackendInterface $cache_backend,
     TransliterationInterface $transliteration,
-    TranslationInterface $translation,
-    array $styles
+    TranslationInterface $translation
   ) {
-    parent::__construct($module_handler, $theme_handler, $cache_backend, $transliteration);
     $this->stringTranslation = $translation;
-    $this->styles = $styles;
+    parent::__construct($cache_backend, $module_handler, $theme_handler, $transliteration);
   }
 
   /**
@@ -52,6 +50,29 @@ class DummyStylePluginManager extends StylePluginManager {
       $this->processDefinition($definition, $plugin_id);
     }
     return $definitions;
+  }
+
+  /**
+   * Getter.
+   *
+   * @return array
+   *   Property value.
+   */
+  public function getStyles(): array {
+    return $this->styles;
+  }
+
+  /**
+   * Setter.
+   *
+   * @param array $styles
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setStyles(array $styles) {
+    $this->styles = $styles;
+    return $this;
   }
 
 }
