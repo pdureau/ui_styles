@@ -67,4 +67,225 @@ class StyleDefinitionTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Test getOptionsAsOptions.
+   *
+   * @param array $options
+   *   The options like in the YAML declaration.
+   * @param array $expected
+   *   The expected result.
+   *
+   * @covers ::getOptionsAsOptions
+   *
+   * @dataProvider definitionGetOptionsAsOptionsProvider
+   */
+  public function testGetOptionsAsOptions(array $options, array $expected): void {
+    $definition = new StyleDefinition([
+      'options' => $options,
+    ]);
+    $this->assertEquals($expected, $definition->getOptionsAsOptions());
+  }
+
+  /**
+   * Provider.
+   *
+   * @return array
+   *   Data.
+   */
+  public function definitionGetOptionsAsOptionsProvider(): array {
+    return [
+      [[
+        'simple' => 'Simple',
+        'complex' => [
+          'label' => 'Complex',
+        ],
+      ], [
+        'simple' => 'Simple',
+        'complex' => 'Complex',
+      ],
+      ],
+    ];
+  }
+
+  /**
+   * Test getOptionsForPreview.
+   *
+   * @param array $style
+   *   The style like in the YAML declaration.
+   * @param array $expected
+   *   The expected result.
+   *
+   * @covers ::getOptionsForPreview
+   *
+   * @dataProvider definitionGetOptionsForPreviewProvider
+   */
+  public function testGetOptionsForPreview(array $style, array $expected): void {
+    $definition = new StyleDefinition($style);
+    $this->assertEquals($expected, $definition->getOptionsForPreview());
+  }
+
+  /**
+   * Provider.
+   *
+   * @return array
+   *   Data.
+   */
+  public function definitionGetOptionsForPreviewProvider(): array {
+    return [
+      'simple' => [
+        [
+          'options' => [
+            'simple' => 'Simple',
+            'simple_bis' => 'Simple bis',
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'description' => '',
+            'previewed_with' => [],
+            'previewed_as' => 'inside',
+          ],
+          'simple_bis' => [
+            'label' => 'Simple bis',
+            'description' => '',
+            'previewed_with' => [],
+            'previewed_as' => 'inside',
+          ],
+        ],
+      ],
+      'simple_with_previewed_with' => [
+        [
+          'options' => [
+            'simple' => 'Simple',
+            'simple_bis' => 'Simple bis',
+          ],
+          'previewed_with' => [
+            'style-class',
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'description' => '',
+            'previewed_with' => [
+              'style-class',
+            ],
+            'previewed_as' => 'inside',
+          ],
+          'simple_bis' => [
+            'label' => 'Simple bis',
+            'description' => '',
+            'previewed_with' => [
+              'style-class',
+            ],
+            'previewed_as' => 'inside',
+          ],
+        ],
+      ],
+      'simple_with_previewed_with_previewed_as' => [
+        [
+          'options' => [
+            'simple' => 'Simple',
+            'simple_bis' => 'Simple bis',
+          ],
+          'previewed_with' => [
+            'style-class',
+          ],
+          'previewed_as' => 'hidden',
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'description' => '',
+            'previewed_with' => [
+              'style-class',
+            ],
+            'previewed_as' => 'hidden',
+          ],
+          'simple_bis' => [
+            'label' => 'Simple bis',
+            'description' => '',
+            'previewed_with' => [
+              'style-class',
+            ],
+            'previewed_as' => 'hidden',
+          ],
+        ],
+      ],
+      'complex' => [
+        [
+          'options' => [
+            'complex' => [
+              'label' => 'Complex',
+              'description' => 'Description',
+              'previewed_with' => [
+                'option-class',
+              ],
+            ],
+          ],
+        ], [
+          'complex' => [
+            'label' => 'Complex',
+            'description' => 'Description',
+            'previewed_with' => [
+              'option-class',
+            ],
+            'previewed_as' => 'inside',
+          ],
+        ],
+      ],
+      'complex_with_previewed_with' => [
+        [
+          'options' => [
+            'complex' => [
+              'label' => 'Complex',
+              'description' => 'Description',
+              'previewed_with' => [
+                'option-class',
+              ],
+            ],
+          ],
+          'previewed_with' => [
+            'style-class',
+          ],
+        ], [
+          'complex' => [
+            'label' => 'Complex',
+            'description' => 'Description',
+            'previewed_with' => [
+              'style-class',
+              'option-class',
+            ],
+            'previewed_as' => 'inside',
+          ],
+        ],
+      ],
+      'complex_with_previewed_with_previewed_as' => [
+        [
+          'options' => [
+            'complex' => [
+              'label' => 'Complex',
+              'description' => 'Description',
+              'previewed_with' => [
+                'option-class',
+              ],
+            ],
+          ],
+          'previewed_with' => [
+            'style-class',
+          ],
+          'previewed_as' => 'hidden',
+        ], [
+          'complex' => [
+            'label' => 'Complex',
+            'description' => 'Description',
+            'previewed_with' => [
+              'style-class',
+              'option-class',
+            ],
+            'previewed_as' => 'hidden',
+          ],
+        ],
+      ],
+    ];
+  }
+
 }

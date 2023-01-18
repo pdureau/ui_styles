@@ -41,9 +41,19 @@ class StylesLibraryController extends ControllerBase {
    *   Style overview page render array.
    */
   public function overview() {
+    $styles = [];
+    foreach ($this->stylesManager->getGroupedDefinitions() as $groupName => $groupedDefinitions) {
+      foreach ($groupedDefinitions as $definition) {
+        // Provide the same structure as in UI Patterns Library.
+        $styles[$groupName][$definition->id()] = $definition->toArray() + [
+          'definition' => $definition->toArray(),
+        ];
+      }
+    }
+
     return [
       '#theme' => 'ui_styles_overview_page',
-      '#styles' => $this->stylesManager->getGroupedDefinitions(),
+      '#styles' => $styles,
     ];
   }
 

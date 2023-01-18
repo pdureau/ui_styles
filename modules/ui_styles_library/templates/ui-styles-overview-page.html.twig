@@ -26,26 +26,30 @@
   {% for group_styles in styles %}
     {% for style in group_styles %}
       <h3 id="{{ style.id }}">{{ style.label }}</h3>
-        {% if style.description %}
-      <p>{{ style.description }}</p>
+      {% if style.description %}
+        <p>{{ style.description }}</p>
       {% endif %}
-      {% for id, label in style.options %}
-        {% set style_attributes = create_attribute().addClass(id).addClass(style.getPreviewedWith()) %}
-        {% set previewed_as = style.getPreviewedAs() %}
+      {% for id, option in style.preview_options %}
+        {% set option_attributes = create_attribute()
+          .addClass(id)
+          .addClass(option.previewed_with) %}
+        {% set previewed_as = option.previewed_as %}
+        {% set label = option.label %}
 
         {% if previewed_as == 'aside' %}
           <p>{{ label }} ({{ id }})</p>
-          <div{{ style_attributes }}>{{ 'Example'|t }}</div>
+          <div{{ option_attributes }}>{{ 'Example'|t }}</div>
         {% elseif previewed_as == 'hidden' %}
           <p>{{ label }} ({{ id }})</p>
         {% else %}
-          <p{{ style_attributes }}>{{ label }} ({{ id }})</p>
+          <p{{ option_attributes }}>{{ label }} ({{ id }})</p>
+        {% endif %}
+
+        {% if option.description is not empty %}
+          <p>{{ option.description }}</p>
         {% endif %}
       {% endfor %}
       <hr>
     {% endfor %}
   {% endfor %}
 {% endif %}
-
-
-

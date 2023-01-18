@@ -233,7 +233,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         $plugin_element = [
           '#type' => 'select',
           '#title' => $definition->getLabel(),
-          '#options' => $definition->getOptions(),
+          '#options' => $definition->getOptionsAsOptions(),
           '#empty_option' => $this->t('- None -'),
           '#default_value' => $selected[$id] ?? '',
           '#weight' => $definition->getWeight(),

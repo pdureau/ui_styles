@@ -136,6 +136,68 @@ class StyleDefinition extends PluginDefinition {
   }
 
   /**
+   * Get options as options.
+   *
+   * @return array
+   *   Options as select options.
+   */
+  public function getOptionsAsOptions(): array {
+    $options = [];
+    foreach ($this->getOptions() as $option_id => $option) {
+      if (\is_scalar($option)) {
+        $options[$option_id] = $option;
+      }
+      elseif (isset($option['label'])) {
+        $options[$option_id] = $option['label'];
+      }
+    }
+    return $options;
+  }
+
+  /**
+   * Get options for preview.
+   *
+   * @return array
+   *   Options for preview.
+   */
+  public function getOptionsForPreview(): array {
+    $style_previewed_as = $this->getPreviewedAs();
+    $style_previewed_with = $this->getPreviewedWith();
+
+    $options = [];
+    foreach ($this->getOptions() as $option_id => $option) {
+      $options[$option_id] = [
+        'label' => '',
+        'description' => '',
+        'previewed_with' => $style_previewed_with,
+        'previewed_as' => $style_previewed_as,
+      ];
+
+      // Label.
+      if (\is_scalar($option)) {
+        $options[$option_id]['label'] = $option;
+      }
+      elseif (isset($option['label'])) {
+        $options[$option_id]['label'] = $option['label'];
+      }
+
+      // Description.
+      if (\is_array($option) && isset($option['description'])) {
+        $options[$option_id]['description'] = $option['description'];
+      }
+
+      // Previewed_with.
+      if (\is_array($option) && isset($option['previewed_with'])) {
+        $options[$option_id]['previewed_with'] = \array_merge(
+          $options[$option_id]['previewed_with'],
+          $option['previewed_with']
+        );
+      }
+    }
+    return $options;
+  }
+
+  /**
    * Setter.
    *
    * @param array $options
@@ -280,7 +342,9 @@ class StyleDefinition extends PluginDefinition {
    *   Array definition.
    */
   public function toArray(): array {
-    return $this->definition;
+    $definition = $this->definition;
+    $definition['preview_options'] = $this->getOptionsForPreview();
+    return $definition;
   }
 
 }
