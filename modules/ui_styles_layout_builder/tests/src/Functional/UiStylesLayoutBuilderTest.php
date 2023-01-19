@@ -4,8 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\ui_styles_layout_builder\Functional;
 
+use Drupal\block_content\BlockContentInterface;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\node\NodeInterface;
+use Drupal\Tests\block_content\Functional\BlockContentTestBase;
+use Drupal\user\UserInterface;
 
 /**
  * Test the ui styles layout builder.
@@ -13,7 +16,7 @@ use Drupal\Tests\BrowserTestBase;
  * @group ui_styles
  * @group ui_styles_layout_builder
  */
-class UiStylesLayoutBuilderTest extends BrowserTestBase {
+class UiStylesLayoutBuilderTest extends BlockContentTestBase {
 
   /**
    * Default theme.
@@ -23,18 +26,25 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * A test node to which comments will be posted.
+   * A test node.
    *
    * @var \Drupal\node\NodeInterface
    */
-  protected $node;
+  protected NodeInterface $node;
+
+  /**
+   * A test block content.
+   *
+   * @var \Drupal\block_content\BlockContentInterface
+   */
+  protected BlockContentInterface $blockContent;
 
   /**
    * The user used in the tests.
    *
    * @var \Drupal\user\UserInterface
    */
-  protected $user;
+  protected UserInterface $user;
 
   /**
    * {@inheritdoc}
@@ -47,6 +57,36 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     'node',
     'ui_styles_layout_builder',
     'ui_styles_layout_builder_test',
+  ];
+
+  /**
+   * The list of Layout Builder block classes expected or not expected.
+   *
+   * @var array
+   */
+  protected array $blockClasses = [
+    'test-class-title-block-wrapper',
+    'test-class-title-block-title',
+    'test-class-title-block-content',
+    'test-class-body-block-wrapper',
+    'test-class-body-block-title',
+    'test-class-body-block-content',
+    'test-class-block-content-entity-block-wrapper',
+    'test-class-block-content-entity-block-title',
+    // @todo in https://www.drupal.org/project/ui_styles/issues/3334615
+    // or in https://www.drupal.org/project/ui_styles/issues/3334791.
+    // 'test-class-block-content-entity-block-content',
+    'test-class-title-block-extra-wrapper',
+    'test-class-title-block-extra-title',
+    'test-class-title-block-extra-content',
+    'test-class-body-block-extra-wrapper',
+    'test-class-body-block-extra-title',
+    'test-class-body-block-extra-content',
+    'test-class-block-content-entity-block-extra-wrapper',
+    'test-class-block-content-entity-block-extra-title',
+    // @todo in https://www.drupal.org/project/ui_styles/issues/3334615
+    // or in https://www.drupal.org/project/ui_styles/issues/3334791.
+    // 'test-class-block-content-entity-block-extra-content',
   ];
 
   /**
@@ -76,6 +116,9 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
         ],
       ],
     ]);
+
+    // Create a block content.
+    $this->blockContent = $this->createBlockContent();
 
     // Enable layout builder on content type.
     $layout_builder_view_display = LayoutBuilderEntityViewDisplay::load('node.page.default');
@@ -116,7 +159,13 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    * Tests to add classes with UI Styles on block.
    */
   public function testUiStylesBlock(): void {
+    $assert_session = $this->assertSession();
     $this->drupalLogin($this->user);
+
+    $this->drupalGet('node/' . $this->node->id());
+    foreach ($this->blockClasses as $class) {
+      $assert_session->responseNotContains($class);
+    }
 
     // Add styles on block.
     $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
@@ -156,14 +205,12 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
    */
   public function testUiStylesBlockOverride(): void {
     $assert_session = $this->assertSession();
-
     $this->drupalLogin($this->user);
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseNotContains('test-class-title-extra');
-    $assert_session->responseNotContains('test-class-title');
-    $assert_session->responseNotContains('test-class-extra');
-    $assert_session->responseNotContains('test-class-block');
+    foreach ($this->blockClasses as $class) {
+      $assert_session->responseNotContains($class);
+    }
 
     $this->drupalGet('node/' . $this->node->id() . '/layout');
     $this->addBlocksAndCheck();
@@ -180,33 +227,44 @@ class UiStylesLayoutBuilderTest extends BrowserTestBase {
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Title');
     $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-extra');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title');
-    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-extra');
-    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-block');
+    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-title-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-title-block-wrapper');
+    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title-block-title');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-title-block-extra-content');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-title-block-content');
     $page->pressButton('Add block');
 
     // Body field block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Body');
     $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-title-extra');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-field-title');
-    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-body-extra');
-    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-body-field');
+    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-body-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-body-block-wrapper');
+    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-block-title');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-body-block-extra-content');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-body-block-content');
+    $page->pressButton('Add block');
+
+    // Block content block.
+    $page->clickLink('Add block in Section 1');
+    $page->clickLink($this->blockContent->label());
+    $page->checkField('edit-settings-label-display');
+    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-block-content-entity-block-wrapper');
+    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-block-content-entity-block-title');
+    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-content');
+    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-block-content-entity-block-content');
     $page->pressButton('Add block');
 
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-title-extra');
-    $assert_session->responseContains('test-class-title');
-    $assert_session->responseContains('test-class-extra');
-    $assert_session->responseContains('test-class-block');
-    $assert_session->responseContains('test-class-body-title-extra');
-    $assert_session->responseContains('test-class-body-field-title');
-    $assert_session->responseContains('test-class-body-extra');
-    $assert_session->responseContains('test-class-body-field');
+    foreach ($this->blockClasses as $class) {
+      $assert_session->responseContains($class);
+    }
   }
 
 }

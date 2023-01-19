@@ -32,6 +32,18 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $formObject = $formState->getFormObject();
     $component = $formObject->getCurrentComponent();
 
+    // Block wrapper.
+    /** @var array $selected */
+    $selected = $component->get('ui_styles_wrapper') ?: [];
+    /** @var string $extra */
+    $extra = $component->get('ui_styles_wrapper_extra') ?: '';
+    $form['ui_styles_wrapper'] = [
+      '#type' => 'details',
+      '#title' => t('Block styles'),
+      '#open' => FALSE,
+    ];
+    $form['ui_styles_wrapper'] = $styles_manager->alterForm($form['ui_styles_wrapper'], $selected, $extra);
+
     // Block title.
     /** @var array $selected */
     $selected = $component->get('ui_styles_title') ?: [];
@@ -82,6 +94,15 @@ function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInter
   /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
   $formObject = $formState->getFormObject();
   $component = $formObject->getCurrentComponent();
+
+  // Block wrapper.
+  /** @var array $ui_styles_wrapper */
+  $ui_styles_wrapper = $formState->getValue('ui_styles_wrapper');
+  // Those values are flat for backward compatibility with initial design.
+  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
+  // move them to proper third_party_settings and wrap them in a bag.
+  $component->set('ui_styles_wrapper', UiStylesUtility::extractSelectedStyles($ui_styles_wrapper));
+  $component->set('ui_styles_wrapper_extra', $ui_styles_wrapper['_ui_styles_extra']);
 
   // Block title.
   /** @var array $ui_styles_title */

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\ui_styles_layout_builder\EventSubscriber;
 
+use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 use Drupal\layout_builder\LayoutBuilderEvents;
 use Drupal\ui_styles\StylePluginManagerInterface;
@@ -59,6 +60,24 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
       return;
     }
     $component = $event->getComponent();
+
+    // Block wrapper.
+    $dummy = [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+    ];
+    /** @var array $selected */
+    $selected = $component->get('ui_styles_wrapper') ?: [];
+    /** @var string $extra */
+    $extra = $component->get('ui_styles_wrapper_extra') ?: '';
+
+    $dummy = $this->styleManager->addClasses($dummy, $selected, $extra);
+    $dummy_attributes = $dummy['#attributes'] ?? [];
+    $block_attributes = $build['#attributes'] ?? [];
+    $build['#attributes'] = AttributeHelper::mergeCollections(
+      $block_attributes,
+      $dummy_attributes
+    );
 
     // Block title.
     $dummy = [

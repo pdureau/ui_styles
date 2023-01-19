@@ -3,7 +3,12 @@ test_class:
   description: Test class
   options:
     test-class-section: Test
-    test-class-block: Test
-    test-class-title: Test
-    test-class-body-field: Test
-    test-class-body-field-title: Test
+    test-class-title-block-wrapper: Test
+    test-class-title-block-title: Test
+    test-class-title-block-content: Test
+    test-class-body-block-wrapper: Test
+    test-class-body-block-title: Test
+    test-class-body-block-content: Test
+    test-class-block-content-entity-block-wrapper: Test
+    test-class-block-content-entity-block-title: Test
+    test-class-block-content-entity-block-content: Test
