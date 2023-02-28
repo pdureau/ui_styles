@@ -118,7 +118,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     ]);
 
     // Create a block content.
-    $this->blockContent = $this->createBlockContent();
+    $this->blockContent = $this->createBlockContent('My block content');
 
     // Enable layout builder on content type.
     $layout_builder_view_display = LayoutBuilderEntityViewDisplay::load('node.page.default');
@@ -249,7 +249,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
 
     // Block content block.
     $page->clickLink('Add block in Section 1');
-    $page->clickLink($this->blockContent->label());
+    $page->clickLink('My block content');
     $page->checkField('edit-settings-label-display');
     $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-wrapper');
     $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-block-content-entity-block-wrapper');

@@ -1,0 +1,57 @@
+/* Toolbar dropdown button On state. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown.ck-ui-styles-inline-dropdown-active > .ck-button.ck-dropdown__button:not(.ck-disabled) {
+  color: var(--ck-color-button-on-color);
+  background: var(--ck-color-button-on-background);
+}
+
+/* Style plugin dropdown button On state. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown.ck-ui-styles-inline-dropdown-style-dropdown-active > .ck-button.ck-dropdown__button:not(.ck-disabled) {
+  color: var(--ck-color-button-on-color);
+  background: var(--ck-color-button-on-background);
+}
+
+/* Dropdown icon point to the right. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown > .ck-button.ck-dropdown__button > .ck-dropdown__arrow {
+  rotate: 270deg;
+}
+
+/* Full width labels. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown {
+  width: 100%;
+}
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown > .ck-button.ck-dropdown__button {
+  min-width: 100%;
+}
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown > .ck-button.ck-dropdown__button > .ck-button__label {
+  width: 100%;
+}
+
+/* Reduce height of style options list. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-list__item .ck.ck-button {
+  padding-top: var(--ck-spacing-tiny);
+  padding-bottom: var(--ck-spacing-tiny);
+}
+
+/* Case it opens to the bottom */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_s,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_se,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_sw,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_sme,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_smw {
+  top: 0;
+  right: auto;
+  left: auto;
+  transform: none;
+}
+
+/* Case it opens to the top. */
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_n,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_ne,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_nw,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_nme,
+.ck.ck-dropdown.ck-ui-styles-inline-dropdown-style-dropdown .ck.ck-dropdown__panel.ck-dropdown__panel_nmw {
+  right: auto;
+  bottom: 0;
+  left: auto;
+  transform: none;
+}

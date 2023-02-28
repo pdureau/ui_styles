@@ -1,0 +1,27 @@
+internal.ckeditor5.ui_styles_block:
+  css:
+    theme:
+      assets/css/ui_styles_ckeditor5_block.editor.css: {}
+  js:
+    js/build/uiStylesBlock.js: { preprocess: false, minified: true }
+  dependencies:
+    - core/ckeditor5
+
+internal.ckeditor5.ui_styles_inline:
+  css:
+    theme:
+      assets/css/ui_styles_ckeditor5_inline.editor.css: {}
+  js:
+    js/build/uiStylesInline.js: { preprocess: false, minified: true }
+  dependencies:
+    - core/ckeditor5
+
+internal.ckeditor5.ui_styles_block.admin:
+  css:
+    theme:
+      assets/css/ui_styles_ckeditor5_block.admin.css: {}
+
+internal.ckeditor5.ui_styles_inline.admin:
+  css:
+    theme:
+      assets/css/ui_styles_ckeditor5_inline.admin.css: {}

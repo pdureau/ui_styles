@@ -1,0 +1,21 @@
+ui_styles_ckeditor5_ckeditor5_plugin:
+  type: mapping
+  label: 'UI Styles'
+  mapping:
+    enabled_styles:
+      type: sequence
+      label: 'Enabled styles'
+      constraints:
+        NotBlank:
+          message: 'Enable at least one style, otherwise disable the UI Styles button.'
+      sequence:
+        type: string
+        label: 'Style'
+
+ckeditor5.plugin.ui_styles_ckeditor5_uiStylesBlock:
+  type: ui_styles_ckeditor5_ckeditor5_plugin
+  label: 'UI Styles (block)'
+
+ckeditor5.plugin.ui_styles_ckeditor5_uiStylesInline:
+  type: ui_styles_ckeditor5_ckeditor5_plugin
+  label: 'UI Styles (inline)'

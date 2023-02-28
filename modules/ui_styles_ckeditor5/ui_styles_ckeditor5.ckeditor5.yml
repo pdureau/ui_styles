@@ -1,0 +1,28 @@
+ui_styles_ckeditor5_uiStylesBlock:
+  ckeditor5:
+    plugins: [uiStylesBlock.UiStylesBlock]
+  drupal:
+    label: 'UI Styles (block)'
+    library: ui_styles_ckeditor5/internal.ckeditor5.ui_styles_block
+    admin_library: ui_styles_ckeditor5/internal.ckeditor5.ui_styles_block.admin
+    class: Drupal\ui_styles_ckeditor5\Plugin\CKEditor5Plugin\UiStylesBlock
+    toolbar_items:
+      UiStylesBlock:
+        label: 'UI Styles (block)'
+    elements:
+      - <$any-html5-element class>
+
+ui_styles_ckeditor5_uiStylesInline:
+  ckeditor5:
+    plugins: [uiStylesInline.UiStylesInline]
+  drupal:
+    label: 'UI Styles (inline)'
+    library: ui_styles_ckeditor5/internal.ckeditor5.ui_styles_inline
+    admin_library: ui_styles_ckeditor5/internal.ckeditor5.ui_styles_inline.admin
+    class: Drupal\ui_styles_ckeditor5\Plugin\CKEditor5Plugin\UiStylesInline
+    toolbar_items:
+      UiStylesInline:
+        label: 'UI Styles (inline)'
+    elements:
+      - <$any-html5-element class>
+      - <span>

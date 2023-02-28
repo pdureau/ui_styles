@@ -9,7 +9,6 @@ use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
@@ -26,6 +25,7 @@ use Drupal\ui_styles\Render\Element;
  */
 class StylePluginManager extends DefaultPluginManager implements StylePluginManagerInterface {
   use StringTranslationTrait;
+  use MachineNameTrait;
 
   /**
    * The theme handler.
@@ -33,13 +33,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected ThemeHandlerInterface $themeHandler;
-
-  /**
-   * The transliteration service.
-   *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
-   */
-  protected TransliterationInterface $transliteration;
 
   /**
    * Constructor.
@@ -336,25 +329,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);
     }
     return $content;
-  }
-
-  /**
-   * Generates a machine name from a string.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $string
-   *   The string to convert.
-   *
-   * @return string
-   *   The converted string.
-   *
-   * @see \Drupal\Core\Block\BlockBase::getMachineNameSuggestion()
-   * @see \Drupal\system\MachineNameController::transliterate()
-   */
-  protected function getMachineName($string): string {
-    $transliterated = $this->transliteration->transliterate($string, LanguageInterface::LANGCODE_DEFAULT, '_');
-    $transliterated = \mb_strtolower($transliterated);
-    $transliterated = \preg_replace('@[^a-z0-9_.]+@', '_', $transliterated);
-    return $transliterated ?? '';
   }
 
 }

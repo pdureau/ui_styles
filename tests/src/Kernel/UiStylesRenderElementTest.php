@@ -20,7 +20,7 @@ class UiStylesRenderElementTest extends KernelTestBase {
   protected static $modules = ['system', 'block'];
 
   /**
-   * Test the isAcceptingAttributes().
+   * Test isAcceptingAttributes().
    *
    * @covers ::isAcceptingAttributes
    * @covers ::isRenderElementAcceptingAttributes
@@ -30,7 +30,7 @@ class UiStylesRenderElementTest extends KernelTestBase {
    */
   public function testIsAcceptingAttributes(array $element, bool $expected): void {
     $result = Element::isAcceptingAttributes($element);
-    $this->assertSame($result, $expected);
+    $this->assertSame($expected, $result);
   }
 
   /**
