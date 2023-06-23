@@ -557,9 +557,9 @@ class StylePluginManagerTest extends UnitTestCase {
       ],
     ];
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
-    $this->assertContains('original-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
-    $this->assertNotContains('added-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
-    $this->assertNotContains('extra-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
+    $this->assertContains('original-class', $newElement['content']['_no_layout_builder']['element'][0]['#attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['_no_layout_builder']['#attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['_no_layout_builder']['#attributes']['class']);
 
     // Test addStyleToBlockContent > no #theme : no #view_mode
     // > isAcceptingAttributes.

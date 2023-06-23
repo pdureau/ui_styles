@@ -73,9 +73,10 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     'test-class-body-block-content',
     'test-class-block-content-entity-block-wrapper',
     'test-class-block-content-entity-block-title',
-    // @todo in https://www.drupal.org/project/ui_styles/issues/3334615
+    'test-class-block-content-entity-block-content',
+    // @todo add an entity that uses Layout Builder with multiple sections for
+    // https://www.drupal.org/project/ui_styles/issues/3334615
     // or in https://www.drupal.org/project/ui_styles/issues/3334791.
-    // 'test-class-block-content-entity-block-content',
     'test-class-title-block-extra-wrapper',
     'test-class-title-block-extra-title',
     'test-class-title-block-extra-content',
@@ -84,9 +85,10 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     'test-class-body-block-extra-content',
     'test-class-block-content-entity-block-extra-wrapper',
     'test-class-block-content-entity-block-extra-title',
-    // @todo in https://www.drupal.org/project/ui_styles/issues/3334615
+    'test-class-block-content-entity-block-extra-content',
+    // @todo add an entity that uses Layout Builder with multiple sections for
+    // https://www.drupal.org/project/ui_styles/issues/3334615
     // or in https://www.drupal.org/project/ui_styles/issues/3334791.
-    // 'test-class-block-content-entity-block-extra-content',
   ];
 
   /**

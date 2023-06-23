@@ -307,8 +307,15 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
         if (Element::isAcceptingAttributes($section)) {
           $content['_layout_builder'][0] = Element::addClasses($section, $styles);
         }
+        return $content;
       }
-      return $content;
+      // If the embedded entity does not use layout builder.
+      else {
+        foreach(Element::children($content) as $key) {
+          $content[$key] = $this->addStyleToBlockContent($content[$key], $styles);
+        }
+        return $content;
+      }
     }
 
     Element::wrapElementIfNotAcceptingAttributes($content);
