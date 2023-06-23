@@ -1,7 +1,7 @@
 name: 'UI Styles CKEditor 5'
 type: module
 description: 'Allows to use styles in CKEditor 5.'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^9.5 || ^10
 package: 'User interface'
 dependencies:
   - drupal:ckeditor5

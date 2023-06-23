@@ -1,5 +1,5 @@
 name: 'UI Styles'
 type: module
 description: 'Define styles from modules and themes.'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^9.5 || ^10
 package: 'User interface'

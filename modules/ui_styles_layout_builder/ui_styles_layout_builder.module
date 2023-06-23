@@ -149,13 +149,8 @@ function ui_styles_layout_builder_preprocess_block(array &$variables): void {
  * Modify the configuration form for layout builder sections (layouts).
  */
 function ui_styles_layout_builder_form_layout_builder_configure_section_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
-  /** @var \Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface $formObject */
+  /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
   $formObject = $form_state->getFormObject();
-  // Alter form only on section update, not on section creation, because of
-  // the section delta shift.
-  if (!$formObject->isUpdate()) {
-    return;
-  }
   $section = $formObject->getCurrentSection();
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
 
@@ -189,7 +184,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
  * storage.
  */
 function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState): void {
-  /** @var \Drupal\ui_styles_layout_builder\ConfigureSectionFormInterface $formObject */
+  /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
   $formObject = $formState->getFormObject();
   $section = $formObject->getCurrentSection();
 

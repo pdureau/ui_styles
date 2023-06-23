@@ -1,8 +1,4 @@
 services:
-  ui_styles_layout_builder.route_subscriber:
-    class: Drupal\ui_styles_layout_builder\EventSubscriber\RouteSubscriber
-    tags:
-      - { name: 'event_subscriber' }
   ui_styles_layout_builder.render_block_component_subscriber:
     class: Drupal\ui_styles_layout_builder\EventSubscriber\BlockComponentRenderArraySubscriber
     arguments:
