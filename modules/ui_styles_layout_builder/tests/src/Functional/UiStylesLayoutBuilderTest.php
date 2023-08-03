@@ -96,7 +96,11 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->user = $this->drupalCreateUser([], NULL, TRUE);
+    $user = $this->drupalCreateUser([], NULL, TRUE);
+    if (!($user instanceof UserInterface)) {
+      $this->fail('Impossible to create the tests user.');
+    }
+    $this->user = $user;
 
     $this->drupalPlaceBlock('local_tasks_block');
 

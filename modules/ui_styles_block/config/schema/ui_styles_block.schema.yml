@@ -1,0 +1,13 @@
+block.block.*.third_party.ui_styles:
+  type: mapping
+  label: 'UI Styles Block third party settings'
+  mapping:
+    block:
+      type: ui_styles.selected_mapping
+      label: 'Block styles'
+    title:
+      type: ui_styles.selected_mapping
+      label: 'Title styles'
+    content:
+      type: ui_styles.selected_mapping
+      label: 'Content styles'

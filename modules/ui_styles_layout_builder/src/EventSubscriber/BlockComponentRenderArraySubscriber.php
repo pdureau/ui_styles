@@ -23,7 +23,7 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
   protected $styleManager;
 
   /**
-   * Dependency injection.
+   * Constructor.
    *
    * @param \Drupal\ui_styles\StylePluginManagerInterface $style_manager
    *   The style manager.

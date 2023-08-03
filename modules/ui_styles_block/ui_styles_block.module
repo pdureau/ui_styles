@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Adding styles to blocks.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\block\BlockInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\ui_styles_block\HookHandler\BlockPresave;
+use Drupal\ui_styles_block\HookHandler\FormBlockFormAlter;
+use Drupal\ui_styles_block\HookHandler\PreprocessBlock;
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for 'block'.
+ */
+function ui_styles_block_block_presave(BlockInterface $entity): void {
+  /** @var \Drupal\ui_styles_block\HookHandler\BlockPresave $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(BlockPresave::class);
+  $instance->setThirdPartySettings($entity);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'block_form'.
+ */
+function ui_styles_block_form_block_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  /** @var \Drupal\ui_styles_block\HookHandler\FormBlockFormAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(FormBlockFormAlter::class);
+  $instance->blockFormAlter($form, $form_state);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for 'block'.
+ */
+function ui_styles_block_preprocess_block(array &$variables): void {
+  /** @var \Drupal\ui_styles_block\HookHandler\PreprocessBlock $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(PreprocessBlock::class);
+  $instance->preprocess($variables);
+}

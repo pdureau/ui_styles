@@ -1,0 +1,4 @@
+name: 'UI Styles Block Test'
+type: module
+description: 'Provides testing styles.'
+package: 'Testing'
