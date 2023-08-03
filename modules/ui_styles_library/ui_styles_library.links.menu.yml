@@ -1,5 +1,11 @@
+ui_suite.index:
+  title: "UI libraries"
+  description: "Design system libraries."
+  route_name: ui_suite.index
+  parent: system.themes_page
+
 ui_styles_library.overview:
-  title: "UI Styles library"
-  description: "See a list of UI Styles which exist on the site."
-  parent: system.admin_reports
+  title: "Styles"
+  description: "See a list of styles which exist on the site."
   route_name: ui_styles_library.overview
+  parent: ui_suite.index

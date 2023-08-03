@@ -1,3 +1,11 @@
+ui_suite.index:
+  path: '/admin/appearance/ui-libraries'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'UI libraries'
+  requirements:
+    _permission: 'access patterns page+access_ui_styles_library+access_ui_examples_library'
+
 ui_styles_library.overview:
   path: '/styles'
   defaults:

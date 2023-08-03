@@ -1,0 +1,4 @@
+ui_suite.index:
+  title: 'UI libraries'
+  route_name: ui_suite.index
+  base_route: system.themes_page
