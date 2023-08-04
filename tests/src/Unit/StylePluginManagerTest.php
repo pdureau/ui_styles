@@ -640,6 +640,26 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertContains('original-class', $newElement['content']['test_image_formatter']['#item_attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test_image_formatter']['#item_attributes']['class']);
     $this->assertContains('extra-class', $newElement['content']['test_image_formatter']['#item_attributes']['class']);
+
+    // Test addStyleToBlockContent > #theme:block > #theme:field
+    // > responsive_image_formatter.
+    $element = [
+      '#theme' => 'block',
+      'content' => [
+        '#theme' => 'field',
+        '#formatter' => 'dummy',
+        'test_responsive_image_formatter' => [
+          '#theme' => 'responsive_image_formatter',
+          '#item_attributes' => [
+            'class' => ['original-class'],
+          ],
+        ],
+      ],
+    ];
+    $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
+    $this->assertContains('original-class', $newElement['content']['test_responsive_image_formatter']['#item_attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['test_responsive_image_formatter']['#item_attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['test_responsive_image_formatter']['#item_attributes']['class']);
   }
 
 }

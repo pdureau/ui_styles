@@ -13,6 +13,14 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 interface StylePluginManagerInterface extends PluginManagerInterface, CategorizingPluginManagerInterface {
 
   /**
+   * List of theme hook using item_attributes instead of attributes.
+   */
+  public const THEME_WITH_ITEM_ATTRIBUTES = [
+    'image_formatter',
+    'responsive_image_formatter',
+  ];
+
+  /**
    * {@inheritdoc}
    *
    * @return \Drupal\ui_styles\Definition\StyleDefinition|null
