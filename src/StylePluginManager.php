@@ -316,8 +316,16 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       return $content;
     }
 
-    Element::wrapElementIfNotAcceptingAttributes($content);
+    // In case of children, like with Drupal 10.1.
+    $children = Element::children($content);
+    if (!empty($children)) {
+      foreach ($children as $delta) {
+        $content[$delta] = $this->addStyleToBlockContent($content[$delta], $styles);
+      }
+      return $content;
+    }
 
+    Element::wrapElementIfNotAcceptingAttributes($content);
     return Element::addClasses($content, $styles);
   }
 
