@@ -336,7 +336,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     foreach (Element::children($content) as $delta) {
       Element::wrapElementIfNotAcceptingAttributes($content[$delta]);
 
-      if (\array_key_exists('#theme', $content[$delta]) && \in_array($content[$delta]['#theme'], $this::THEME_WITH_ITEM_ATTRIBUTES)) {
+      if (\array_key_exists('#theme', $content[$delta]) && \in_array($content[$delta]['#theme'], $this::THEME_WITH_ITEM_ATTRIBUTES, TRUE)) {
         $attr_property = '#item_attributes';
       }
       $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);

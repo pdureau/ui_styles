@@ -3,6 +3,7 @@ test_class:
   description: Test class
   options:
     test-class-section: Test
+    test-class-region: Test
     test-class-title-block-wrapper: Test
     test-class-title-block-title: Test
     test-class-title-block-content: Test

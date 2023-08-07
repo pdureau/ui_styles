@@ -40,6 +40,19 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
         $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
         $element['layout_builder'][$index]['layout-builder__section'] =
           $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'], $selected, $extra);
+
+        // Regions.
+        /** @var array $regions_configuration */
+        $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
+        foreach ($regions_configuration as $region_name => $region_styles) {
+          /** @var array $selected */
+          $selected = $region_styles['selected'] ?? [];
+          /** @var string $extra */
+          $extra = $region_styles['extra'] ?? '';
+          $element['layout_builder'][$index]['layout-builder__section'][$region_name] =
+            $styles_manager->addClasses($element['layout_builder'][$index]['layout-builder__section'][$region_name], $selected, $extra);
+        }
+
         ++$delta;
       }
     }

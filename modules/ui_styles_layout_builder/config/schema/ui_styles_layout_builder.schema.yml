@@ -1,2 +1,9 @@
 layout_builder.section.third_party.ui_styles:
   type: ui_styles.selected_mapping
+  mapping:
+    regions:
+      type: sequence
+      label: "Regions' styles"
+      sequence:
+        type: ui_styles.selected_mapping
+        label: "Region's styles"
