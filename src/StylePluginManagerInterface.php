@@ -73,11 +73,13 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    *   The selected class(es).
    * @param string $extra
    *   The optional free extra class(es).
+   * @param string $theme
+   *   The optional theme.
    *
    * @return array
    *   The modified form element.
    */
-  public function alterForm(array $form, array $selected = [], string $extra = ''): array;
+  public function alterForm(array $form, array $selected = [], string $extra = '', string $theme = ''): array;
 
   /**
    * Add classes to target element.
@@ -93,5 +95,16 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    *   The modified render element.
    */
   public function addClasses(array $target_element, array $selected = [], string $extra = ''): array;
+
+  /**
+   * Filter plugins by the modules and the selected theme and its parents.
+   *
+   * @param string $theme
+   *   The theme to filter the plugins against.
+   *
+   * @return \Drupal\ui_styles\Definition\StyleDefinition[][]
+   *   The list of filtered, grouped and sorted definitions.
+   */
+  public function getDefinitionsForTheme(string $theme): array;
 
 }

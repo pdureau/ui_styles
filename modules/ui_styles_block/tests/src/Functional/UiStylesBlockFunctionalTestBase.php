@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Drupal\Tests\ui_styles_block\Functional;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 
@@ -13,7 +12,6 @@ use Drupal\user\UserInterface;
  * Provides common methods for UI Styles Block functional tests.
  */
 abstract class UiStylesBlockFunctionalTestBase extends BrowserTestBase {
-  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}

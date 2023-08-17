@@ -1,0 +1,5 @@
+name: 'UI Styles Test Theme 2'
+type: theme
+description: 'UI Styles test theme.'
+base theme: false
+package: 'Testing'

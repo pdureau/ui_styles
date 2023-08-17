@@ -1,0 +1,6 @@
+ui_styles_regions:
+  type: sequence
+  label: 'Selected regions styles'
+  sequence:
+    type: ui_styles.selected_mapping
+    label: 'Selected styles mapping'

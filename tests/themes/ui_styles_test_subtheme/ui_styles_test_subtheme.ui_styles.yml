@@ -1,0 +1,4 @@
+ui_styles_test_subtheme:
+  label: "Test subtheme"
+  options:
+    my-subtheme-class: "Test value"

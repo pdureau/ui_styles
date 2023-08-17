@@ -1,0 +1,5 @@
+ui_styles_test_subsubtheme:
+  category: "Subsubtheme group"
+  label: "Test subsubtheme"
+  options:
+    my-subsubtheme-class: "Test value"

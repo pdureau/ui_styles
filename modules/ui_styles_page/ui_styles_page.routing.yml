@@ -1,0 +1,15 @@
+ui_styles_page.regions.overview:
+  path: '/admin/appearance/regions-styles'
+  defaults:
+    _controller: 'Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Regions styles'
+  requirements:
+    _permission: 'administer themes'
+
+ui_styles_page.regions.theme_settings:
+  path: '/admin/appearance/regions-styles/{theme}'
+  defaults:
+    _form: 'Drupal\ui_styles_page\Form\RegionsThemeSettingsForm'
+    _title_callback: 'theme_handler:getName'
+  requirements:
+    _permission: 'administer themes'

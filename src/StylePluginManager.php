@@ -209,8 +209,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   /**
    * {@inheritdoc}
    */
-  public function alterForm(array $form, array $selected = [], string $extra = ''): array {
-    $grouped_plugin_definitions = $this->getGroupedDefinitions();
+  public function alterForm(array $form, array $selected = [], string $extra = '', string $theme = ''): array {
+    if (!empty($theme)) {
+      $grouped_plugin_definitions = $this->getDefinitionsForTheme($theme);
+    }
+    else {
+      $grouped_plugin_definitions = $this->getGroupedDefinitions();
+    }
+
     if (empty($grouped_plugin_definitions)) {
       return $form;
     }
@@ -285,6 +291,33 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
 
     Element::wrapElementIfNotAcceptingAttributes($element);
     return Element::addClasses($element, $styles);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefinitionsForTheme(string $theme): array {
+    $themes = $this->themeHandler->listInfo();
+    // Create a list which includes the current theme and all its base themes.
+    if (isset($themes[$theme]->base_themes)) {
+      $theme_keys = \array_keys($themes[$theme]->base_themes);
+      $theme_keys[] = $theme;
+    }
+    else {
+      $theme_keys = [$theme];
+    }
+
+    $definitions = $this->getDefinitions();
+    foreach ($definitions as $definition_key => $definition) {
+      if ($this->moduleHandler->moduleExists($definition->getProvider())
+        || \in_array($definition->getProvider(), $theme_keys, TRUE)) {
+        continue;
+      }
+
+      unset($definitions[$definition_key]);
+    }
+
+    return $this->getGroupedDefinitions($definitions);
   }
 
   /**

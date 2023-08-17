@@ -1,0 +1,7 @@
+name: 'UI Styles Page'
+type: module
+description: "Apply styles to themes' regions."
+core_version_requirement: ^9.5 || ^10
+package: 'User interface'
+dependencies:
+  - ui_styles:ui_styles

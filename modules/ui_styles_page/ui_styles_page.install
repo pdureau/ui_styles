@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for the ui_styles_page module.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\ui_styles_page\UiStylesPageInterface;
+
+/**
+ * Implements hook_uninstall().
+ */
+function ui_styles_page_uninstall(): void {
+  $themeHandler = \Drupal::service('theme_handler');
+  $configFactory = \Drupal::configFactory();
+  foreach ($themeHandler->listInfo() as $theme) {
+    $config = $configFactory->getEditable($theme->getName() . '.settings');
+    $regionsStylesSettings = $config->get(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
+    if ($regionsStylesSettings == NULL) {
+      continue;
+    }
+    /** @var array $settings */
+    $settings = $config->get();
+    unset($settings[UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS]);
+    $config->setData($settings)->save();
+  }
+}

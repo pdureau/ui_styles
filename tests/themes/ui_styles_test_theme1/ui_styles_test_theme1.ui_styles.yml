@@ -1,0 +1,4 @@
+ui_styles_test_theme1:
+  label: "Test theme 1"
+  options:
+    theme1-class: "Test value"

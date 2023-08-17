@@ -1,0 +1,11 @@
+ui_styles_page.regions.overview:
+  title: 'Regions styles'
+  description: 'Configure themes regions styles.'
+  route_name: ui_styles_page.regions.overview
+  parent: system.themes_page
+
+ui_styles_page.regions.theme_settings:
+  title: 'Theme name'
+  route_name: ui_styles_page.regions.theme_settings
+  parent: ui_styles_page.regions.overview
+  deriver: Drupal\ui_styles_page\Plugin\Derivative\RegionStyles
