@@ -24,21 +24,5 @@ export default class UiStylesInlineEditing extends Plugin {
     const normalizedStyleDefinitions = normalizeConfig(editor.config.get('uiStylesInline.options'));
 
     editor.commands.add('uiStylesInline', new UiStylesInlineCommand(editor, normalizedStyleDefinitions));
-
-    this._defineSchema();
-  }
-
-  _defineSchema() {
-    const schema = this.editor.model.schema;
-
-    // Allow the remove format plugin to remove the classes.
-    schema.setAttributeProperties('htmlAttributes', {
-      isFormatting: true
-    });
-
-    // Allow the remove format plugin to remove the span.
-    schema.setAttributeProperties('htmlSpan', {
-      isFormatting: true
-    });
   }
 }

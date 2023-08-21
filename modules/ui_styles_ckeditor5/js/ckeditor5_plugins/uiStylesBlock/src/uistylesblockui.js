@@ -41,7 +41,12 @@ export default class UiStylesBlockUI extends Plugin {
       options.forEach(style => {
         buttons.push(componentFactory.create(`UIStylesBlock:${style.id}`));
       });
-      addToolbarToDropdown(dropdownView, buttons, {enableActiveItemFocusOnDropdownOpen: false});
+
+      addToolbarToDropdown(dropdownView, buttons, {
+        enableActiveItemFocusOnDropdownOpen: false,
+        isVertical: true,
+        ariaLabel: t('UI Styles block toolbar')
+      });
 
       // Configure dropdown properties and behavior.
       dropdownView.buttonView.set({
@@ -49,9 +54,6 @@ export default class UiStylesBlockUI extends Plugin {
         withText: true,
         tooltip: true,
       });
-
-      dropdownView.toolbarView.isVertical = true;
-      dropdownView.toolbarView.ariaLabel = t('UI Styles block toolbar');
 
       // As it is (or seems to be) currently not possible to bind the isOn of
       // dropdownView.buttonView to the command, apply a class on dropdownView

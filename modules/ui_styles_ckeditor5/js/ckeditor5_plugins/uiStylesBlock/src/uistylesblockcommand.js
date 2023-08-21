@@ -2,7 +2,6 @@
 
 import {Command} from 'ckeditor5/src/core';
 import {first} from 'ckeditor5/src/utils';
-import defaultConfig from '@ckeditor/ckeditor5-html-support/src/schemadefinitions';
 
 export default class UiStylesBlockCommand extends Command {
 
@@ -36,6 +35,8 @@ export default class UiStylesBlockCommand extends Command {
   refresh() {
     const model = this.editor.model;
     const selection = model.document.selection;
+    const htmlSupport = this.editor.plugins.get('GeneralHtmlSupport');
+    const dataSchema = this.editor.plugins.get('DataSchema');
 
     const value = new Set();
     const enabledStyles = new Set();
@@ -53,7 +54,17 @@ export default class UiStylesBlockCommand extends Command {
           break;
         }
 
-        if (!model.schema.checkAttribute(block, 'htmlAttributes')) {
+        // Get element from block name.
+        const schemaDefinitions = dataSchema.getDefinitionsForModel(block.name);
+        const schemaDefinition = schemaDefinitions.find(schemaDefinition => (schemaDefinition.model == block.name) && (schemaDefinition.isBlock == true));
+
+        if (schemaDefinition === undefined) {
+          continue;
+        }
+
+        const attributeName = htmlSupport.getGhsAttributeNameForElement(schemaDefinition.view);
+
+        if (!model.schema.checkAttribute(block, attributeName)) {
           continue;
         }
 
@@ -62,7 +73,7 @@ export default class UiStylesBlockCommand extends Command {
           enabledStyles.add(definition.name);
 
           // Check if this block style is active.
-          const ghsAttributeValue = block.getAttribute('htmlAttributes');
+          const ghsAttributeValue = block.getAttribute(attributeName);
 
           if (hasAllClasses(ghsAttributeValue, definition.classes)) {
             value.add(definition.name);
@@ -80,34 +91,30 @@ export default class UiStylesBlockCommand extends Command {
 		const model = this.editor.model;
 		const selection = model.document.selection;
 		const htmlSupport = this.editor.plugins.get('GeneralHtmlSupport');
+    const dataSchema = this.editor.plugins.get('DataSchema');
 
-		const definition = this._styleDefinitions.find(({name}) => name == styleName);
+    const definition = this._styleDefinitions.find(({name}) => name == styleName);
 
     const shouldAddStyle = !this.value.includes(definition.name);
-
-    // As there is currently no method to get the current definitions from
-    // dataSchema, loop on default definitions and add manually the only
-    // Drupal core added element.
-    defaultConfig.block.push({
-      model: 'drupalMedia',
-      view: 'drupal-media',
-    });
 
 		model.change(() => {
       let selectables;
       selectables = getAffectedBlocks(selection.getSelectedBlocks(), model.schema);
       for (const selectable of selectables) {
         // Get element from block name.
-        const schemaDefinition = defaultConfig.block.find(schemaDefinition => schemaDefinition.model == selectable.name);
+        const schemaDefinitions = dataSchema.getDefinitionsForModel(selectable.name);
+        const schemaDefinition = schemaDefinitions.find(schemaDefinition => (schemaDefinition.model == selectable.name) && (schemaDefinition.isBlock == true));
 
-        if (schemaDefinition !== null) {
-          if (shouldAddStyle) {
-            htmlSupport.removeModelHtmlClass(schemaDefinition.view, definition.excluded_classes, selectable);
-            htmlSupport.addModelHtmlClass(schemaDefinition.view, definition.classes, selectable);
-          }
-          else {
-            htmlSupport.removeModelHtmlClass(schemaDefinition.view, definition.classes, selectable);
-          }
+        if (schemaDefinition === undefined) {
+          continue;
+        }
+
+        if (shouldAddStyle) {
+          htmlSupport.removeModelHtmlClass(schemaDefinition.view, definition.excluded_classes, selectable);
+          htmlSupport.addModelHtmlClass(schemaDefinition.view, definition.classes, selectable);
+        }
+        else {
+          htmlSupport.removeModelHtmlClass(schemaDefinition.view, definition.classes, selectable);
         }
       }
 		});
