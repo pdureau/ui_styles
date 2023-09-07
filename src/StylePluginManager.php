@@ -233,8 +233,11 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     if (\count($grouped_plugin_definitions) == 1) {
       $multiple_groups = FALSE;
     }
-
+    $suffix = ' (' . $this->t('used') . ')';
+    $global_used = FALSE;
     foreach ($grouped_plugin_definitions as $group_plugin_definitions) {
+      $group_used = FALSE;
+      $group_key = '';
       foreach ($group_plugin_definitions as $definition) {
         $id = $definition->id();
         $element_name = 'ui_styles_' . $id;
@@ -246,6 +249,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
           '#default_value' => $selected[$id] ?? '',
           '#weight' => $definition->getWeight(),
         ];
+        // Check if current style is used.
+        $used = FALSE;
+        if (!empty($plugin_element['#default_value']) && $plugin_element['#default_value'] != $this->t('- None -')) {
+          $global_used = TRUE;
+          $group_used = TRUE;
+          $used = TRUE;
+        }
 
         // Create group if it does not exist yet.
         if ($multiple_groups && $definition->hasCategory()) {
@@ -259,10 +269,20 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
           }
 
           $form[$group_key][$element_name] = $plugin_element;
+          if ($used) {
+            $form[$group_key][$element_name]['#title'] .= $suffix;
+          }
         }
         else {
           $form[$element_name] = $plugin_element;
+          if ($used) {
+            $form[$element_name]['#title'] .= $suffix;
+          }
         }
+      }
+
+      if (!empty($group_key) && $group_used && isset($form[$group_key]['#title'])) {
+        $form[$group_key]['#title'] .= $suffix;
       }
     }
     $form['_ui_styles_extra'] = [
@@ -271,6 +291,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       '#description' => $this->t('You can add many values using spaces as separators'),
       '#default_value' => $extra ?: '',
     ];
+
+    if ($global_used && !empty($form['#title'])) {
+      $form['#title'] .= $suffix;
+    }
     return $form;
   }
 

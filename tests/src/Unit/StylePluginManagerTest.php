@@ -55,11 +55,13 @@ class StylePluginManagerTest extends UnitTestCase {
   protected $styles = [
     0 => [
       'id' => 'test1',
+      'category' => 'Main',
       'options' => ['opt1', 'opt2', 'opt3'],
       'label' => 'has_label',
     ],
     1 => [
       'id' => 'test2',
+      'category' => 'Main',
       'options' => ['opt1', 'opt2', 'opt3'],
       'label' => 'has_label',
     ],
@@ -371,19 +373,42 @@ class StylePluginManagerTest extends UnitTestCase {
    * @covers ::alterForm
    */
   public function testAlterForm(): void {
-    $form = [];
+    $suffix = ' (used)';
+    $form = [
+      '#type' => 'details',
+      '#title' => 'Main',
+      '#open' => FALSE,
+    ];
     $extra = 'has_extra';
 
     $form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt2',
       'test2' => 'opt3',
     ], $extra);
-
     $this->assertSame($form['_ui_styles_extra']['#default_value'], 'has_extra');
     $this->assertArrayHasKey('ui_styles_test1', $form);
     $this->assertArrayHasKey('ui_styles_test2', $form);
     $this->assertSame($form['ui_styles_test1']['#default_value'], 'opt2');
     $this->assertSame($form['ui_styles_test2']['#default_value'], 'opt3');
+    $this->assertSame($form['ui_styles_test1']['#options'], $this->styles[0]['options']);
+    $this->assertSame($form['ui_styles_test1']['#title'], $this->styles[0]['label'] . $suffix);
+    $this->assertSame($form['ui_styles_test2']['#options'], $this->styles[1]['options']);
+    $this->assertSame($form['ui_styles_test2']['#title'], $this->styles[1]['label'] . $suffix);
+
+    // Test parent title.
+    $this->assertSame($form['#title'], 'Main' . $suffix);
+
+    // Test that if no value is used suffix is not set.
+    $form = [
+      '#type' => 'details',
+      '#title' => 'Main',
+      '#open' => FALSE,
+    ];
+    $extra = '';
+
+    $form = $this->stylePluginManager->alterForm($form, [], $extra);
+    $this->assertArrayHasKey('ui_styles_test1', $form);
+    $this->assertArrayHasKey('ui_styles_test2', $form);
     $this->assertSame($form['ui_styles_test1']['#options'], $this->styles[0]['options']);
     $this->assertSame($form['ui_styles_test1']['#title'], $this->styles[0]['label']);
     $this->assertSame($form['ui_styles_test2']['#options'], $this->styles[1]['options']);
