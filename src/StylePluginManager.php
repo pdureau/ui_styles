@@ -195,6 +195,15 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     }
 
     $definition = new StyleDefinition($definition);
+    // Makes links titles translatable.
+    $links = array_map(function ($link) {
+      if (is_array($link) && !$link['title'] instanceof TranslatableMarkup) {
+        $link['title'] = new TranslatableMarkup($link['title'], [], ['context' => 'ui_styles']);
+      }
+      return $link;
+    }, $definition->getLinks());
+    $definition->setLinks($links);
+
   }
 
   /**

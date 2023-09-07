@@ -15,7 +15,18 @@
     <ul>
       {% for style in group_styles %}
         <li>
+          {# Anchor link. #}
           <a href="#{{ style.id }}">{{ style.label }}</a>
+          {# External documentation links. #}
+          {% if style.render_links %}
+            <ul>
+              {% for renderLink in style.render_links %}
+                <li>
+                  {{ renderLink }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>

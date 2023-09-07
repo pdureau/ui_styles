@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\ui_styles\Definition;
 
 use Drupal\Component\Plugin\Definition\PluginDefinition;
+use Drupal\Core\Url;
 
 /**
  * Style definition class.
@@ -21,6 +22,7 @@ class StyleDefinition extends PluginDefinition {
     'enabled' => TRUE,
     'label' => '',
     'description' => '',
+    'links' => [],
     'category' => '',
     'options' => [],
     'previewed_with' => [],
@@ -336,6 +338,59 @@ class StyleDefinition extends PluginDefinition {
   }
 
   /**
+   * Getter.
+   *
+   * @return array
+   *   The links.
+   */
+  public function getLinks(): array {
+    $links = [];
+
+    foreach ($this->definition['links'] as $link) {
+      if (!\is_array($link)) {
+        $link = [
+          'url' => $link,
+        ];
+      }
+
+      $link += [
+        'title' => 'External documentation',
+      ];
+
+      $links[] = $link;
+    }
+
+    return $links;
+  }
+
+  /**
+   * Setter.
+   *
+   * @param array $links
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setLinks(array $links) {
+    $this->definition['links'] = $links;
+    return $this;
+  }
+
+  /**
+   * Construct render links.
+   *
+   * @return array
+   *   Render links.
+   */
+  public function getRenderLinks(): array {
+    $renderLinks = [];
+    foreach ($this->getLinks() as $link) {
+      $renderLinks[] = $this->renderLink($link);
+    }
+    return $renderLinks;
+  }
+
+  /**
    * Return array definition.
    *
    * @return array
@@ -344,7 +399,38 @@ class StyleDefinition extends PluginDefinition {
   public function toArray(): array {
     $definition = $this->definition;
     $definition['preview_options'] = $this->getOptionsForPreview();
+    $definition['render_links'] = $this->getRenderLinks();
     return $definition;
+  }
+
+  /**
+   * Render link.
+   *
+   * @param array $link
+   *   A link from getLinks method.
+   *
+   * @return array
+   *   The link render element.
+   */
+  protected function renderLink(array $link): array {
+    $renderLink = [
+      '#type' => 'link',
+      '#title' => $link['title'],
+    ];
+
+    if (!empty($link['url'])) {
+      $renderLink['#url'] = Url::fromUri($link['url']);
+    }
+
+    if (!empty($link['options'])) {
+      $renderLink['#options'] = $link['options'];
+    }
+
+    if (!empty($link['attributes'])) {
+      $renderLink['#attributes'] = $link['attributes'];
+    }
+
+    return $renderLink;
   }
 
 }

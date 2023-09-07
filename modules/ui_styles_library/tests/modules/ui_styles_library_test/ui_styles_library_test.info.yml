@@ -1,0 +1,4 @@
+name: 'UI Styles Library Test'
+type: module
+description: 'Provides test for UI Styles Library.'
+package: 'Testing'

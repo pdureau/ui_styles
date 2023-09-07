@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\Tests\ui_styles\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -37,8 +38,18 @@ class PluginTest extends KernelTestBase {
       'test' => [
         'id' => 'test',
         'provider' => 'ui_styles_test',
-        'label' => $this->t('Test'),
-        'description' => $this->t('Test plugin.'),
+        'label' => 'Test',
+        'description' => 'Test plugin.',
+        'links' => [
+          [
+            'url' => 'https://test.com',
+            'title' => 'External documentation',
+          ],
+          [
+            'url' => 'https://example.com',
+            'title' => 'Example',
+          ],
+        ],
         'enabled' => TRUE,
       ],
     ];

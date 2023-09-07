@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\ui_styles\Unit;
 
+use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Definition\StyleDefinition;
 
@@ -282,6 +283,106 @@ class StyleDefinitionTest extends UnitTestCase {
               'option-class',
             ],
             'previewed_as' => 'hidden',
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test getLinks.
+   *
+   * @param array $links
+   *   The links like in the YAML declaration.
+   * @param array $expected
+   *   The expected result.
+   *
+   * @covers ::getLinks
+   *
+   * @dataProvider definitionGetLinksProvider
+   */
+  public function testGetLinks(array $links, array $expected): void {
+    $definition = new StyleDefinition([
+      'links' => $links,
+    ]);
+    $this->assertEquals($expected, $definition->getLinks());
+  }
+
+  /**
+   * Provider.
+   *
+   * @return array
+   *   Data.
+   */
+  public function definitionGetLinksProvider(): array {
+    return [
+      [
+        [
+          'https://test.com',
+          [
+            'url' => 'https://example.com',
+            'title' => 'Example',
+          ],
+        ],
+        [
+          [
+            'url' => 'https://test.com',
+            'title' => 'External documentation',
+          ],
+          [
+            'url' => 'https://example.com',
+            'title' => 'Example',
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test getRenderLinks.
+   *
+   * @param array $links
+   *   The links like in the YAML declaration.
+   * @param array $expected
+   *   The expected result.
+   *
+   * @covers ::getRenderLinks
+   *
+   * @dataProvider definitionGetRenderLinksProvider
+   */
+  public function testGetRenderLinks(array $links, array $expected): void {
+    $definition = new StyleDefinition([
+      'links' => $links
+    ]);
+    $this->assertEquals($expected, $definition->getRenderLinks());
+  }
+
+  /**
+   * Provider.
+   *
+   * @return array
+   *   Data.
+   */
+  public function definitionGetRenderLinksProvider(): array {
+    return [
+      [
+        [
+          'https://test.com',
+          [
+            'url' => 'https://example.com',
+            'title' => 'Example',
+          ],
+        ],
+        [
+          [
+            '#type' => 'link',
+            '#url' => Url::fromUri('https://test.com'),
+            '#title' => 'External documentation',
+          ],
+          [
+            '#type' => 'link',
+            '#url' => Url::fromUri('https://example.com'),
+            '#title' => 'Example',
           ],
         ],
       ],
