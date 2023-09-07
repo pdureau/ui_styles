@@ -352,7 +352,7 @@ class StyleDefinitionTest extends UnitTestCase {
    */
   public function testGetRenderLinks(array $links, array $expected): void {
     $definition = new StyleDefinition([
-      'links' => $links
+      'links' => $links,
     ]);
     $this->assertEquals($expected, $definition->getRenderLinks());
   }

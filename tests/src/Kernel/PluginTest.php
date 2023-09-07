@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Drupal\Tests\ui_styles\Kernel;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
