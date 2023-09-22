@@ -103,8 +103,8 @@ class FormBlockFormAlter implements ContainerInjectionInterface {
   protected function getBlockParts(): array {
     return [
       'block' => $this->t('Block styles'),
-      'title' => $this->t('Block title styles'),
-      'content' => $this->t('Block content styles'),
+      'title' => $this->t('Title styles'),
+      'content' => $this->t('Content styles'),
     ];
   }
 

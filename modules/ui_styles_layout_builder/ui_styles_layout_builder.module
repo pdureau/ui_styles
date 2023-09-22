@@ -51,7 +51,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $extra = $component->get('ui_styles_title_extra') ?: '';
     $form['ui_styles_title'] = [
       '#type' => 'details',
-      '#title' => t('Block title styles'),
+      '#title' => t('Title styles'),
       '#open' => FALSE,
       '#states' => [
         'invisible' => [
@@ -68,7 +68,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $extra = $component->get('ui_styles_extra') ?: '';
     $form['ui_styles'] = [
       '#type' => 'details',
-      '#title' => t('Block content styles'),
+      '#title' => t('Content styles'),
       '#open' => FALSE,
     ];
     $form['ui_styles'] = $styles_manager->alterForm($form['ui_styles'], $selected, $extra);
