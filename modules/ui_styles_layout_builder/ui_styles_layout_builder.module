@@ -14,12 +14,6 @@ use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\ui_styles\UiStylesUtility;
 
-/*
- *
- * LAYOUT BUILDER COMPONENTS (BLOCKS)
- *
- */
-
 /**
  * Implements hook_form_alter().
  *
@@ -27,7 +21,11 @@ use Drupal\ui_styles\UiStylesUtility;
  */
 function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $formState): void {
   if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
+    /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
+    if (empty($styles_manager->getGroupedDefinitions())) {
+      return;
+    }
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $component = $formObject->getCurrentComponent();
@@ -39,7 +37,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $extra = $component->get('ui_styles_wrapper_extra') ?: '';
     $form['ui_styles_wrapper'] = [
       '#type' => 'details',
-      '#title' => t('Block styles'),
+      '#title' => \t('Block styles'),
       '#open' => FALSE,
     ];
     $form['ui_styles_wrapper'] = $styles_manager->alterForm($form['ui_styles_wrapper'], $selected, $extra);
@@ -51,7 +49,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $extra = $component->get('ui_styles_title_extra') ?: '';
     $form['ui_styles_title'] = [
       '#type' => 'details',
-      '#title' => t('Title styles'),
+      '#title' => \t('Title styles'),
       '#open' => FALSE,
       '#states' => [
         'invisible' => [
@@ -68,7 +66,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     $extra = $component->get('ui_styles_extra') ?: '';
     $form['ui_styles'] = [
       '#type' => 'details',
-      '#title' => t('Content styles'),
+      '#title' => \t('Content styles'),
       '#open' => FALSE,
     ];
     $form['ui_styles'] = $styles_manager->alterForm($form['ui_styles'], $selected, $extra);
@@ -76,7 +74,7 @@ function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $f
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
-    array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
+    \array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
 
     // Set form actions to a high weight, just so that we can make our form
     // style element appear right before them.
@@ -137,12 +135,6 @@ function ui_styles_layout_builder_preprocess_block(array &$variables): void {
   }
 }
 
-/*
- *
- * LAYOUT BUILDER SECTIONS (LAYOUTS)
- *
- */
-
 /**
  * Implements hook_form_FORM_ID_alter() for 'layout_builder_configure_section'.
  *
@@ -152,7 +144,11 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
   $formObject = $form_state->getFormObject();
   $section = $formObject->getCurrentSection();
+  /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
   $styles_manager = \Drupal::service('plugin.manager.ui_styles');
+  if (empty($styles_manager->getGroupedDefinitions())) {
+    return;
+  }
 
   // Section.
   /** @var array $selected */
@@ -164,7 +160,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   ];
   $form['ui_styles']['section'] = [
     '#type' => 'details',
-    '#title' => t('Section styles'),
+    '#title' => \t('Section styles'),
     '#open' => FALSE,
   ];
   $form['ui_styles']['section'] = $styles_manager->alterForm($form['ui_styles']['section'], $selected, $extra);
@@ -186,7 +182,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
     $extra = $regions_configuration[$region_name]['extra'] ?? '';
     $form['ui_styles']['regions'][$region_name] = [
       '#type' => 'details',
-      '#title' => t('@region_label region styles', [
+      '#title' => \t('@region_label region styles', [
         '@region_label' => $region_infos['label'] ?? '',
       ]),
       '#open' => FALSE,
@@ -197,7 +193,7 @@ function ui_styles_layout_builder_form_layout_builder_configure_section_alter(ar
   // Our submit handler must execute before the default one, because the
   // default handler stores the section & component data in the tempstore
   // and we need to update those objects before that happens.
-  array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
+  \array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
 
   // Set form actions to a high weight, just so that we can make our form
   // style element appear right before them.
@@ -272,7 +268,7 @@ function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterfa
     $layout_field_name = OverridesSectionStorage::FIELD_NAME;
     // Layout override: we are dealing with a content entity.
     if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
-      if ($build['#view_mode'] !== 'default' and $build['#view_mode'] !== 'full') {
+      if ($build['#view_mode'] !== 'default' && $build['#view_mode'] !== 'full') {
         // Layout Builder only supports customizing the Full/Default view mode.
         // See also: https://www.drupal.org/project/drupal/issues/2907413.
         return;

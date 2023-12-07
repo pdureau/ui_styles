@@ -11,6 +11,7 @@ use Drupal\ui_styles\MachineNameTrait;
  * Class to test MachineNameTestTrait.
  */
 class MachineNameTraitTestClass {
+
   use MachineNameTrait;
 
   /**

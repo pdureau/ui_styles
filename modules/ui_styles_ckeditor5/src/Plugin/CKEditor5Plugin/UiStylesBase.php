@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * UI Styles base plugin class.
  */
 abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5PluginConfigurableInterface, CKEditor5PluginElementsSubsetInterface, ContainerFactoryPluginInterface {
+
   use CKEditor5PluginConfigurableTrait;
   use MachineNameTrait;
 
@@ -106,6 +107,14 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $grouped_plugin_definitions = $this->stylesManager->getGroupedDefinitions();
     if (empty($grouped_plugin_definitions)) {
+      $form['warning'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [
+            $this->t('There are no styles available.'),
+          ],
+        ],
+      ];
       return $form;
     }
     $form_state->set(self::MULTIPLE_GROUPS_KEY, TRUE);

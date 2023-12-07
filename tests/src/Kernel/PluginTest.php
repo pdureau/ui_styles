@@ -13,6 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
  * @group ui_styles
  */
 class PluginTest extends KernelTestBase {
+
   use StringTranslationTrait;
 
   /**

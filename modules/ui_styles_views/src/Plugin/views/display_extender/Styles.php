@@ -50,6 +50,18 @@ class Styles extends DisplayExtenderPluginBase {
     }
     $form['#title'] .= $this->t('UI Styles');
 
+    if (empty($this->stylesManager->getGroupedDefinitions())) {
+      $form['warning'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [
+            $this->t('There are no styles available.'),
+          ],
+        ],
+      ];
+      return;
+    }
+
     foreach ($this->getHandledSections() as $section_id => $section_name) {
       if (!$this->isApplicable($section_id)) {
         continue;

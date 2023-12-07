@@ -24,6 +24,7 @@ use Drupal\ui_styles\Render\Element;
  * @method \Drupal\ui_styles\Definition\StyleDefinition[] getDefinitions()
  */
 class StylePluginManager extends DefaultPluginManager implements StylePluginManagerInterface {
+
   use StringTranslationTrait;
   use MachineNameTrait;
 

@@ -26,7 +26,7 @@ function ui_styles_views_uninstall(): void {
   $config = \Drupal::service('config.factory')->getEditable('views.settings');
   /** @var array $display_extenders */
   $display_extenders = $config->get('display_extenders') ?: [];
-  $key = array_search('ui_styles', $display_extenders);
+  $key = \array_search('ui_styles', $display_extenders, TRUE);
   if ($key !== FALSE) {
     unset($display_extenders[$key]);
     $config->set('display_extenders', $display_extenders);

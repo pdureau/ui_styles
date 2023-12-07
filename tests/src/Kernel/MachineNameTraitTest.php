@@ -17,6 +17,7 @@ use Drupal\ui_styles_test\MachineNameTraitTestClass;
  * @coversDefaultClass \Drupal\ui_styles\MachineNameTrait
  */
 class MachineNameTraitTest extends KernelTestBase {
+
   use StringTranslationTrait;
 
   /**
@@ -51,7 +52,7 @@ class MachineNameTraitTest extends KernelTestBase {
    *
    * @dataProvider providerTestStrings
    */
-  public function testGetMachineNameString(TranslatableMarkup|string $input, string $expected): void {
+  public function testGetMachineNameString(string|TranslatableMarkup $input, string $expected): void {
     $this->assertSame($expected, $this->testClass->callMachineName($input));
   }
 

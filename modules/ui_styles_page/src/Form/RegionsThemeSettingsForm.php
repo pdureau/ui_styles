@@ -61,6 +61,18 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
       return $form;
     }
 
+    if (empty($this->stylesManager->getDefinitionsForTheme($theme))) {
+      $form['warning'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [
+            $this->t('There are no styles available for this theme.'),
+          ],
+        ],
+      ];
+      return $form;
+    }
+
     $form_state->set('theme_name', $theme);
     $this->editableConfig = [
       $theme . '.settings',

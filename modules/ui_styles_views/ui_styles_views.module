@@ -51,5 +51,4 @@ function ui_styles_views_preprocess_views_view(array &$variables): void {
     $extra = $styles_extender->getExtraStyles('pager_options');
     $variables['pager'] = $styles_manager->addClasses($variables['pager'], $selected, $extra);
   }
-
 }

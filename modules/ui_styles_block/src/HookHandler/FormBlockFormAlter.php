@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Block Layout Alter.
  */
 class FormBlockFormAlter implements ContainerInjectionInterface {
+
   use StringTranslationTrait;
 
   /**
@@ -62,6 +63,15 @@ class FormBlockFormAlter implements ContainerInjectionInterface {
       return;
     }
 
+    $theme = $block->getTheme();
+    if ($theme == NULL) {
+      return;
+    }
+
+    if (empty($this->stylesManager->getDefinitionsForTheme($theme))) {
+      return;
+    }
+
     $form['ui_styles'] = [
       '#type' => 'container',
     ];
@@ -90,7 +100,7 @@ class FormBlockFormAlter implements ContainerInjectionInterface {
         $extra = $settings['extra'];
       }
       // @phpstan-ignore-next-line
-      $form['ui_styles'][$part_id] = $this->stylesManager->alterForm($form['ui_styles'][$part_id], $selected, $extra);
+      $form['ui_styles'][$part_id] = $this->stylesManager->alterForm($form['ui_styles'][$part_id], $selected, $extra, $theme);
     }
   }
 
