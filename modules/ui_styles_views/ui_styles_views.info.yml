@@ -1,7 +1,7 @@
 name: 'UI Styles Views'
 type: module
 description: 'Apply styles to view parts.'
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^10.1
 package: 'User interface'
 dependencies:
   - drupal:views
