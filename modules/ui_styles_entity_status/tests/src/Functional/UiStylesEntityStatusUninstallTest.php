@@ -2,18 +2,18 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\Tests\ui_styles_page\Functional;
+namespace Drupal\Tests\ui_styles_entity_status\Functional;
 
 use Drupal\Core\Extension\ModuleInstallerInterface;
-use Drupal\ui_styles_page\UiStylesPageInterface;
+use Drupal\ui_styles_entity_status\UiStylesEntityStatusInterface;
 
 /**
- * Test uninstall ui_styles_page module.
+ * Test uninstall ui_styles_entity_status module.
  *
  * @group ui_styles
- * @group ui_styles_page
+ * @group ui_styles_entity_status
  */
-class UiStylesPageUninstallTest extends UiStylesPageFunctionalTestBase {
+class UiStylesEntityStatusUninstallTest extends UiStylesEntityStatusFunctionalTestBase {
 
   /**
    * The module installer service.
@@ -35,23 +35,21 @@ class UiStylesPageUninstallTest extends UiStylesPageFunctionalTestBase {
    */
   public function testUninstall(): void {
     $themeSettings = $this->configFactory->getEditable($this->defaultTheme . '.settings');
-    $themeSettings->set(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS, [
-      'sidebar_first' => [
-        'selected' => [
-          'fake' => 'fake',
-        ],
-        'extra' => 'free-value',
+    $themeSettings->set(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY, [
+      'selected' => [
+        'fake' => 'fake',
       ],
+      'extra' => 'free-value',
     ]);
     $themeSettings->save();
 
-    $settings = $themeSettings->get(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
+    $settings = $themeSettings->get(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY);
     $this->assertNotNull($settings);
 
-    $this->moduleInstaller->uninstall(['ui_styles_page']);
+    $this->moduleInstaller->uninstall(['ui_styles_entity_status']);
 
     $themeSettings = $this->configFactory->getEditable($this->defaultTheme . '.settings');
-    $settings = $themeSettings->get(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
+    $settings = $themeSettings->get(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY);
     $this->assertNull($settings);
   }
 

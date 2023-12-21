@@ -1,0 +1,7 @@
+name: 'UI Styles Entity Status'
+type: module
+description: 'Apply styles depending on a content entity status.'
+core_version_requirement: ^10.1
+package: 'User interface'
+dependencies:
+  - ui_styles:ui_styles

@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains module file.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\ui_styles_entity_status\HookHandler\EntityView;
+use Drupal\ui_styles_entity_status\HookHandler\FormSystemThemeSettingsAlter;
+use Drupal\ui_styles_entity_status\UiStylesEntityStatusInterface;
+
+/**
+ * Implements hook_entity_view().
+ */
+function ui_styles_entity_status_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, string $view_mode): void {
+  /** @var \Drupal\ui_styles_entity_status\HookHandler\EntityView $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityView::class);
+  $instance->alter($build, $entity, $display, $view_mode);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'system_theme_settings'.
+ */
+function ui_styles_entity_status_form_system_theme_settings_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\ui_styles_entity_status\HookHandler\FormSystemThemeSettingsAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(FormSystemThemeSettingsAlter::class);
+  $instance->alter($form, $form_state);
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function ui_styles_entity_status_config_schema_info_alter(array &$definitions): void {
+  if (!isset($definitions['theme_settings']['mapping'])) {
+    return;
+  }
+
+  $definitions['theme_settings']['mapping'][UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY] = [
+    'type' => 'ui_styles_entity_status.unpublished',
+  ];
+}

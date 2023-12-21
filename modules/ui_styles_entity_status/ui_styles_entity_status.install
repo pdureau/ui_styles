@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install and update functions for the ui_styles_entity_status module.
+ */
+
+declare(strict_types = 1);
+
+use Drupal\ui_styles_entity_status\UiStylesEntityStatusInterface;
+
+/**
+ * Implements hook_uninstall().
+ */
+function ui_styles_entity_status_uninstall(): void {
+  $themeHandler = \Drupal::service('theme_handler');
+  $configFactory = \Drupal::configFactory();
+  foreach ($themeHandler->listInfo() as $theme) {
+    $config = $configFactory->getEditable($theme->getName() . '.settings');
+    $entityStatusSettings = $config->get(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY);
+    if ($entityStatusSettings == NULL) {
+      continue;
+    }
+    /** @var array $settings */
+    $settings = $config->get();
+    unset($settings[UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY]);
+    $config->setData($settings)->save();
+  }
+}
