@@ -31,40 +31,36 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
     $delta = 0;
     $max = \count($section_storage->getSections());
     foreach (Element::children($element['layout_builder']) as $index) {
-      foreach (Element::children($element['layout_builder'][$index]) as $layout_index) {
-        if ($delta >= $max) {
-          break 2;
-        }
-
-        if (!\is_numeric($layout_index)) {
-          continue;
-        }
-        $layout = &$element['layout_builder'][$index][$layout_index];
-        if (!isset($layout['#layout'])) {
-          continue;
-        }
-
-        // Section styles.
-        $section = $section_storage->getSection($delta);
-        /** @var array $selected */
-        $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-        /** @var string $extra */
-        $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-        $layout = $styles_manager->addClasses($layout, $selected, $extra);
-
-        // Regions styles.
-        /** @var array $regions_configuration */
-        $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
-        foreach ($regions_configuration as $region_name => $region_styles) {
-          /** @var array $selected */
-          $selected = $region_styles['selected'] ?? [];
-          /** @var string $extra */
-          $extra = $region_styles['extra'] ?? '';
-          $layout[$region_name] = $styles_manager->addClasses($layout[$region_name], $selected, $extra);
-        }
-
-        ++$delta;
+      if ($delta >= $max) {
+        break;
       }
+
+      // Dealing with "add section link" sections.
+      if (!isset($element['layout_builder'][$index]['layout-builder__section'])) {
+        continue;
+      }
+      $layout = &$element['layout_builder'][$index]['layout-builder__section'];
+
+      // Section styles.
+      $section = $section_storage->getSection($delta);
+      /** @var array $selected */
+      $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
+      /** @var string $extra */
+      $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
+      $layout = $styles_manager->addClasses($layout, $selected, $extra);
+
+      // Regions styles.
+      /** @var array $regions_configuration */
+      $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
+      foreach ($regions_configuration as $region_name => $region_styles) {
+        /** @var array $selected */
+        $selected = $region_styles['selected'] ?? [];
+        /** @var string $extra */
+        $extra = $region_styles['extra'] ?? '';
+        $layout[$region_name] = $styles_manager->addClasses($layout[$region_name], $selected, $extra);
+      }
+
+      ++$delta;
     }
     return $element;
   }
