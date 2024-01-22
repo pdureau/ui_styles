@@ -105,7 +105,7 @@ class FormSystemThemeSettingsAlter implements ContainerInjectionInterface {
     $selected = UiStylesUtility::extractSelectedStyles($unpublished_classes);
     $extra = $unpublished_classes['_ui_styles_extra'] ?? '';
     if (empty($selected) && empty($extra)) {
-      $form_state->unsetValue(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY);
+      $form_state->setValue(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY, []);
     }
     else {
       $form_state->setValue(UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY, [
