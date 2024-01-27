@@ -1,25 +1,21 @@
 # UI Styles
 
-## Overview
-
 This module allows:
+- developers to define styles (simple lists of concurrent CSS classes) from
+  modules and themes
+- site builders to use those styles on:
+    - blocks from Block layout with [UI Styles Block](./modules/ui_styles_block)
+    - formatted text with [UI Styles CKEditor 5](./modules/ui_styles_ckeditor5)
+    - unpublished content entities with [UI Styles Entity Status](./modules/ui_styles_entity_status)
+    - blocks and section from Layout Builder with
+      [UI Styles Layout Builder](./modules/ui_styles_layout_builder)
+    - theme regions with [UI Styles Page](./modules/ui_styles_page)
+    - style format, pager and exposed form from Views with
+      [UI Styles Views](./modules/ui_styles_views)
+- to browse styles from a library page with
+  [UI Styles Library](./modules/ui_styles_library)
 
-- developers to define styles (simple lists of concurrent CSS classes) from modules and themes
-- site builders to use those styles on blocks and section from Layout Builder (with `ui_styles_layout_builder` sub-module)
-- site builders to use those styles on style format, pager and exposed form from Views (with `ui_styles_views` sub-module)
-- everyone to browse styles from a library page (with `ui_styles_library` sub-module)
-
-## Features
-
-Heavily inspired by [layout\_builder\_styles](https://www.drupal.org/project/layout_builder_styles) module, with those differences:
-
-* styles are plugin-based instead of being config-entity-based, to be created and managed by the themer (inside a YML file), and then only used by the site builder in the layout builder interface (see also: [#3107972](https://www.drupal.org/project/layout_builder_styles/issues/3107972))
-* styles are organized as groups of classes, because some styles should only allow one class to be chosen (see also: [#3075502](https://www.drupal.org/project/layout_builder_styles/issues/3075502))
-* with a preview page, like [ui_patterns_library](https://ui-patterns.readthedocs.io/en/8.x-1.x/content/patterns-definition.html), available there: /styles
-* on rendering, classes are attached to the first render array inside the block, instead of being attached to the block wrapper
-* it is possible to add free extra classes, using a simple text field
-
-## Example of a plugin declaration in the YML file
+**Example of a plugin declaration in the YAML file**
 
 ```yaml
 colors_background_color:
@@ -43,17 +39,16 @@ colors_background_color:
 ```
 
 Where:
-
-* `colors_background_color` is the plugin ID
-* 'label' is used in the library and the layout builder forms
-* 'description' is only used in the library
-* 'category' (optional) to group styles in the forms
-* 'options' is the list of all classes and labels of the style
-* 'previewed_with' (optional) is a list of classes used in the library to pimp the preview
-* 'previewed_as' (optional) can be:
-  * `inside`: default
-  * `aside`: for styles not intended to be applied on `p` tag and having side effects
-  * `hidden`: when the style may have side effects on the whole styles library
+- `colors_background_color` is the plugin ID
+- 'label' is used in the library and the layout builder forms
+- 'description' is only used in the library
+- 'category' (optional) to group styles in the forms
+- 'options' is the list of all classes and labels of the style
+- 'previewed_with' (optional) is a list of classes used in the library to pimp the preview
+- 'previewed_as' (optional) can be:
+    - `inside`: default
+    - `aside`: for styles not intended to be applied on `p` tag and having side effects
+    - `hidden`: when the style may have side effects on the whole styles library
 
 You can disable a plugin by declaring a plugin with the same ID and if your
 module has a higher weight than the module declaring the plugin, example:
@@ -63,20 +58,34 @@ colors_background_color:
   enabled: false
 ```
 
+
 ## Requirements
 
-This module has no specific requirement.
+This module requires no modules outside of Drupal core.
 
-## Recommended Module
-
-[ui\_suite\_bootstrap](https://www.drupal.org/project/ui_suite_bootstrap) is an example of a site-building friendly Drupal theme using [UI Styles](https://www.drupal.org/project/ui_styles) with [UI Patterns](https://www.drupal.org/project/ui_patterns), [Layout Options](https://www.drupal.org/project/layout_options) and [UI Examples](https://www.drupal.org/project/ui_examples) modules, to implements [Bootstrap](https://getbootstrap.com/) 4:
-
-![Overview](doc/schema.png)
 
 ## Installation
 
-Install and enable this module like any other Drupal module.
+Install as you would normally install a contributed Drupal module. For further
+information, see
+[Installing Drupal Modules](https://www.drupal.org/docs/extending-drupal/installing-drupal-modules).
+
 
 ## Configuration
 
-The module has no modifiable settings.
+The module has no menu or modifiable settings. There is no configuration.
+
+The submodules provide new configuration options depending on the submodule
+specificities.
+
+
+## Maintainers
+
+Current maintainers:
+- Florent Torregrosa - [Grimreaper](https://www.drupal.org/user/2388214)
+- Pierre Dureau - [pdureau](https://www.drupal.org/user/1903334)
+- Michael Fanini - [G4MBINI](https://www.drupal.org/user/2533498)
+
+Supporting organizations:
+- [Smile](https://www.drupal.org/smile)
+- [Dropteam](https://www.drupal.org/dropteam)
