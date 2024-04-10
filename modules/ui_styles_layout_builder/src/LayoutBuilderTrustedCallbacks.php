@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\ui_styles_layout_builder;
 
@@ -53,6 +53,10 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
       /** @var array $regions_configuration */
       $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
       foreach ($regions_configuration as $region_name => $region_styles) {
+        // Skip if the region is not available anymore due to changed layout.
+        if (!isset($layout[$region_name])) {
+          continue;
+        }
         /** @var array $selected */
         $selected = $region_styles['selected'] ?? [];
         /** @var string $extra */

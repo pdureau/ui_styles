@@ -5,7 +5,7 @@
  * Installation file for UI Styles Library module.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * Add new permission to access the library to all roles.

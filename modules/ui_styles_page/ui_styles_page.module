@@ -5,7 +5,7 @@
  * Adding styles to regions.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Drupal\ui_styles_page\HookHandler\PreprocessRegion;
 use Drupal\ui_styles_page\UiStylesPageInterface;

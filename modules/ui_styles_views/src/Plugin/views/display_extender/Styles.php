@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\ui_styles_views\Plugin\views\display_extender;
 
@@ -170,10 +170,10 @@ class Styles extends DisplayExtenderPluginBase {
     $display = $this->view->getDisplay();
     $display_definition = $display->getPluginDefinition();
     // Exclude Entity Reference, ReST Export, Feed... displays.
-    if (\array_key_exists('entity_reference_display', $display_definition) && $display_definition['entity_reference_display']) {
+    if (\is_array($display_definition) && \array_key_exists('entity_reference_display', $display_definition) && $display_definition['entity_reference_display']) {
       return FALSE;
     }
-    if (\array_key_exists('returns_response', $display_definition) && $display_definition['returns_response']) {
+    if (\is_array($display_definition) && \array_key_exists('returns_response', $display_definition) && $display_definition['returns_response']) {
       return FALSE;
     }
     if ($section == 'pager_options' && !$display->isPagerEnabled()) {

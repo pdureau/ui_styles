@@ -5,7 +5,7 @@
  * Adding styles to blocks.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Drupal\block\BlockInterface;
 use Drupal\Core\Form\FormStateInterface;

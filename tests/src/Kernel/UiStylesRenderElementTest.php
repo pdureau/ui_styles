@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\ui_styles\Render\Element;
