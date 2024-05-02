@@ -35,7 +35,7 @@ class DummyStylePluginManager extends StylePluginManager {
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
     TransliterationInterface $transliteration,
-    TranslationInterface $translation
+    TranslationInterface $translation,
   ) {
     $this->stringTranslation = $translation;
     parent::__construct($cache_backend, $module_handler, $theme_handler, $transliteration);

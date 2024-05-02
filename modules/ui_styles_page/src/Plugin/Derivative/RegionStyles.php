@@ -39,7 +39,7 @@ class RegionStyles extends DeriverBase implements ContainerDeriverInterface {
    */
   public function __construct(
     ThemeHandlerInterface $themeHandler,
-    StylePluginManagerInterface $stylesManager
+    StylePluginManagerInterface $stylesManager,
   ) {
     $this->themeHandler = $themeHandler;
     $this->stylesManager = $stylesManager;

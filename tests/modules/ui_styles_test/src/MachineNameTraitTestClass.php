@@ -21,7 +21,7 @@ class MachineNameTraitTestClass {
    *   The transliteration service.
    */
   public function __construct(
-    TransliterationInterface $transliteration
+    TransliterationInterface $transliteration,
   ) {
     $this->transliteration = $transliteration;
   }

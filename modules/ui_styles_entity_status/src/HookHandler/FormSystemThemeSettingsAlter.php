@@ -33,7 +33,7 @@ class FormSystemThemeSettingsAlter implements ContainerInjectionInterface {
    *   The styles plugin manager.
    */
   public function __construct(
-    StylePluginManagerInterface $stylesManager
+    StylePluginManagerInterface $stylesManager,
   ) {
     $this->stylesManager = $stylesManager;
   }

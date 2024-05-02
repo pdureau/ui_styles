@@ -7,344 +7,71 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Template\AttributeHelper;
-use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
-use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
-use Drupal\ui_styles\UiStylesUtility;
+use Drupal\ui_styles_layout_builder\HookHandler\ElementInfoAlter;
+use Drupal\ui_styles_layout_builder\HookHandler\EntityViewAlter;
+use Drupal\ui_styles_layout_builder\HookHandler\FormLayoutBuilderBlockAlter;
+use Drupal\ui_styles_layout_builder\HookHandler\FormLayoutBuilderConfigureSectionAlter;
+use Drupal\ui_styles_layout_builder\HookHandler\PreprocessBlock;
 
 /**
- * Implements hook_form_alter().
- *
- * Modify the configuration form for layout builder components (blocks).
+ * Implements hook_element_info_alter().
  */
-function ui_styles_layout_builder_form_alter(array &$form, FormStateInterface $formState): void {
-  if ($form['#form_id'] === 'layout_builder_add_block' || $form['#form_id'] === 'layout_builder_update_block') {
-    /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
-    $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-    if (empty($styles_manager->getGroupedDefinitions())) {
-      return;
-    }
-    /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
-    $formObject = $formState->getFormObject();
-    $component = $formObject->getCurrentComponent();
-
-    // Block wrapper.
-    /** @var array $selected */
-    $selected = $component->get('ui_styles_wrapper') ?: [];
-    /** @var string $extra */
-    $extra = $component->get('ui_styles_wrapper_extra') ?: '';
-    $form['ui_styles_wrapper'] = [
-      '#type' => 'details',
-      '#title' => \t('Block styles'),
-      '#open' => FALSE,
-    ];
-    $form['ui_styles_wrapper'] = $styles_manager->alterForm($form['ui_styles_wrapper'], $selected, $extra);
-
-    // Block title.
-    /** @var array $selected */
-    $selected = $component->get('ui_styles_title') ?: [];
-    /** @var string $extra */
-    $extra = $component->get('ui_styles_title_extra') ?: '';
-    $form['ui_styles_title'] = [
-      '#type' => 'details',
-      '#title' => \t('Title styles'),
-      '#open' => FALSE,
-      '#states' => [
-        'invisible' => [
-          ':input[name="settings[label_display]"]' => ['checked' => FALSE],
-        ],
-      ],
-    ];
-    $form['ui_styles_title'] = $styles_manager->alterForm($form['ui_styles_title'], $selected, $extra);
-
-    // Block content.
-    /** @var array $selected */
-    $selected = $component->get('ui_styles') ?: [];
-    /** @var string $extra */
-    $extra = $component->get('ui_styles_extra') ?: '';
-    $form['ui_styles'] = [
-      '#type' => 'details',
-      '#title' => \t('Content styles'),
-      '#open' => FALSE,
-    ];
-    $form['ui_styles'] = $styles_manager->alterForm($form['ui_styles'], $selected, $extra);
-
-    // Our submit handler must execute before the default one, because the
-    // default handler stores the section & component data in the tempstore
-    // and we need to update those objects before that happens.
-    \array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_block_form');
-
-    // Set form actions to a high weight, just so that we can make our form
-    // style element appear right before them.
-    $form['actions']['#weight'] = (int) 100;
-  }
+function ui_styles_layout_builder_element_info_alter(array &$info): void {
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\ElementInfoAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(ElementInfoAlter::class);
+  $instance->alter($info);
 }
 
 /**
- * Custom submit handler for submitting LB block forms.
- *
- * Persists the configured block style to the component configuration data,
- * which is later persisted to section storage by layout builder's base form.
+ * Implements hook_entity_view_alter().
  */
-function _ui_styles_layout_builder_submit_block_form(array $form, FormStateInterface $formState): void {
-  /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
-  $formObject = $formState->getFormObject();
-  $component = $formObject->getCurrentComponent();
+function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\EntityViewAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityViewAlter::class);
+  $instance->alter($build, $entity, $display);
+}
 
-  // Block wrapper.
-  /** @var array $ui_styles_wrapper */
-  $ui_styles_wrapper = $formState->getValue('ui_styles_wrapper');
-  // Those values are flat for backward compatibility with initial design.
-  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
-  // move them to proper third_party_settings and wrap them in a bag.
-  $component->set('ui_styles_wrapper', UiStylesUtility::extractSelectedStyles($ui_styles_wrapper));
-  $component->set('ui_styles_wrapper_extra', $ui_styles_wrapper['_ui_styles_extra']);
+/**
+ * Implements hook_form_FORM_ID_alter() for 'layout_builder_add_block'.
+ */
+function ui_styles_layout_builder_form_layout_builder_add_block_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\FormLayoutBuilderBlockAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(FormLayoutBuilderBlockAlter::class);
+  $instance->formAlter($form, $form_state);
+}
 
-  // Block title.
-  /** @var array $ui_styles_title */
-  $ui_styles_title = $formState->getValue('ui_styles_title');
-  // Those values are flat for backward compatibility with initial design.
-  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
-  // move them to proper third_party_settings and wrap them in a bag.
-  $component->set('ui_styles_title', UiStylesUtility::extractSelectedStyles($ui_styles_title));
-  $component->set('ui_styles_title_extra', $ui_styles_title['_ui_styles_extra']);
+/**
+ * Implements hook_form_FORM_ID_alter() for 'layout_builder_configure_section'.
+ */
+function ui_styles_layout_builder_form_layout_builder_configure_section_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\FormLayoutBuilderConfigureSectionAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(FormLayoutBuilderConfigureSectionAlter::class);
+  $instance->formAlter($form, $form_state);
+}
 
-  // Block content.
-  /** @var array $ui_styles */
-  $ui_styles = $formState->getValue('ui_styles');
-  // Those values are flat for backward compatibility with initial design.
-  // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
-  // move them to proper third_party_settings and wrap them in a bag.
-  $component->set('ui_styles', UiStylesUtility::extractSelectedStyles($ui_styles));
-  $component->set('ui_styles_extra', $ui_styles['_ui_styles_extra']);
+/**
+ * Implements hook_form_FORM_ID_alter() for 'layout_builder_update_block'.
+ */
+function ui_styles_layout_builder_form_layout_builder_update_block_alter(array &$form, FormStateInterface $form_state): void {
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\FormLayoutBuilderBlockAlter $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(FormLayoutBuilderBlockAlter::class);
+  $instance->formAlter($form, $form_state);
 }
 
 /**
  * Implements hook_preprocess_HOOK() for 'block'.
  */
 function ui_styles_layout_builder_preprocess_block(array &$variables): void {
-  // Block title.
-  if (!empty($variables['configuration']['label_display'])) {
-    $ui_style_title_attributes = $variables['configuration']['ui_style_title_attributes'] ?? [];
-    $variables['title_attributes'] = AttributeHelper::mergeCollections(
-      $variables['title_attributes'],
-      $ui_style_title_attributes
-    );
-  }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter() for 'layout_builder_configure_section'.
- *
- * Modify the configuration form for layout builder sections (layouts).
- */
-function ui_styles_layout_builder_form_layout_builder_configure_section_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
-  /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
-  $formObject = $form_state->getFormObject();
-  $section = $formObject->getCurrentSection();
-  /** @var \Drupal\ui_styles\StylePluginManagerInterface $styles_manager */
-  $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-  if (empty($styles_manager->getGroupedDefinitions())) {
-    return;
-  }
-
-  // Section.
-  /** @var array $selected */
-  $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-  /** @var string $extra */
-  $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-  $form['ui_styles'] = [
-    '#type' => 'container',
-  ];
-  $form['ui_styles']['section'] = [
-    '#type' => 'details',
-    '#title' => \t('Section styles'),
-    '#open' => FALSE,
-  ];
-  $form['ui_styles']['section'] = $styles_manager->alterForm($form['ui_styles']['section'], $selected, $extra);
-
-  // Regions.
-  /** @var array $regions_configuration */
-  $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
-  $regions = $section->getLayout()->getPluginDefinition()->getRegions();
-  if (!empty($regions)) {
-    $form['ui_styles']['regions'] = [
-      '#type' => 'container',
-    ];
-  }
-
-  foreach ($regions as $region_name => $region_infos) {
-    /** @var array $selected */
-    $selected = $regions_configuration[$region_name]['selected'] ?? [];
-    /** @var string $extra */
-    $extra = $regions_configuration[$region_name]['extra'] ?? '';
-    $form['ui_styles']['regions'][$region_name] = [
-      '#type' => 'details',
-      '#title' => \t('@region_label region styles', [
-        '@region_label' => $region_infos['label'] ?? '',
-      ]),
-      '#open' => FALSE,
-    ];
-    $form['ui_styles']['regions'][$region_name] = $styles_manager->alterForm($form['ui_styles']['regions'][$region_name], $selected, $extra);
-  }
-
-  // Our submit handler must execute before the default one, because the
-  // default handler stores the section & component data in the tempstore
-  // and we need to update those objects before that happens.
-  \array_unshift($form['#submit'], '_ui_styles_layout_builder_submit_section_form');
-
-  // Set form actions to a high weight, just so that we can make our form
-  // style element appear right before them.
-  $form['actions']['#weight'] = (int) 100;
-}
-
-/**
- * Custom submit handler for submitting LB section forms.
- *
- * This is used to persist the selected style to the layout configuration
- * array, which layout builder's ConfigureSectionForm will persist to section
- * storage.
- */
-function _ui_styles_layout_builder_submit_section_form(array $form, FormStateInterface $formState): void {
-  /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
-  $formObject = $formState->getFormObject();
-  $section = $formObject->getCurrentSection();
-
-  /** @var array $ui_styles */
-  $ui_styles = $formState->getValue('ui_styles');
-
-  // Section.
-  $section->setThirdPartySetting('ui_styles', 'selected', UiStylesUtility::extractSelectedStyles($ui_styles['section']));
-  $section->setThirdPartySetting('ui_styles', 'extra', $ui_styles['section']['_ui_styles_extra']);
-
-  // Regions.
-  $regions = [];
-  /** @var array $ui_styles_regions */
-  $ui_styles_regions = $ui_styles['regions'] ?? [];
-  foreach ($ui_styles_regions as $region_name => $region_styles) {
-    $regions[$region_name] = [
-      'selected' => UiStylesUtility::extractSelectedStyles($region_styles),
-      'extra' => $region_styles['_ui_styles_extra'],
-    ];
-  }
-  $section->setThirdPartySetting('ui_styles', 'regions', $regions);
-}
-
-/**
- * Implements hook_element_info_alter().
- *
- * Because hook_preprocess_layout() deals only with layouts rendered by
- * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
- * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout
- * builder's sections level:
- * - using hook_entity_view_alter() while rendering an entity
- * - using hook_element_info_alter() while previewing.
- *
- * See also: https://www.drupal.org/project/drupal/issues/3080684 .
- */
-function ui_styles_layout_builder_element_info_alter(array &$types): void {
-  $types['layout_builder']['#pre_render'][] = 'Drupal\ui_styles_layout_builder\LayoutBuilderTrustedCallbacks::preRender';
-}
-
-/**
- * Implements hook_entity_view_alter().
- *
- * Because hook_preprocess_layout() deals only with layouts rendered by
- * \Drupal::service('plugin.manager.core.layout')->getThemeImplementations()
- * (for example, this is not the case for layouts managed from
- * ui_patterns_layout_builder module), we need to move up to the layout
- * builder's sections level:
- * - using hook_entity_view_alter() while rendering an entity
- * - using hook_element_info_alter() while previewing.
- */
-function ui_styles_layout_builder_entity_view_alter(array &$build, EntityInterface $entity, LayoutEntityDisplayInterface $display): void {
-  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-  if ($display->isLayoutBuilderEnabled()) {
-    $styles_manager = \Drupal::service('plugin.manager.ui_styles');
-    $layout_builder = &$build['_layout_builder'];
-    $layout_field_name = OverridesSectionStorage::FIELD_NAME;
-    // Layout override: we are dealing with a content entity.
-    if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
-      if ($build['#view_mode'] !== 'default' && $build['#view_mode'] !== 'full') {
-        // Layout Builder only supports customizing the Full/Default view mode.
-        // See also: https://www.drupal.org/project/drupal/issues/2907413.
-        return;
-      }
-      foreach ($entity->get($layout_field_name) as $delta => $section_item) {
-        /** @var Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
-        if (!$layout_builder[$delta]) {
-          // We may encounter some issue when manipulating the last section.
-          continue;
-        }
-        /** @var \Drupal\layout_builder\Section $section */
-        $section = $section_item->get('section')->getValue();
-        /** @var array $selected */
-        $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-        /** @var string $extra */
-        $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-        $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
-
-        // Regions.
-        /** @var array $regions_configuration */
-        $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
-        foreach ($regions_configuration as $region_name => $region_styles) {
-          /** @var array $selected */
-          $selected = $region_styles['selected'] ?? [];
-          /** @var string $extra */
-          $extra = $region_styles['extra'] ?? '';
-          // Set styles classes.
-          $extra = \explode(' ', $extra);
-          $styles = \array_merge($selected, $extra);
-          $styles = \array_unique(\array_filter($styles));
-
-          // Do not use the service to add the classes to avoid the div wrapper.
-          // Otherwise, classes would be added twice.
-          $layout_builder[$delta][$region_name]['#attributes'] = $layout_builder[$delta][$region_name]['#attributes'] ?? [];
-          $layout_builder[$delta][$region_name]['#attributes'] = AttributeHelper::mergeCollections(
-            $layout_builder[$delta][$region_name]['#attributes'],
-            [
-              'class' => $styles,
-            ]
-          );
-        }
-      }
-    }
-    // Default layout: we are dealing with a config entity.
-    else {
-      foreach ($display->getSections() as $delta => $section) {
-        /** @var array $selected */
-        $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-        /** @var string $extra */
-        $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
-        $layout_builder[$delta] = $styles_manager->addClasses($layout_builder[$delta], $selected, $extra);
-
-        // Regions.
-        /** @var array $regions_configuration */
-        $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
-        foreach ($regions_configuration as $region_name => $region_styles) {
-          /** @var array $selected */
-          $selected = $region_styles['selected'] ?? [];
-          /** @var string $extra */
-          $extra = $region_styles['extra'] ?? '';
-          // Set styles classes.
-          $extra = \explode(' ', $extra);
-          $styles = \array_merge($selected, $extra);
-          $styles = \array_unique(\array_filter($styles));
-
-          // Do not use the service to add the classes to avoid the div wrapper.
-          // Otherwise, classes would be added twice.
-          $layout_builder[$delta][$region_name]['#attributes'] = $layout_builder[$delta][$region_name]['#attributes'] ?? [];
-          $layout_builder[$delta][$region_name]['#attributes'] = AttributeHelper::mergeCollections(
-            $layout_builder[$delta][$region_name]['#attributes'],
-            [
-              'class' => $styles,
-            ]
-          );
-        }
-      }
-    }
-  }
+  /** @var \Drupal\ui_styles_layout_builder\HookHandler\PreprocessBlock $instance */
+  $instance = \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(PreprocessBlock::class);
+  $instance->preprocess($variables);
 }

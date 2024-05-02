@@ -51,7 +51,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     CacheBackendInterface $cache_backend,
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
-    TransliterationInterface $transliteration
+    TransliterationInterface $transliteration,
   ) {
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
     $this->alterInfo('ui_styles_styles');

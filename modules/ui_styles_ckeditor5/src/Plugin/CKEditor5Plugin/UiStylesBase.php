@@ -72,7 +72,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
     string $plugin_id,
     CKEditor5PluginDefinition $plugin_definition,
     StylePluginManagerInterface $stylesManager,
-    TransliterationInterface $transliteration
+    TransliterationInterface $transliteration,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->stylesManager = $stylesManager;

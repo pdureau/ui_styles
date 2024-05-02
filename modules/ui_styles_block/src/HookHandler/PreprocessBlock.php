@@ -40,7 +40,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
    */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
-    StylePluginManagerInterface $stylesManager
+    StylePluginManagerInterface $stylesManager,
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->stylesManager = $stylesManager;
