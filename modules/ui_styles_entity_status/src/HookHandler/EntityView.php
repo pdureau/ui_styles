@@ -10,7 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
-use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\ui_styles\SectionStorageTrait;
 use Drupal\ui_styles\StylePluginManagerInterface;
 use Drupal\ui_styles_entity_status\UiStylesEntityStatusInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Add classes to entity view build array.
  */
 class EntityView implements ContainerInjectionInterface {
+
+  use SectionStorageTrait;
 
   /**
    * The styles plugin manager.
@@ -97,24 +99,14 @@ class EntityView implements ContainerInjectionInterface {
     // Layout Builder display.
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if ($display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled()) {
-      $layout_builder = &$build['_layout_builder'];
-      $layout_field_name = OverridesSectionStorage::FIELD_NAME;
-      // Layout override: we are dealing with a content entity.
-      if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
-        foreach ($entity->get($layout_field_name) as $delta => $section_item) {
-          /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
-          if (!$layout_builder[$delta]) {
-            // We may encounter some issue when manipulating the last section.
-            continue;
-          }
-          $layout_builder[$delta] = $this->stylesManager->addClasses($layout_builder[$delta], $selected, $extra);
-        }
+      $storage = $this->getDisplaySectionStorage($entity, $display, $view_mode);
+      if ($storage == NULL) {
+        return;
       }
-      // Default layout: we are dealing with a config entity.
-      else {
-        foreach ($display->getSections() as $delta => $section) {
-          $layout_builder[$delta] = $this->stylesManager->addClasses($layout_builder[$delta], $selected, $extra);
-        }
+
+      $layout_builder = &$build['_layout_builder'];
+      foreach ($storage->getSections() as $delta => $section) {
+        $layout_builder[$delta] = $this->stylesManager->addClasses($layout_builder[$delta], $selected, $extra);
       }
     }
   }

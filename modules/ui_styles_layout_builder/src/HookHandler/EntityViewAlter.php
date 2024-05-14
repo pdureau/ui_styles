@@ -10,8 +10,8 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
-use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
+use Drupal\ui_styles\SectionStorageTrait;
 use Drupal\ui_styles\StylePluginManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Add classes to Layout Builder sections.
  */
 class EntityViewAlter implements ContainerInjectionInterface {
+
+  use SectionStorageTrait;
 
   /**
    * The styles plugin manager.
@@ -80,35 +82,18 @@ class EntityViewAlter implements ContainerInjectionInterface {
       return;
     }
 
-    if ($display->isLayoutBuilderEnabled()) {
-      $layout_builder = &$build['_layout_builder'];
-      $layout_field_name = OverridesSectionStorage::FIELD_NAME;
-      // Layout override: we are dealing with a content entity.
-      if ($entity->hasField($layout_field_name) && !$entity->get($layout_field_name)->isEmpty()) {
-        if ($build['#view_mode'] !== 'default' && $build['#view_mode'] !== 'full') {
-          // Layout Builder only supports customizing the Full/Default view
-          // mode.
-          // See also: https://www.drupal.org/project/drupal/issues/2907413.
-          return;
-        }
-        foreach ($entity->get($layout_field_name) as $delta => $section_item) {
-          /** @var \Drupal\layout_builder\Plugin\Field\FieldType\LayoutSectionItem $section_item */
-          if (!$layout_builder[$delta]) {
-            // We may encounter some issue when manipulating the last section.
-            continue;
-          }
-          /** @var \Drupal\layout_builder\Section $section */
-          $section = $section_item->get('section')->getValue();
+    if (!$display->isLayoutBuilderEnabled()) {
+      return;
+    }
 
-          $this->addStylesToSection($layout_builder, $section, $delta);
-        }
-      }
-      // Default layout: we are dealing with a config entity.
-      else {
-        foreach ($display->getSections() as $delta => $section) {
-          $this->addStylesToSection($layout_builder, $section, $delta);
-        }
-      }
+    $storage = $this->getDisplaySectionStorage($entity, $display, $build['#view_mode']);
+    if ($storage == NULL) {
+      return;
+    }
+
+    $layout_builder = &$build['_layout_builder'];
+    foreach ($storage->getSections() as $delta => $section) {
+      $this->addStylesToSection($layout_builder, $section, $delta);
     }
   }
 
