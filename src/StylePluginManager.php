@@ -235,7 +235,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $multiple_groups = FALSE;
     }
     $suffix = ' (' . $this->t('used') . ')';
-    $global_used = FALSE;
+    $global_used = $extra;
     foreach ($grouped_plugin_definitions as $group_plugin_definitions) {
       $group_used = FALSE;
       $group_key = '';

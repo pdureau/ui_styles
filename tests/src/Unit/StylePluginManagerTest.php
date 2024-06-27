@@ -104,6 +104,18 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->stringTranslation = $this->getStringTranslationStub();
 
     $transliteration = $this->createMock(TransliterationInterface::class);
+    $transliteration->expects($this->any())
+      ->method('transliterate')
+      ->willReturnCallback(static function (string $string) {
+        switch ($string) {
+          case 'Main':
+            return 'Main';
+
+          case 'Main 2':
+            return 'Main 2';
+        }
+        return '';
+      });
 
     $this->stylePluginManager = new DummyStylePluginManager($cache, $moduleHandler, $themeHandler, $transliteration, $this->stringTranslation);
     $this->stylePluginManager->setStyles($this->styles);
@@ -379,40 +391,180 @@ class StylePluginManagerTest extends UnitTestCase {
       '#title' => 'Main',
       '#open' => FALSE,
     ];
-    $extra = 'has_extra';
 
-    $form = $this->stylePluginManager->alterForm($form, [
+    $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt2',
       'test2' => 'opt3',
-    ], $extra);
-    $this->assertSame($form['_ui_styles_extra']['#default_value'], 'has_extra');
-    $this->assertArrayHasKey('ui_styles_test1', $form);
-    $this->assertArrayHasKey('ui_styles_test2', $form);
-    $this->assertSame($form['ui_styles_test1']['#default_value'], 'opt2');
-    $this->assertSame($form['ui_styles_test2']['#default_value'], 'opt3');
-    $this->assertSame($form['ui_styles_test1']['#options'], $this->styles[0]['options']);
-    $this->assertSame($form['ui_styles_test1']['#title'], $this->styles[0]['label'] . $suffix);
-    $this->assertSame($form['ui_styles_test2']['#options'], $this->styles[1]['options']);
-    $this->assertSame($form['ui_styles_test2']['#title'], $this->styles[1]['label'] . $suffix);
-
-    // Test parent title.
-    $this->assertSame($form['#title'], 'Main' . $suffix);
+    ], 'has_extra');
+    $this->assertSame('has_extra', $altered_form['_ui_styles_extra']['#default_value']);
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame('opt2', $altered_form['ui_styles_test1']['#default_value']);
+    $this->assertSame('opt3', $altered_form['ui_styles_test2']['#default_value']);
+    $this->assertSame($this->styles[0]['options'], $altered_form['ui_styles_test1']['#options']);
+    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['options'], $altered_form['ui_styles_test2']['#options']);
+    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['ui_styles_test2']['#title']);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
 
     // Test that if no value is used suffix is not set.
+    $altered_form = $this->stylePluginManager->alterForm($form, [], '');
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame($this->styles[0]['options'], $altered_form['ui_styles_test1']['#options']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['options'], $altered_form['ui_styles_test2']['#options']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
+  }
+
+  /**
+   * Test if used suffix is correctly placed.
+   *
+   * @covers ::alterForm
+   */
+  public function testUsedSuffix(): void {
+    $suffix = ' (used)';
     $form = [
       '#type' => 'details',
       '#title' => 'Main',
       '#open' => FALSE,
     ];
-    $extra = '';
 
-    $form = $this->stylePluginManager->alterForm($form, [], $extra);
-    $this->assertArrayHasKey('ui_styles_test1', $form);
-    $this->assertArrayHasKey('ui_styles_test2', $form);
-    $this->assertSame($form['ui_styles_test1']['#options'], $this->styles[0]['options']);
-    $this->assertSame($form['ui_styles_test1']['#title'], $this->styles[0]['label']);
-    $this->assertSame($form['ui_styles_test2']['#options'], $this->styles[1]['options']);
-    $this->assertSame($form['ui_styles_test2']['#title'], $this->styles[1]['label']);
+    $ungrouped_styles = [
+      0 => [
+        'id' => 'test1',
+        'category' => 'Main',
+        'options' => ['opt1', 'opt2', 'opt3'],
+        'label' => 'has_label',
+      ],
+      1 => [
+        'id' => 'test2',
+        'category' => 'Main',
+        'options' => ['opt1', 'opt2', 'opt3'],
+        'label' => 'has_label',
+      ],
+    ];
+    $this->stylePluginManager->setStyles($ungrouped_styles);
+
+    // No values.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => '',
+    ], '');
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame('Main', $altered_form['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
+
+    // Value on test1.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => 'opt1',
+      'test2' => '',
+    ], '');
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
+
+    // Value on test2.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => 'opt1',
+    ], '');
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['ui_styles_test2']['#title']);
+
+    // Value on extra.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => '',
+    ], 'extra');
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
+
+    $grouped_styles = [
+      0 => [
+        'id' => 'test1',
+        'category' => 'Main',
+        'options' => ['opt1', 'opt2', 'opt3'],
+        'label' => 'has_label',
+      ],
+      1 => [
+        'id' => 'test2',
+        'category' => 'Main 2',
+        'options' => ['opt1', 'opt2', 'opt3'],
+        'label' => 'has_label',
+      ],
+    ];
+    $this->stylePluginManager->setStyles($grouped_styles);
+
+    // No values.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => '',
+    ], '');
+    $this->assertArrayHasKey('main', $altered_form);
+    $this->assertArrayHasKey('main_2', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
+    $this->assertSame('Main', $altered_form['#title']);
+    $this->assertSame('Main', $altered_form['main']['#title']);
+    $this->assertSame('Main 2', $altered_form['main_2']['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['main']['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
+
+    // Value on test1.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => 'opt1',
+      'test2' => '',
+    ], '');
+    $this->assertArrayHasKey('main', $altered_form);
+    $this->assertArrayHasKey('main_2', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main' . $suffix, $altered_form['main']['#title']);
+    $this->assertSame('Main 2', $altered_form['main_2']['#title']);
+    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['main']['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
+
+    // Value on test2.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => 'opt2',
+    ], '');
+    $this->assertArrayHasKey('main', $altered_form);
+    $this->assertArrayHasKey('main_2', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main', $altered_form['main']['#title']);
+    $this->assertSame('Main 2' . $suffix, $altered_form['main_2']['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['main']['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['main_2']['ui_styles_test2']['#title']);
+
+    // Value on extra.
+    $altered_form = $this->stylePluginManager->alterForm($form, [
+      'test1' => '',
+      'test2' => '',
+    ], 'extra');
+    $this->assertArrayHasKey('main', $altered_form);
+    $this->assertArrayHasKey('main_2', $altered_form);
+    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
+    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
+    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main', $altered_form['main']['#title']);
+    $this->assertSame('Main 2', $altered_form['main_2']['#title']);
+    $this->assertSame($this->styles[0]['label'], $altered_form['main']['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
   }
 
   /**
