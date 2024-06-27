@@ -36,7 +36,7 @@ class UiStylesRenderElementTest extends KernelTestBase {
   /**
    * Data provider for testIsAcceptingAttributes().
    */
-  public function providerTestAttributes(): array {
+  public static function providerTestAttributes(): array {
     $data = [
       'already_exist' => [
         [

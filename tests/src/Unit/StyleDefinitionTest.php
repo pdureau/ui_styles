@@ -50,7 +50,7 @@ class StyleDefinitionTest extends UnitTestCase {
    * @return array
    *   Data.
    */
-  public function definitionGettersProvider(): array {
+  public static function definitionGettersProvider(): array {
     return [
       ['getProvider', 'provider', 'my_module'],
       ['id', 'id', 'plugin_id'],
@@ -93,7 +93,7 @@ class StyleDefinitionTest extends UnitTestCase {
    * @return array
    *   Data.
    */
-  public function definitionGetOptionsAsOptionsProvider(): array {
+  public static function definitionGetOptionsAsOptionsProvider(): array {
     return [
       [[
         'simple' => 'Simple',
@@ -131,7 +131,7 @@ class StyleDefinitionTest extends UnitTestCase {
    * @return array
    *   Data.
    */
-  public function definitionGetOptionsForPreviewProvider(): array {
+  public static function definitionGetOptionsForPreviewProvider(): array {
     return [
       'simple' => [
         [
@@ -314,7 +314,7 @@ class StyleDefinitionTest extends UnitTestCase {
    * @return array
    *   Data.
    */
-  public function definitionGetLinksProvider(): array {
+  public static function definitionGetLinksProvider(): array {
     return [
       [
         [
@@ -363,7 +363,7 @@ class StyleDefinitionTest extends UnitTestCase {
    * @return array
    *   Data.
    */
-  public function definitionGetRenderLinksProvider(): array {
+  public static function definitionGetRenderLinksProvider(): array {
     return [
       [
         [

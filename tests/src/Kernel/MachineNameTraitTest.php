@@ -71,7 +71,7 @@ class MachineNameTraitTest extends KernelTestBase {
   /**
    * Data provider for test methods.
    */
-  public function providerTestStrings(): array {
+  public static function providerTestStrings(): array {
     return [
       'string' => [
         'test',

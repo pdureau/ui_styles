@@ -77,15 +77,3 @@ The module has no menu or modifiable settings. There is no configuration.
 
 The submodules provide new configuration options depending on the submodule
 specificities.
-
-
-## Maintainers
-
-Current maintainers:
-- Florent Torregrosa - [Grimreaper](https://www.drupal.org/user/2388214)
-- Pierre Dureau - [pdureau](https://www.drupal.org/user/1903334)
-- Michael Fanini - [G4MBINI](https://www.drupal.org/user/2533498)
-
-Supporting organizations:
-- [Smile](https://www.drupal.org/smile)
-- [Dropteam](https://www.drupal.org/dropteam)
