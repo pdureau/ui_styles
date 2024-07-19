@@ -3,7 +3,7 @@
  */
 
 import {Plugin} from 'ckeditor5/src/core';
-import {Model, createDropdown, addListToDropdown, addToolbarToDropdown} from 'ckeditor5/src/ui';
+import {ViewModel, createDropdown, addListToDropdown, addToolbarToDropdown} from 'ckeditor5/src/ui';
 import {Collection} from 'ckeditor5/src/utils';
 
 export default class UiStylesInlineUI extends Plugin {
@@ -95,7 +95,7 @@ export default class UiStylesInlineUI extends Plugin {
         const normalizedStyleOptionName = `${style.id}:${style_option.name}`;
         const styleDef = {
           type: 'button',
-          model: new Model({
+          model: new ViewModel({
             commandName: 'uiStylesInline',
             commandParam: normalizedStyleOptionName,
             label: style_option.name,
