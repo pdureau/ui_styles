@@ -1,0 +1,7 @@
+name: 'UI Styles Stylesheet Generator Test'
+type: theme
+description: 'UI Styles test theme.'
+base theme: false
+package: 'Testing'
+libraries:
+  - ui_styles_stylesheet_generator_test/bar

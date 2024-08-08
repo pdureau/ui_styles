@@ -6,6 +6,7 @@ internal.ckeditor5.ui_styles_block:
     js/build/uiStylesBlock.js: { preprocess: false, minified: true }
   dependencies:
     - core/ckeditor5
+    - ui_styles_ckeditor5/stylesheet
 
 internal.ckeditor5.ui_styles_inline:
   css:
@@ -15,6 +16,7 @@ internal.ckeditor5.ui_styles_inline:
     js/build/uiStylesInline.js: { preprocess: false, minified: true }
   dependencies:
     - core/ckeditor5
+    - ui_styles_ckeditor5/stylesheet
 
 internal.ckeditor5.ui_styles_block.admin:
   css:
@@ -25,3 +27,8 @@ internal.ckeditor5.ui_styles_inline.admin:
   css:
     theme:
       assets/css/ui_styles_ckeditor5_inline.admin.css: {}
+
+stylesheet:
+  css:
+    theme:
+      /ui_styles/stylesheet.css?prefix=.ck-content: { minified: true }

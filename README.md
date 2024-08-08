@@ -63,6 +63,16 @@ colors_background_color:
 
 This module requires no modules outside of Drupal core.
 
+This module requires the
+[PHP CSS Parser](https://github.com/MyIntervals/PHP-CSS-Parser) library, so it
+requires to be installed with Composer.
+
+A patch may also be required on this library, it is documented into the
+`composer.json` file of the module.
+
+If you are using `cweagans/composer-patches` with the `enable-patching` option
+enabled in your `composer.json`, the patch should be applied automatically.
+
 
 ## Installation
 

@@ -1,0 +1,19 @@
+{
+    "name": "drupal/ui_styles",
+    "description": "Define styles from modules and themes.",
+    "license": "GPL-2.0-or-later",
+    "type": "drupal-module",
+    "require": {
+        "sabberworm/php-css-parser": "^8.6"
+    },
+    "require-dev": {
+        "drupal/ui_skins": "^1.0"
+    },
+    "extra": {
+        "patches": {
+            "sabberworm/php-css-parser": {
+                "1 - Fix/css4 rgb parsing - https://www.drupal.org/project/ui_styles/issues/3453784#comment-15719087": "https://www.drupal.org/files/issues/2024-08-08/sabberworm-php-css-parser-202.patch"
+            }
+        }
+    }
+}

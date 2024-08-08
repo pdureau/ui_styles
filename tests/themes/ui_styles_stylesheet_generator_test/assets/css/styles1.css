@@ -1,0 +1,8 @@
+.style1-class1,
+.style1-class2 {
+  color: var(--foo);
+}
+
+.body {
+  background-color: inherit;
+}

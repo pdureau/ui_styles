@@ -1,0 +1,11 @@
+ui_styles_stylesheet_generator_test1:
+  label: "Test stylesheet generator 1"
+  options:
+    style1-class1: "Test value"
+    style1-class2: "Test value"
+
+ui_styles_stylesheet_generator_test2:
+  label: "Test stylesheet generator 2"
+  options:
+    style2-class1: "Test value"
+    style2-class2: "Test value"

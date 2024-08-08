@@ -1,0 +1,6 @@
+bar:
+  css:
+    theme:
+      assets/css/variables.css: { }
+      assets/css/styles1.css: { }
+      assets/css/styles2.css: { }

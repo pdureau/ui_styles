@@ -1,0 +1,17 @@
+:root {
+  --foo: "used";
+}
+
+.my-scope {
+  --foo: ui_skins;
+}
+
+.prefix .style1-class1,
+.prefix .style1-class2 {
+  color: var(--foo);
+}
+
+.prefix .style2-class1,
+.prefix .style2-class2 {
+  color: var(--foo);
+}

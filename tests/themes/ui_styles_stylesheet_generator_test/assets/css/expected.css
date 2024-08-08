@@ -1,0 +1,11 @@
+:root {
+  --foo: "used";
+}
+.prefix .style1-class1,
+.prefix .style1-class2 {
+  color: var(--foo);
+}
+.prefix .style2-class1,
+.prefix .style2-class2 {
+  color: var(--foo);
+}

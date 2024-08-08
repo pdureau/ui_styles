@@ -1,4 +1,9 @@
 services:
+  logger.channel.ui_styles:
+    parent: logger.channel_base
+    arguments:
+      - 'ui_styles'
+
   plugin.manager.ui_styles:
     class: Drupal\ui_styles\StylePluginManager
     arguments:
@@ -6,3 +11,12 @@ services:
       - '@module_handler'
       - '@theme_handler'
       - '@transliteration'
+
+  ui_styles.stylesheet_generator:
+    class: Drupal\ui_styles\Service\StylesheetGenerator
+    arguments:
+      - '@module_handler'
+      - '@theme_handler'
+      - '@library.discovery'
+      - '@logger.channel.ui_styles'
+      - '@plugin.manager.ui_styles'
