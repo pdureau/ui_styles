@@ -57,6 +57,33 @@ class Element extends CoreElement {
   ];
 
   /**
+   * Wrappers that hold content for styling.
+   *
+   * Meaningless wrappers must not receive styling until the very last moment
+   * when we can't find an element to style.
+   *
+   * @var array
+   */
+  public static $meaninglessThemeWrappers = [
+    'view',
+    'layout',
+    'block',
+  ];
+
+  /**
+   * An element that only has those properties set is considered empty.
+   *
+   * @var string[]
+   */
+  public static $emptyProperties = [
+    '#access',
+    '#access_callback',
+    '#attached',
+    '#cache',
+    '#weight',
+  ];
+
+  /**
    * Add HTML classes to render array.
    *
    * @param array $element
@@ -69,7 +96,7 @@ class Element extends CoreElement {
    * @return array
    *   A render array.
    */
-  public static function addClasses(array $element, array $classes, $attr_property = '#attributes'): array {
+  public static function addClasses(array $element, array $classes, string $attr_property = '#attributes'): array {
     $element[$attr_property] = $element[$attr_property] ?? [];
     $element[$attr_property] = AttributeHelper::mergeCollections(
       $element[$attr_property],
@@ -88,6 +115,87 @@ class Element extends CoreElement {
     if (!Element::isAcceptingAttributes($element)) {
       $element = Element::wrapElement($element);
     }
+  }
+
+  /**
+   * Traverse the render tree and find all first elements accepting attributes.
+   *
+   * @param array $element
+   *   The render element. Must be reference to update in place later.
+   *
+   * @return array
+   *   Plain array of nested elements references to directly manipulate.
+   */
+  public static function findFirstAcceptingAttributes(array &$element): array {
+    $candidates = [];
+    // For field items we likely reached the real content, no need to go deeper.
+    // We return even non-accepting elements because it's the content.
+    if (\in_array($element['#theme'] ?? '', ['field'], TRUE)) {
+      foreach (static::children($element) as $key) {
+        $candidates[] = &$element[$key];
+      }
+      return $candidates;
+    }
+    // If an element is accepting attributes and not just a wrapper,
+    // it's the desired content to style.
+    if (!static::isMeaninglessWrapper($element) && Element::isAcceptingAttributes($element)) {
+      $candidates[] = &$element;
+      return $candidates;
+    }
+    // Go deeper in the tree.
+    $siblings_marked_keys = [];
+    foreach (static::children($element) as $key) {
+      $new_candidates = static::findFirstAcceptingAttributes($element[$key]);
+      $candidates = \array_merge($candidates, $new_candidates);
+      if (!empty($new_candidates)) {
+        $siblings_marked_keys[] = $key;
+      }
+    }
+    // If some siblings were marked for styles and unmarked elements are leafs,
+    // wrap them as they possibly represent some content as other siblings.
+    if (!empty($siblings_marked_keys)) {
+      $unmarked = \array_diff(static::children($element), $siblings_marked_keys);
+      foreach ($unmarked as $key) {
+        if (static::hasAllEmptyChildren($element[$key])) {
+          // Exclude empty elements.
+          if (static::isEmpty($element[$key])) {
+            continue;
+          }
+
+          $candidates[] = &$element[$key];
+        }
+      }
+    }
+    return $candidates;
+  }
+
+  /**
+   * Checks whether the element is only a wrapper.
+   */
+  public static function isMeaninglessWrapper(array $element): bool {
+    // Check it is a meaningless wrapper.
+    if (!\in_array($element['#theme'] ?? '', static::$meaninglessThemeWrappers, TRUE)) {
+      return FALSE;
+    }
+    // Check that wrapper has some content otherwise it's content itself.
+    return !static::hasAllEmptyChildren($element);
+  }
+
+  /**
+   * Checks whether the element doesn't have children or they are empty.
+   */
+  public static function hasAllEmptyChildren(array $element): bool {
+    // Check that wrapper has some content otherwise it's content itself.
+    $children = static::children($element);
+    if (empty($children)) {
+      return TRUE;
+    }
+    foreach ($children as $key) {
+      if (!empty($element[$key])) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -137,6 +245,13 @@ class Element extends CoreElement {
 
     // Other render arrays (#markup, #plain_text...)
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function isEmpty(array $elements): bool {
+    return \array_diff(\array_keys($elements), static::$emptyProperties) === [];
   }
 
   /**

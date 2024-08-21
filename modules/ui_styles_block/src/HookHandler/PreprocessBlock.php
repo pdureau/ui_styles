@@ -118,9 +118,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
     // classes to the block content.
     $selected = $styles['content']['selected'] ?? [];
     $extra = $styles['content']['extra'] ?? '';
-    // Trick to make the addClasses method usable without changes.
-    $variables['#theme'] = 'block';
-    $variables = $this->stylesManager->addClasses($variables, $selected, $extra);
+    $variables['content'] = $this->stylesManager->addClasses($variables['content'], $selected, $extra);
   }
 
   /**

@@ -6,6 +6,7 @@ namespace Drupal\Tests\ui_styles\Unit;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Transliteration\TransliterationInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -81,6 +82,10 @@ class StylePluginManagerTest extends UnitTestCase {
       ->willReturn([
         'valid_theme' => [
           'variables' => ['attributes' => 'something'],
+        ],
+        'block' => [
+          'variables' => [],
+          'template' => 'block',
         ],
       ]);
     $container = new ContainerBuilder();
@@ -571,8 +576,8 @@ class StylePluginManagerTest extends UnitTestCase {
    * Test the addClasses().
    *
    * @covers ::addClasses
-   * @covers ::addStyleToBlockContent
-   * @covers ::addStyleToFieldFormatterItems
+   * @covers \Drupal\ui_styles\Render\Element::findFirstAcceptingAttributes
+   * @covers \Drupal\ui_styles\Render\Element::wrapElementIfNotAcceptingAttributes
    */
   public function testAddClasses(): void {
     $element = [
@@ -593,11 +598,21 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertContains('added-class', $newElement['#attributes']['class']);
     $this->assertContains('extra-class', $newElement['#attributes']['class']);
 
-    // Test not able to add attributes.
+    // Test drilling process to set attributes on the first available element.
+    // Classes must be set to all first-encountered elements in the tree
+    // that allow attributes and not go deeper.
+    // If root allows to add, it should not go deeper.
+    // Test not able to add attributes and extra wrapper is added.
     $element = [
       '#no_attributes' => [
         'class' => [
           'original-class',
+        ],
+      ],
+      'element1' => [
+        '#no_attributes' => [],
+        'element1_1' => [
+          '#no_attributes' => [],
         ],
       ],
     ];
@@ -605,6 +620,78 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertContains('original-class', $newElement['element']['#no_attributes']['class']);
     $this->assertContains('added-class', $newElement['#attributes']['class']);
     $this->assertContains('extra-class', $newElement['#attributes']['class']);
+    $this->assertEmpty($newElement['element']['element1']['#no_attributes']);
+    $this->assertEmpty($newElement['element']['element1']['element1_1']['#no_attributes']);
+
+    // Test complex structure with siblings.
+    $element = [
+      '#no_attributes' => [
+        'class' => [
+          'original-class',
+        ],
+      ],
+      'element1' => [
+        '#no_attributes' => [
+          'class' => [
+            'original-class',
+          ],
+        ],
+        'element1_1' => [
+          '#attributes' => [],
+        ],
+        'element1_2' => [
+          '#attributes' => [],
+          'element1_2_1' => [
+            '#attributes' => [],
+          ],
+        ],
+        'element1_3' => [
+          '#no_attributes' => [
+            'class' => [
+              'original-class',
+            ],
+          ],
+          'element1_3_1' => [
+            '#attributes' => [],
+          ],
+        ],
+      ],
+      'element2' => [
+        '#attributes' => [],
+      ],
+      'element3' => [
+        '#no_attributes' => [],
+      ],
+    ];
+    $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
+    // No wrapper added.
+    $this->assertArrayNotHasKey('element', $newElement);
+    $this->assertArrayNotHasKey('#attributes', $newElement);
+    // Elements that must have classes added.
+    $test_cases_must_have_parents = [
+      ['element1', 'element1_1'],
+      ['element1', 'element1_2'],
+      ['element1', 'element1_3', 'element1_3_1'],
+      ['element2'],
+      ['element3'],
+    ];
+    foreach ($test_cases_must_have_parents as $parents) {
+      /** @var array $nested_element */
+      $nested_element = NestedArray::getValue($newElement, $parents);
+      $this->assertContains('added-class', $nested_element['#attributes']['class']);
+      $this->assertContains('extra-class', $nested_element['#attributes']['class']);
+    }
+    $this->assertArrayHasKey('element', $newElement['element3']);
+    // Elements that must not have new classes added.
+    $test_cases_not_have_parents = [
+      ['element1', 'element1_2', 'element1_2_1'],
+      ['element1', 'element1_3'],
+    ];
+    foreach ($test_cases_not_have_parents as $parents) {
+      /** @var array $nested_element */
+      $nested_element = NestedArray::getValue($newElement, $parents);
+      $this->assertEmpty($nested_element['#attributes'] ?? NULL);
+    }
 
     // Test addStyleToBlockContent > #theme:block > #theme:field.
     $element = [
@@ -635,7 +722,7 @@ class StylePluginManagerTest extends UnitTestCase {
         '#formatter' => 'media_thumbnail',
         'test' => [
           // Allowed #attributes tag.
-          '#type' => 'html_tag',
+          '#theme' => 'image_formatter',
           '#item_attributes' => [
             'class' => ['original-class'],
           ],
@@ -653,7 +740,7 @@ class StylePluginManagerTest extends UnitTestCase {
       '#theme' => 'block',
       'content' => [
         '#theme' => 'field',
-        '#formatter' => 'media_thumbnail',
+        '#formatter' => 'dummy',
         'test' => [
           // Not allowed #attributes tag.
           '#type' => 'inline_template',
@@ -668,8 +755,31 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertContains('original-class', $newElement['content']['test']['element']['#no_attributes']['class']);
     $this->assertNotContains('added-class', $newElement['content']['test']['element']['#no_attributes']['class']);
     $this->assertNotContains('extra-class', $newElement['content']['test']['element']['#no_attributes']['class']);
-    $this->assertContains('added-class', $newElement['content']['test']['#item_attributes']['class']);
-    $this->assertContains('extra-class', $newElement['content']['test']['#item_attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['test']['#attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['test']['#attributes']['class']);
+
+    // Test addStyleToBlockContent > #theme:block > #theme:dummy
+    // > !isAcceptingAttributes.
+    $element = [
+      '#theme' => 'block',
+      'content' => [
+        '#theme' => 'dummy',
+        'test' => [
+          // Not allowed #attributes tag.
+          '#type' => 'inline_template',
+          '#no_attributes' => [
+            'class' => ['original-class'],
+          ],
+        ],
+      ],
+    ];
+    $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
+    // The content had been wrapped in a div.
+    $this->assertContains('original-class', $newElement['content']['element']['test']['#no_attributes']['class']);
+    $this->assertNotContains('added-class', $newElement['content']['element']['test']['#no_attributes']['class']);
+    $this->assertNotContains('extra-class', $newElement['content']['element']['test']['#no_attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['#attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['#attributes']['class']);
 
     // Test addStyleToBlockContent > #theme:block > #theme:not field.
     $element = [
@@ -702,7 +812,14 @@ class StylePluginManagerTest extends UnitTestCase {
       'content' => [
         '#view_mode' => 'block',
         '_layout_builder' => [
-          0 => [
+          [
+            // Allowed #attributes tag.
+            '#type' => 'html_tag',
+            '#attributes' => [
+              'class' => ['original-class'],
+            ],
+          ],
+          [
             // Allowed #attributes tag.
             '#type' => 'html_tag',
             '#attributes' => [
@@ -716,6 +833,9 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertContains('original-class', $newElement['content']['_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('extra-class', $newElement['content']['_layout_builder'][0]['#attributes']['class']);
+    $this->assertContains('original-class', $newElement['content']['_layout_builder'][1]['#attributes']['class']);
+    $this->assertContains('added-class', $newElement['content']['_layout_builder'][1]['#attributes']['class']);
+    $this->assertContains('extra-class', $newElement['content']['_layout_builder'][1]['#attributes']['class']);
 
     // Test addStyleToBlockContent > #view_mode > no _layout_builder.
     $element = [
@@ -731,12 +851,20 @@ class StylePluginManagerTest extends UnitTestCase {
             ],
           ],
         ],
+        '_layout_builder' => [
+          '#cache' => [
+            'contexts' => ['my_context'],
+            'tags' => ['my_tag'],
+            'max-age' => -1,
+          ],
+        ],
       ],
     ];
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('extra-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
+    $this->assertCount(1, $newElement['content']['_layout_builder']);
 
     // Test addStyleToBlockContent > no #theme : no #view_mode
     // > isAcceptingAttributes.

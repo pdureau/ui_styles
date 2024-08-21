@@ -305,26 +305,53 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   public function addClasses(array $element, array $selected = [], string $extra = ''): array {
     // Set styles classes.
     $extra = \explode(' ', $extra);
-    $styles = \array_merge($selected, $extra);
+    $styles = \array_merge(\array_values($selected), $extra);
     $styles = \array_unique(\array_filter($styles));
 
     if (\count($styles) === 0) {
       return $element;
     }
 
-    // Blocks are special.
-    if (isset($element['#theme'])
-      && $element['#theme'] === 'block'
-      && isset($element['content'])
-      && !empty($element['content'])
-    ) {
-      // Try to add styles to block content instead of wrapper.
-      $element['content'] = $this->addStyleToBlockContent($element['content'], $styles);
+    return $this->addClassesToAcceptingOrWrap($element, $styles);
+  }
+
+  /**
+   * Add classes to an element.
+   *
+   * Tries to add classes to elements accepting attributes.
+   * Searches for elements in the tree, siblings are all considered.
+   * Stops drilling a tree branch when targets are found.
+   *
+   * @param array $element
+   *   Render element.
+   * @param array $classes
+   *   Styles classes.
+   *
+   * @return array
+   *   Render array with modified children or a wrapper.
+   */
+  protected function addClassesToAcceptingOrWrap(array $element, array $classes): array {
+    // We expect meaningless wrappers to have children. So we try to add classes
+    // deeper into the rendering tree.
+    if (Element::isMeaninglessWrapper($element)) {
+      foreach (Element::children($element) as $key) {
+        $element[$key] = $this->addClassesToAcceptingOrWrap($element[$key], $classes);
+      }
       return $element;
     }
-
-    Element::wrapElementIfNotAcceptingAttributes($element);
-    return Element::addClasses($element, $styles);
+    // Try to find elements to add classes.
+    $candidates = Element::findFirstAcceptingAttributes($element);
+    if (empty($candidates)) {
+      // If there is no place to inject, create a wrapper.
+      $candidates[] = &$element;
+    }
+    // Apply classes to all candidates.
+    foreach ($candidates as &$candidate) {
+      Element::wrapElementIfNotAcceptingAttributes($candidate);
+      $attr_property = $this->getElementAttributesProperty($candidate);
+      $candidate = Element::addClasses($candidate, $classes, $attr_property);
+    }
+    return $element;
   }
 
   /**
@@ -355,60 +382,15 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   }
 
   /**
-   * Add styles to block content instead of block wrapper.
+   * Returns element attributes property.
    */
-  protected function addStyleToBlockContent(array $content, array $styles): array {
-    // Field formatters are special.
-    if (isset($content['#theme']) && $content['#theme'] === 'field') {
-      if ($content['#formatter'] === 'media_thumbnail') {
-        return $this->addStyleToFieldFormatterItems($content, $styles, '#item_attributes');
-      }
-      return $this->addStyleToFieldFormatterItems($content, $styles);
+  protected function getElementAttributesProperty(array $element): string {
+    if (\array_key_exists('#theme', $element)
+      && \in_array($element['#theme'], $this::THEME_WITH_ITEM_ATTRIBUTES, TRUE)
+    ) {
+      return '#item_attributes';
     }
-
-    // Embedded entity displays are special.
-    if (isset($content['#view_mode'])) {
-      // Let's deal only with single section layout builder for now.
-      if (isset($content['_layout_builder']) && \count(Element::children($content['_layout_builder'])) === 1) {
-        $section = $content['_layout_builder'][0];
-        if (Element::isAcceptingAttributes($section)) {
-          $content['_layout_builder'][0] = Element::addClasses($section, $styles);
-        }
-        return $content;
-      }
-      // If the embedded entity does not use layout builder.
-      foreach (Element::children($content) as $key) {
-        $content[$key] = $this->addStyleToBlockContent($content[$key], $styles);
-      }
-      return $content;
-    }
-
-    // In case of children, like with Drupal 10.1.
-    $children = Element::children($content);
-    if (!empty($children)) {
-      foreach ($children as $delta) {
-        $content[$delta] = $this->addStyleToBlockContent($content[$delta], $styles);
-      }
-      return $content;
-    }
-
-    Element::wrapElementIfNotAcceptingAttributes($content);
-    return Element::addClasses($content, $styles);
-  }
-
-  /**
-   * Add style to field formatter items.
-   */
-  protected function addStyleToFieldFormatterItems(array $content, array $styles, string $attr_property = '#attributes'): array {
-    foreach (Element::children($content) as $delta) {
-      Element::wrapElementIfNotAcceptingAttributes($content[$delta]);
-
-      if (\array_key_exists('#theme', $content[$delta]) && \in_array($content[$delta]['#theme'], $this::THEME_WITH_ITEM_ATTRIBUTES, TRUE)) {
-        $attr_property = '#item_attributes';
-      }
-      $content[$delta] = Element::addClasses($content[$delta], $styles, $attr_property);
-    }
-    return $content;
+    return '#attributes';
   }
 
 }

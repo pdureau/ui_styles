@@ -4,6 +4,9 @@ test_class:
   options:
     test-class-section: Test
     test-class-region: Test
+    test-class-section-2-col: Test
+    test-class-region-first: Test
+    test-class-region-second: Test
     test-class-title-block-wrapper: Test
     test-class-title-block-title: Test
     test-class-title-block-content: Test

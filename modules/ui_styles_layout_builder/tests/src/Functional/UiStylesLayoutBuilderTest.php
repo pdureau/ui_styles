@@ -8,6 +8,7 @@ use Drupal\block_content\BlockContentInterface;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\block_content\Functional\BlockContentTestBase;
+use Drupal\Tests\ui_styles\Trait\AssertTrait;
 use Drupal\user\UserInterface;
 
 /**
@@ -17,6 +18,8 @@ use Drupal\user\UserInterface;
  * @group ui_styles_layout_builder
  */
 class UiStylesLayoutBuilderTest extends BlockContentTestBase {
+
+  use AssertTrait;
 
   /**
    * Default theme.
@@ -74,9 +77,6 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     'test-class-block-content-entity-block-wrapper',
     'test-class-block-content-entity-block-title',
     'test-class-block-content-entity-block-content',
-    // @todo add an entity that uses Layout Builder with multiple sections for
-    // https://www.drupal.org/project/ui_styles/issues/3334615
-    // or in https://www.drupal.org/project/ui_styles/issues/3334791.
     'test-class-title-block-extra-wrapper',
     'test-class-title-block-extra-title',
     'test-class-title-block-extra-content',
@@ -86,9 +86,6 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     'test-class-block-content-entity-block-extra-wrapper',
     'test-class-block-content-entity-block-extra-title',
     'test-class-block-content-entity-block-extra-content',
-    // @todo add an entity that uses Layout Builder with multiple sections for
-    // https://www.drupal.org/project/ui_styles/issues/3334615
-    // or in https://www.drupal.org/project/ui_styles/issues/3334791.
   ];
 
   /**
@@ -125,6 +122,11 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
 
     // Create a block content.
     $this->blockContent = $this->createBlockContent('My block content');
+    $this->blockContent->set('body', [
+      'value' => 'My body text (block content)',
+      'format' => 'plain_text',
+    ]);
+    $this->blockContent->save();
 
     // Enable layout builder on content type.
     $layout_builder_view_display = LayoutBuilderEntityViewDisplay::load('node.page.default');
@@ -139,7 +141,6 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
    * Tests to add classes with UI Styles on section.
    */
   public function testUiStylesSection(): void {
-    $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
     $this->drupalLogin($this->user);
@@ -150,7 +151,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra');
+    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-section');
     $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section');
     $page->fillField('ui_styles[regions][content][_ui_styles_extra]', 'test-class-extra-region');
     $page->selectFieldOption('ui_styles[regions][content][ui_styles_test_class]', 'test-class-region');
@@ -159,10 +160,33 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-extra');
-    $assert_session->responseContains('test-class-section');
-    $assert_session->responseContains('test-class-extra-region');
-    $assert_session->responseContains('test-class-region');
+    $pageContent = $this->getSession()->getPage()->getContent();
+    $this->assertContainsTimes($pageContent, 'test-class-extra-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-region', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region', 1);
+
+    // Add a section with multiple regions and add classes to it.
+    $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
+    $page->clickLink('Add section');
+    $page->clickLink('Two column');
+    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-2-cols-section');
+    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section-2-col');
+    $page->fillField('ui_styles[regions][first][_ui_styles_extra]', 'test-class-extra-first');
+    $page->selectFieldOption('ui_styles[regions][first][ui_styles_test_class]', 'test-class-region-first');
+    $page->fillField('ui_styles[regions][second][_ui_styles_extra]', 'test-class-extra-second');
+    $page->selectFieldOption('ui_styles[regions][second][ui_styles_test_class]', 'test-class-region-second');
+    $page->pressButton('Add section');
+    $page->pressButton('Save layout');
+
+    $this->drupalGet('node/' . $this->node->id());
+    $pageContent = $this->getSession()->getPage()->getContent();
+    $this->assertContainsTimes($pageContent, 'test-class-extra-2-cols-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-section-2-col', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-first', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region-first', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-second', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region-second', 1);
   }
 
   /**
@@ -192,7 +216,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $this->drupalLogin($this->user);
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseNotContains('test-class-extra');
+    $assert_session->responseNotContains('test-class-extra-section');
     $assert_session->responseNotContains('test-class-section');
     $assert_session->responseNotContains('test-class-extra-region');
     $assert_session->responseNotContains('test-class-region');
@@ -201,7 +225,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra');
+    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-section');
     $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section');
     $page->fillField('ui_styles[regions][content][_ui_styles_extra]', 'test-class-extra-region');
     $page->selectFieldOption('ui_styles[regions][content][ui_styles_test_class]', 'test-class-region');
@@ -210,10 +234,33 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
-    $assert_session->responseContains('test-class-extra');
-    $assert_session->responseContains('test-class-section');
-    $assert_session->responseContains('test-class-extra-region');
-    $assert_session->responseContains('test-class-region');
+    $pageContent = $this->getSession()->getPage()->getContent();
+    $this->assertContainsTimes($pageContent, 'test-class-extra-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-region', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region', 1);
+
+    // Add a section with multiple regions and add classes to it.
+    $this->drupalGet('node/' . $this->node->id() . '/layout');
+    $page->clickLink('Add section');
+    $page->clickLink('Two column');
+    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-2-cols-section');
+    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section-2-col');
+    $page->fillField('ui_styles[regions][first][_ui_styles_extra]', 'test-class-extra-first');
+    $page->selectFieldOption('ui_styles[regions][first][ui_styles_test_class]', 'test-class-region-first');
+    $page->fillField('ui_styles[regions][second][_ui_styles_extra]', 'test-class-extra-second');
+    $page->selectFieldOption('ui_styles[regions][second][ui_styles_test_class]', 'test-class-region-second');
+    $page->pressButton('Add section');
+    $page->pressButton('Save layout');
+
+    $this->drupalGet('node/' . $this->node->id());
+    $pageContent = $this->getSession()->getPage()->getContent();
+    $this->assertContainsTimes($pageContent, 'test-class-extra-2-cols-section', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-section-2-col', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-first', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region-first', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-extra-second', 1);
+    $this->assertContainsTimes($pageContent, 'test-class-region-second', 1);
   }
 
   /**
@@ -236,7 +283,6 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
    * Add blocks in Layout Builder and check for CSS classes.
    */
   protected function addBlocksAndCheck(): void {
-    $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
     // Title block.
@@ -278,8 +324,9 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $page->pressButton('Save layout');
 
     $this->drupalGet('node/' . $this->node->id());
+    $pageContent = $this->getSession()->getPage()->getContent();
     foreach ($this->blockClasses as $class) {
-      $assert_session->responseContains($class);
+      $this->assertContainsTimes($pageContent, $class, 1);
     }
   }
 
