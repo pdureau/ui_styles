@@ -27,6 +27,8 @@ class StyleDefinitionTest extends UnitTestCase {
    *
    * @covers ::getCategory
    * @covers ::getDescription
+   * @covers ::getEmptyOption
+   * @covers ::getIcon
    * @covers ::getLabel
    * @covers ::getOptions
    * @covers ::getPreviewedAs
@@ -58,10 +60,12 @@ class StyleDefinitionTest extends UnitTestCase {
       ['getDescription', 'description', 'Plugin description.'],
       ['getCategory', 'category', 'Plugin category'],
       ['getOptions', 'options', ['my-class' => 'My class']],
+      ['getEmptyOption', 'empty_option', '- None -'],
       ['getPreviewedWith', 'previewed_with', ['my-class']],
       ['getPreviewedAs', 'previewed_as', 'inside'],
       ['getPreviewedAs', 'previewed_as', 'aside'],
       ['getPreviewedAs', 'previewed_as', 'hidden'],
+      ['getIcon', 'icon', 'icon'],
       ['getWeight', 'weight', 10],
       ['isEnabled', 'enabled', FALSE],
       ['isEnabled', 'enabled', TRUE],
@@ -283,6 +287,105 @@ class StyleDefinitionTest extends UnitTestCase {
               'option-class',
             ],
             'previewed_as' => 'hidden',
+          ],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test getOptionsWithIcon.
+   *
+   * @param array $style
+   *   The style like in the YAML declaration.
+   * @param array $expected
+   *   The expected result.
+   *
+   * @covers ::getOptionsWithIcon
+   *
+   * @dataProvider definitionGetOptionsWithIconProvider
+   */
+  public function testGetOptionsWithIcon(array $style, array $expected): void {
+    $definition = new StyleDefinition($style);
+    $this->assertEquals($expected, $definition->getOptionsWithIcon());
+  }
+
+  /**
+   * Provider.
+   *
+   * @return array
+   *   Data.
+   */
+  public static function definitionGetOptionsWithIconProvider(): array {
+    return [
+      'no_icon' => [
+        [
+          'options' => [
+            'simple' => 'Simple',
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'icon' => '',
+          ],
+        ],
+      ],
+      'global_icon' => [
+        [
+          'icon' => 'my_icon',
+          'options' => [
+            'simple' => 'Simple',
+            'simple_bis' => 'Simple bis',
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'icon' => 'my_icon',
+          ],
+          'simple_bis' => [
+            'label' => 'Simple bis',
+            'icon' => 'my_icon',
+          ],
+        ],
+      ],
+      'icon_on_one_option' => [
+        [
+          'options' => [
+            'simple' => 'Simple',
+            'complex' => [
+              'label' => 'Complex',
+              'icon' => 'my_icon',
+            ],
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'icon' => '',
+          ],
+          'complex' => [
+            'label' => 'Complex',
+            'icon' => 'my_icon',
+          ],
+        ],
+      ],
+      'icon_on_one_option_and_global_icon' => [
+        [
+          'icon' => 'global_icon',
+          'options' => [
+            'simple' => 'Simple',
+            'complex' => [
+              'label' => 'Complex',
+              'icon' => 'my_icon',
+            ],
+          ],
+        ], [
+          'simple' => [
+            'label' => 'Simple',
+            'icon' => 'global_icon',
+          ],
+          'complex' => [
+            'label' => 'Complex',
+            'icon' => 'my_icon',
           ],
         ],
       ],

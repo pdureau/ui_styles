@@ -14,8 +14,10 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Definition\StyleDefinition;
+use Drupal\ui_styles\Source\SourcePluginManagerInterface;
 use Drupal\ui_styles\StylePluginManager;
 use Drupal\ui_styles_test\DummyStylePluginManager;
+use Drupal\ui_styles_test\Plugin\UiStyles\Source\TestSelect;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -122,7 +124,18 @@ class StylePluginManagerTest extends UnitTestCase {
         return '';
       });
 
-    $this->stylePluginManager = new DummyStylePluginManager($cache, $moduleHandler, $themeHandler, $transliteration, $this->stringTranslation);
+    $sourcePluginManager = $this->createMock(SourcePluginManagerInterface::class);
+    $sourcePluginManager->expects($this->any())
+      ->method('getApplicableSourcePlugin')
+      ->willReturn(new TestSelect(
+        [],
+        'test_select',
+        [
+          'id' => 'test_select',
+        ]
+      ));
+
+    $this->stylePluginManager = new DummyStylePluginManager($cache, $moduleHandler, $themeHandler, $transliteration, $sourcePluginManager, $this->stringTranslation);
     $this->stylePluginManager->setStyles($this->styles);
   }
 

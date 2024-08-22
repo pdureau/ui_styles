@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\ui_styles\Source\SourcePluginManagerInterface;
 use Drupal\ui_styles\StylePluginManager;
 
 /**
@@ -35,10 +36,11 @@ class DummyStylePluginManager extends StylePluginManager {
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
     TransliterationInterface $transliteration,
+    SourcePluginManagerInterface $sourcePluginManager,
     TranslationInterface $translation,
   ) {
     $this->stringTranslation = $translation;
-    parent::__construct($cache_backend, $module_handler, $theme_handler, $transliteration);
+    parent::__construct($cache_backend, $module_handler, $theme_handler, $transliteration, $sourcePluginManager);
   }
 
   /**

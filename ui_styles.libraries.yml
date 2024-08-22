@@ -1,0 +1,10 @@
+source_plugin_select:
+  css:
+    theme:
+      assets/css/ui_styles_source_plugin_select.css: {}
+      /ui_styles/stylesheet.css?prefix=.ui-styles-source-select-plugin: { minified: true }
+
+source_plugin_toolbar:
+  css:
+    theme:
+      assets/css/ui_styles_source_plugin_toolbar.css: {}

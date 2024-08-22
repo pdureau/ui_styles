@@ -16,6 +16,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\ui_styles\Definition\StyleDefinition;
 use Drupal\ui_styles\Render\Element;
+use Drupal\ui_styles\Source\SourceInterface;
+use Drupal\ui_styles\Source\SourcePluginManagerInterface;
 
 /**
  * Provides the default style plugin manager.
@@ -36,6 +38,13 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   protected ThemeHandlerInterface $themeHandler;
 
   /**
+   * The Source plugin manager.
+   *
+   * @var \Drupal\ui_styles\Source\SourcePluginManagerInterface
+   */
+  protected SourcePluginManagerInterface $sourcePluginManager;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
@@ -46,18 +55,22 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    *   The theme handler.
    * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
    *   The transliteration service.
+   * @param \Drupal\ui_styles\Source\SourcePluginManagerInterface $source_plugin_manager
+   *   The source plugin manager.
    */
   public function __construct(
     CacheBackendInterface $cache_backend,
     ModuleHandlerInterface $module_handler,
     ThemeHandlerInterface $theme_handler,
     TransliterationInterface $transliteration,
+    SourcePluginManagerInterface $source_plugin_manager,
   ) {
     $this->setCacheBackend($cache_backend, 'ui_styles', ['ui_styles']);
     $this->alterInfo('ui_styles_styles');
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;
     $this->transliteration = $transliteration;
+    $this->sourcePluginManager = $source_plugin_manager;
 
     // Set defaults in the constructor to be able to use string translation.
     $this->defaults = [
@@ -67,8 +80,10 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       'description' => '',
       'category' => $this->t('Other'),
       'options' => [],
+      'empty_option' => $this->t('- None -'),
       'previewed_with' => [],
       'previewed_as' => 'inside',
+      'icon' => '',
       'weight' => 0,
     ];
   }
@@ -81,6 +96,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $this->discovery->addTranslatableProperty('label', 'label_context');
     $this->discovery->addTranslatableProperty('description', 'description_context');
     $this->discovery->addTranslatableProperty('category', 'category_context');
+    $this->discovery->addTranslatableProperty('empty_option', 'empty_option_context');
     $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     return $this->discovery;
   }
@@ -240,19 +256,18 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       $group_used = FALSE;
       $group_key = '';
       foreach ($group_plugin_definitions as $definition) {
+        // Get applicable source plugin.
+        $style_type_plugin = $this->sourcePluginManager->getApplicableSourcePlugin($definition);
+        if (!$style_type_plugin instanceof SourceInterface) {
+          continue;
+        }
         $id = $definition->id();
         $element_name = 'ui_styles_' . $id;
-        $plugin_element = [
-          '#type' => 'select',
-          '#title' => $definition->getLabel(),
-          '#options' => $definition->getOptionsAsOptions(),
-          '#empty_option' => $this->t('- None -'),
-          '#default_value' => $selected[$id] ?? '',
-          '#weight' => $definition->getWeight(),
-        ];
+        $plugin_element = $style_type_plugin->getWidgetForm($definition, $selected[$id] ?? '');
+
         // Check if current style is used.
         $used = FALSE;
-        if (!empty($plugin_element['#default_value']) && $plugin_element['#default_value'] != $this->t('- None -')) {
+        if (!empty($plugin_element['#default_value'])) {
           $global_used = TRUE;
           $group_used = TRUE;
           $used = TRUE;
@@ -296,6 +311,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     if ($global_used && !empty($form['#title'])) {
       $form['#title'] .= $suffix;
     }
+
     return $form;
   }
 

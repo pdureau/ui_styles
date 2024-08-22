@@ -4,6 +4,10 @@ services:
     arguments:
       - 'ui_styles'
 
+  plugin.manager.ui_styles.source:
+    class: Drupal\ui_styles\Source\SourcePluginManager
+    parent: default_plugin_manager
+
   plugin.manager.ui_styles:
     class: Drupal\ui_styles\StylePluginManager
     arguments:
@@ -11,6 +15,7 @@ services:
       - '@module_handler'
       - '@theme_handler'
       - '@transliteration'
+      - '@plugin.manager.ui_styles.source'
 
   ui_styles.stylesheet_generator:
     class: Drupal\ui_styles\Service\StylesheetGenerator

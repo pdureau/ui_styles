@@ -25,8 +25,10 @@ class StyleDefinition extends PluginDefinition {
     'links' => [],
     'category' => '',
     'options' => [],
+    'empty_option' => '- None -',
     'previewed_with' => [],
     'previewed_as' => 'inside',
+    'icon' => '',
     'weight' => 0,
     'additional' => [],
     'provider' => '',
@@ -200,6 +202,52 @@ class StyleDefinition extends PluginDefinition {
   }
 
   /**
+   * Get options for preview.
+   *
+   * @return array
+   *   Options for preview.
+   */
+  public function getOptionsWithIcon(): array {
+    $style_icon = $this->getIcon();
+    $style_previewed_with = $this->getPreviewedWith();
+
+    $options = [];
+    foreach ($this->getOptions() as $option_id => $option) {
+      $options[$option_id] = [
+        'label' => '',
+        'icon' => $style_icon,
+        'previewed_with' => $style_previewed_with,
+      ];
+
+      // Label.
+      if (\is_scalar($option)) {
+        $options[$option_id]['label'] = $option;
+      }
+      elseif (isset($option['label'])) {
+        $options[$option_id]['label'] = $option['label'];
+      }
+
+      // Icon.
+      if (\is_array($option) && isset($option['icon'])) {
+        $options[$option_id]['icon'] = $option['icon'];
+      }
+
+      // Previewed_with.
+      if (\is_array($option) && isset($option['previewed_with'])) {
+        $options[$option_id]['previewed_with'] = \array_merge(
+          // @phpstan-ignore-next-line
+          $options[$option_id]['previewed_with'],
+          $option['previewed_with']
+        );
+      }
+      if (empty($options[$option_id]['previewed_with'])) {
+        unset($options[$option_id]['previewed_with']);
+      }
+    }
+    return $options;
+  }
+
+  /**
    * Setter.
    *
    * @param array $options
@@ -209,6 +257,29 @@ class StyleDefinition extends PluginDefinition {
    */
   public function setOptions(array $options) {
     $this->definition['options'] = $options;
+    return $this;
+  }
+
+  /**
+   * Getter.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string
+   *   Property value.
+   */
+  public function getEmptyOption() {
+    return $this->definition['empty_option'];
+  }
+
+  /**
+   * Setter.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $emptyOption
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setEmptyOption($emptyOption) {
+    $this->definition['empty_option'] = $emptyOption;
     return $this;
   }
 
@@ -255,6 +326,29 @@ class StyleDefinition extends PluginDefinition {
    */
   public function setPreviewedAs(string $previewedAs) {
     $this->definition['previewed_as'] = $previewedAs;
+    return $this;
+  }
+
+  /**
+   * Getter.
+   *
+   * @return string
+   *   Property value.
+   */
+  public function getIcon() {
+    return $this->definition['icon'];
+  }
+
+  /**
+   * Setter.
+   *
+   * @param string $icon
+   *   Property value.
+   *
+   * @return $this
+   */
+  public function setIcon($icon) {
+    $this->definition['icon'] = $icon;
     return $this;
   }
 

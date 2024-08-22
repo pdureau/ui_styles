@@ -1,0 +1,87 @@
+.ui-styles-source-select-plugin > div > div:focus-within,
+.ui-styles-source-select-plugin > div > div {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.ui-styles-source-select-plugin > div > div {
+  display: flex !important;
+  overflow: hidden !important;
+  flex-direction: column !important;
+  height: 47px !important;
+  border: 1px solid rgba(0, 0, 0, 0.8) !important;
+}
+
+.ui-styles-source-select-plugin > div > div::after {
+  position: absolute !important;
+  z-index: 3 !important;
+  top: 17px !important;
+  right: 14px !important;
+  width: 0.8em !important;
+  height: 0.5em !important;
+  content: "" !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  clip-path: polygon(100% 0%, 0 0%, 50% 100%) !important;
+}
+
+div:has(> .ui-styles-source-select-plugin[type="radio"]:hover),
+div:has(> .ui-styles-source-select-plugin[type="radio"] + label:hover) {
+  color: #fff !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+div:has(> .ui-styles-source-select-plugin[type="radio"]:checked) {
+  order: -1 !important;
+}
+
+div:has(> .ui-styles-source-select-plugin[type="radio"]) {
+  z-index: 1 !important;
+  top: 0 !important;
+  order: 2 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  background-color: white !important;
+}
+
+.ui-styles-source-select-plugin[type="radio"] + label {
+  position: absolute !important;
+  z-index: -1 !important;
+  left: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  white-space: normal !important;
+  color: #000 !important;
+  margin-block: unset !important;
+}
+
+.ui-styles-source-select-plugin[type="radio"] {
+  width: 100% !important;
+  height: 45px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  opacity: 0 !important;
+}
+
+div:has(> .ui-styles-source-select-plugin[type="radio"] + label) {
+  position: relative !important;
+  display: inline-block !important;
+  overflow: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: all !important;
+  font-weight: normal !important;
+}
+
+.ui-styles-source-select-plugin-option {
+  display: block !important;
+  margin: 0 !important;
+  margin-right: 10px !important;
+  line-height: 20px !important;
+}

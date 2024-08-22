@@ -1,0 +1,38 @@
+.ui-styles-source-toolbar-plugin > div > div {
+  display: flex !important;
+  flex-direction: row !important;
+}
+
+.ui-styles-source-toolbar-plugin[type="radio"] {
+  -webkit-appearance: none !important;
+  display: none !important;
+}
+
+.form-boolean-group:has(.ui-styles-source-toolbar-plugin) {
+  display: flex !important;
+}
+
+div:has(> .ui-styles-source-toolbar-plugin[type="radio"]) {
+  display: flex !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  margin-right: 5px !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 5px !important;
+  background-color: #fff !important;
+}
+
+div:has(> .ui-styles-source-toolbar-plugin[type="radio"]:checked) {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.ui-styles-source-toolbar-plugin[type="radio"] + label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
