@@ -9,7 +9,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 /**
  * Dummy test class for doCallback.
  */
-class DoCallbackTest implements TrustedCallbackInterface {
+class DoTestCallback implements TrustedCallbackInterface {
 
   /**
    * {@inheritdoc}

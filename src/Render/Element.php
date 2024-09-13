@@ -347,6 +347,8 @@ class Element extends CoreElement {
   /**
    * Performs a callback.
    *
+   * Cannot use the renderer service as the doCallback method is protected.
+   *
    * @param string $callback_type
    *   The type of the callback. For example, '#post_render'.
    * @param string|callable $callback
@@ -358,29 +360,18 @@ class Element extends CoreElement {
    *   The callback's return value.
    *
    * @see \Drupal\Core\Security\TrustedCallbackInterface
+   * @see \Drupal\Core\Render\Renderer::doCallback()
    */
   protected static function doCallback($callback_type, $callback, array $args) {
-    if (\is_string($callback)) {
-      $double_colon = \strpos($callback, self::CALLBACK_NEEDLE);
-      if ($double_colon === FALSE) {
-        // We don't deal with this situation.
-        // @todo Do we need to deal with it? Check Drupal\Core\Render\Renderer.
-      }
-      elseif ($double_colon > 0) {
-        $callback = \explode(self::CALLBACK_NEEDLE, $callback, self::CALLBACK_NEEDLE_LENGTH);
-      }
-    }
-
-    $message = \sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. Support for this callback implementation is deprecated in 8.8.0 and will be removed in Drupal 9.0.0. See https://www.drupal.org/node/2966725', $callback_type, '%s');
-
+    $callable = \Drupal::service('callable_resolver')->getCallableFromDefinition($callback);
+    $message = \sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
     // - All public methods on Render elements are considered trusted.
     // - Helper classes that contain only callback methods can implement this
     //   instead of TrustedCallbackInterface.
     $callbackWrapper = new TrustedCallbackWrapper();
-    // @phpstan-ignore-next-line
-    return $callbackWrapper->doTrustedCallback($callback, $args, $message, TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION, RenderCallbackInterface::class);
+    return $callbackWrapper->doTrustedCallback($callable, $args, $message, TrustedCallbackInterface::THROW_EXCEPTION, RenderCallbackInterface::class);
   }
 
 }

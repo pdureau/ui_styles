@@ -6,6 +6,7 @@ namespace Drupal\Tests\ui_styles\Unit;
 
 use Drupal\Core\Render\ElementInfoManager;
 use Drupal\Core\Theme\Registry;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Render\Element;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -34,6 +35,13 @@ class UiStylesRenderElementTest extends UnitTestCase {
   protected $elementInfoManager;
 
   /**
+   * The callable resolver.
+   *
+   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $callableResolver;
+
+  /**
    * The dependency injection container.
    *
    * @var \Symfony\Component\DependencyInjection\ContainerBuilder
@@ -49,12 +57,13 @@ class UiStylesRenderElementTest extends UnitTestCase {
     $this->container = new ContainerBuilder();
 
     $this->themeRegistry = $this->createMock(Registry::class);
-
     $this->elementInfoManager = $this->createMock(ElementInfoManager::class);
+    $this->callableResolver = $this->createMock(CallableResolver::class);
 
     $container = new ContainerBuilder();
     $container->set('theme.registry', $this->themeRegistry);
     $container->set('plugin.manager.element_info', $this->elementInfoManager);
+    $container->set('callable_resolver', $this->callableResolver);
     \Drupal::setContainer($container);
   }
 
@@ -241,7 +250,10 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackValidTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoTestCallback::myCallbackValidTest']]);
+    $this->callableResolver->expects($this->once())
+      ->method('getCallableFromDefinition')
+      ->willReturn('Drupal\ui_styles_test\DoTestCallback::myCallbackValidTest');
     $result = Element::isAcceptingAttributes($element);
     $this->assertTrue($result, 'Element with #pre_render, #type not with/without and valid doCallback must be true.');
   }
@@ -266,7 +278,10 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackNotValidTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoTestCallback::myCallbackNotValidTest']]);
+    $this->callableResolver->expects($this->once())
+      ->method('getCallableFromDefinition')
+      ->willReturn('Drupal\ui_styles_test\DoTestCallback::myCallbackNotValidTest');
     $result = Element::isAcceptingAttributes($element);
     $this->assertFalse($result, 'Element with #pre_render, #type not valid and not valid doCallback must be false.');
   }
@@ -284,7 +299,10 @@ class UiStylesRenderElementTest extends UnitTestCase {
     ];
     $this->elementInfoManager->expects($this->once())
       ->method('getInfo')
-      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoCallbackTest::myCallbackNotValidThemeTest']]);
+      ->willReturn(['#pre_render' => ['Drupal\ui_styles_test\DoTestCallback::myCallbackNotValidThemeTest']]);
+    $this->callableResolver->expects($this->once())
+      ->method('getCallableFromDefinition')
+      ->willReturn('Drupal\ui_styles_test\DoTestCallback::myCallbackNotValidThemeTest');
     $result = Element::isAcceptingAttributes($element);
     $this->assertFalse($result, 'Element with #pre_render, #type not valid theme and not valid doCallback must be false.');
   }
