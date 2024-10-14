@@ -216,121 +216,121 @@ class StylePluginManagerTest extends UnitTestCase {
    */
   public function testGetSortedDefinitions(): void {
     $this->stylePluginManager->setStyles([
-      'id_z1z2' => [
-        'category' => 'Z',
+      'id_1zz2' => [
         'weight' => 1,
+        'category' => 'Z',
         'label' => '(Z)',
-        'id' => 'id_z1z2',
+        'id' => 'id_1zz2',
       ],
-      'id_z1z1' => [
-        'category' => 'Z',
+      'id_1zz1' => [
         'weight' => 1,
+        'category' => 'Z',
         'label' => 'Z',
-        'id' => 'id_z1z1',
+        'id' => 'id_1zz1',
       ],
-      'id_z1a2' => [
-        'category' => 'Z',
+      'id_1za2' => [
         'weight' => 1,
+        'category' => 'Z',
         'label' => '(A)',
-        'id' => 'id_z1a2',
+        'id' => 'id_1za2',
       ],
-      'id_z1a1' => [
-        'category' => 'Z',
+      'id_1za1' => [
         'weight' => 1,
-        'label' => 'A',
-        'id' => 'id_z1a1',
-      ],
-      'id_z0z2' => [
         'category' => 'Z',
-        'weight' => 0,
+        'label' => 'A',
+        'id' => 'id_1za1',
+      ],
+      'id_1az2' => [
+        'weight' => 1,
+        'category' => 'A',
         'label' => '(Z)',
-        'id' => 'id_z0z2',
+        'id' => 'id_1az2',
       ],
-      'id_z0z1' => [
-        'category' => 'Z',
-        'weight' => 0,
-        'label' => 'Z',
-        'id' => 'id_z0z1',
-      ],
-      'id_z0a2' => [
-        'category' => 'Z',
-        'weight' => 0,
-        'label' => '(A)',
-        'id' => 'id_z0a2',
-      ],
-      'id_z0a1' => [
-        'category' => 'Z',
-        'weight' => 0,
-        'label' => 'A',
-        'id' => 'id_z0a1',
-      ],
-      'id_a1z2' => [
-        'category' => 'A',
+      'id_1az1' => [
         'weight' => 1,
+        'category' => 'A',
+        'label' => 'Z',
+        'id' => 'id_1az1',
+      ],
+      'id_1aa2' => [
+        'weight' => 1,
+        'category' => 'A',
+        'label' => '(A)',
+        'id' => 'id_1aa2',
+      ],
+      'id_1aa1' => [
+        'weight' => 1,
+        'category' => 'A',
+        'label' => 'A',
+        'id' => 'id_1aa1',
+      ],
+      'id_0zz2' => [
+        'weight' => 0,
+        'category' => 'Z',
         'label' => '(Z)',
-        'id' => 'id_a1z2',
+        'id' => 'id_0zz2',
       ],
-      'id_a1z1' => [
-        'category' => 'A',
-        'weight' => 1,
-        'label' => 'Z',
-        'id' => 'id_a1z1',
-      ],
-      'id_a1a2' => [
-        'category' => 'A',
-        'weight' => 1,
-        'label' => '(A)',
-        'id' => 'id_a1a2',
-      ],
-      'id_a1a1' => [
-        'category' => 'A',
-        'weight' => 1,
-        'label' => 'A',
-        'id' => 'id_a1a1',
-      ],
-      'id_a0z2' => [
-        'category' => 'A',
+      'id_0zz1' => [
         'weight' => 0,
+        'category' => 'Z',
+        'label' => 'Z',
+        'id' => 'id_0zz1',
+      ],
+      'id_0za2' => [
+        'weight' => 0,
+        'category' => 'Z',
+        'label' => '(A)',
+        'id' => 'id_0za2',
+      ],
+      'id_0za1' => [
+        'weight' => 0,
+        'category' => 'Z',
+        'label' => 'A',
+        'id' => 'id_0za1',
+      ],
+      'id_0az2' => [
+        'weight' => 0,
+        'category' => 'A',
         'label' => '(Z)',
-        'id' => 'id_a0z2',
+        'id' => 'id_0az2',
       ],
-      'id_a0z1' => [
-        'category' => 'A',
+      'id_0az1' => [
         'weight' => 0,
+        'category' => 'A',
         'label' => 'Z',
-        'id' => 'id_a0z1',
+        'id' => 'id_0az1',
       ],
-      'id_a0a2' => [
-        'category' => 'A',
+      'id_0aa2' => [
         'weight' => 0,
+        'category' => 'A',
         'label' => '(A)',
-        'id' => 'id_a0a2',
+        'id' => 'id_0aa2',
       ],
-      'id_a0a1' => [
-        'category' => 'A',
+      'id_0aa1' => [
         'weight' => 0,
+        'category' => 'A',
         'label' => 'A',
-        'id' => 'id_a0a1',
+        'id' => 'id_0aa1',
       ],
     ]);
 
     $expected = [
-      'id_a0a1',
-      'id_a0a2',
-      'id_a0z1',
-      'id_a0z2',
-      'id_a1a1',
-      'id_a1a2',
-      'id_a1z1',
-      'id_a1z2',
-      'id_z0a1',
-      'id_z0a2',
-      'id_z0z1',
-      'id_z0z2',
-      'id_z1a1',
-      'id_z1a2',
-      'id_z1z1',
-      'id_z1z2',
+      'id_0aa1',
+      'id_0aa2',
+      'id_0az1',
+      'id_0az2',
+      'id_0za1',
+      'id_0za2',
+      'id_0zz1',
+      'id_0zz2',
+      'id_1aa1',
+      'id_1aa2',
+      'id_1az1',
+      'id_1az2',
+      'id_1za1',
+      'id_1za2',
+      'id_1zz1',
+      'id_1zz2',
     ];
 
     $sorted_definitions = $this->stylePluginManager->getSortedDefinitions();
@@ -362,7 +362,7 @@ class StylePluginManagerTest extends UnitTestCase {
         'weight' => 0,
       ],
       'cat_2_0_a' => [
-        'id' => 'cat_1_0_a',
+        'id' => 'cat_2_0_a',
         'category' => 'Cat 2',
         'label' => 'A',
         'weight' => 0,

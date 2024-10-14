@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_ckeditor5\Plugin\CKEditor5Plugin;
 
+use Drupal\Component\Transliteration\TransliterationInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableTrait;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginElementsSubsetInterface;
-use Drupal\Component\Transliteration\TransliterationInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\editor\EditorInterface;
 use Drupal\ui_styles\MachineNameTrait;
 use Drupal\ui_styles\StylePluginManagerInterface;

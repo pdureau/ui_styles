@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ui_styles_layout_builder\Functional;
 
+use Drupal\Tests\block_content\Functional\BlockContentTestBase;
+use Drupal\Tests\ui_styles\Trait\AssertTrait;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\NodeInterface;
-use Drupal\Tests\block_content\Functional\BlockContentTestBase;
-use Drupal\Tests\ui_styles\Trait\AssertTrait;
 use Drupal\user\UserInterface;
 
 /**

@@ -123,6 +123,12 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $definitions = $definitions ?? $this->getDefinitions();
 
     \uasort($definitions, static function (StyleDefinition $item1, StyleDefinition $item2) {
+      // Sort by weight.
+      $weight = $item1->getWeight() <=> $item2->getWeight();
+      if ($weight != 0) {
+        return $weight;
+      }
+
       // Sort by category.
       $category1 = $item1->getCategory();
       if ($category1 instanceof TranslatableMarkup) {
@@ -134,12 +140,6 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
       }
       if ($category1 != $category2) {
         return \strnatcasecmp($category1, $category2);
-      }
-
-      // Sort by weight.
-      $weight = $item1->getWeight() <=> $item2->getWeight();
-      if ($weight != 0) {
-        return $weight;
       }
 
       // Sort by label ignoring parenthesis.
