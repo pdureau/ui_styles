@@ -4,7 +4,7 @@ ui_suite.index:
     _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
     _title: 'UI libraries'
   requirements:
-    _permission: 'access patterns page+access_ui_styles_library+access_ui_examples_library+access ui icons library'
+    _permission: 'access patterns page+access components page+access_ui_styles_library+access_ui_examples_library+access ui icons library'
 
 ui_styles_library.overview:
   path: '/admin/appearance/ui/styles'
