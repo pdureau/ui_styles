@@ -42,6 +42,7 @@ div:has(> .ui-styles-source-select-plugin[type="radio"]) {
   top: 0 !important;
   order: 2 !important;
   box-sizing: border-box !important;
+  min-height: auto;
   white-space: nowrap !important;
   background-color: white !important;
 }
