@@ -7,6 +7,7 @@
         "sabberworm/php-css-parser": "^8.6"
     },
     "require-dev": {
+        "drupal/ui_patterns": "^2.0",
         "drupal/ui_skins": "^1.0"
     },
     "extra": {

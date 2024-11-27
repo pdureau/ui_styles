@@ -1,0 +1,8 @@
+name: 'UI Styles UI Patterns'
+type: module
+description: 'Provides styles integration in UI Patterns.'
+core_version_requirement: ^10.1 || ^11
+package: 'User interface'
+dependencies:
+  - ui_patterns:ui_patterns (>=2.0)
+  - ui_styles:ui_styles

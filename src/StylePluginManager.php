@@ -304,7 +304,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $form['_ui_styles_extra'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Extra classes'),
-      '#description' => $this->t('You can add many values using spaces as separators'),
+      '#description' => $this->t('You can add many values using spaces as separators.'),
       '#default_value' => $extra ?: '',
     ];
 
