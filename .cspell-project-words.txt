@@ -1,2 +1,4 @@
+fontawesome
+pymdownx
 sabberworm
 tfor

@@ -1,2 +1,3 @@
 modules/ui_styles_ckeditor5/js/**/**.js
 modules/ui_styles_ckeditor5/webpack.config.js
+mkdocs.yml

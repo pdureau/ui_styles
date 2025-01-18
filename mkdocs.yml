@@ -1,0 +1,48 @@
+site_name: 'UI Styles'
+repo_name: drupal/ui_styles
+repo_url: https://git.drupalcode.org/project/ui_styles
+edit_uri: /-/edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    # Palette toggle for automatic mode
+    - media: '(prefers-color-scheme)'
+      primary: blue
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: '(prefers-color-scheme: light)'
+      primary: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: '(prefers-color-scheme: dark)'
+      primary: blue
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+nav:
+  - Home: 'index.md'
+  - Project page: 'https://www.drupal.org/project/ui_styles'
+
+plugins:
+  - search
+  - privacy:
+      enabled: !ENV [CI, false]
+
+extra:
+  social:
+    - icon: fontawesome/solid/user-astronaut
+      link: https://www.drupal.org/project/ui_suite
+      name: 'UI Suite'
+
+markdown_extensions:
+  - markdown.extensions.admonition
+  - pymdownx.extra
