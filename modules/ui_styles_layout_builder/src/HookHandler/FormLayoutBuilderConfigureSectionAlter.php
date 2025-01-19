@@ -4,48 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_layout_builder\HookHandler;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\ui_styles\StylePluginManagerInterface;
-use Drupal\ui_styles\UiStylesUtility;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Layout Builder section form alter.
  */
-class FormLayoutBuilderConfigureSectionAlter implements ContainerInjectionInterface {
+class FormLayoutBuilderConfigureSectionAlter {
 
-  use DependencySerializationTrait;
   use StringTranslationTrait;
-
-  /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
-  public function __construct(StylePluginManagerInterface $stylesManager) {
-    $this->stylesManager = $stylesManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    // @phpstan-ignore-next-line
-    return new static(
-      $container->get('plugin.manager.ui_styles')
-    );
-  }
 
   /**
    * Add UI Styles on section config form.
@@ -56,28 +23,22 @@ class FormLayoutBuilderConfigureSectionAlter implements ContainerInjectionInterf
    *   The form state.
    */
   public function formAlter(array &$form, FormStateInterface $formState): void {
-    if (empty($this->stylesManager->getGroupedDefinitions())) {
-      return;
-    }
-
     /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $formObject */
     $formObject = $formState->getFormObject();
     $section = $formObject->getCurrentSection();
 
     // Section.
-    /** @var array $selected */
-    $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
-    /** @var string $extra */
-    $extra = $section->getThirdPartySetting('ui_styles', 'extra') ?: '';
     $form['ui_styles'] = [
       '#type' => 'container',
     ];
     $form['ui_styles']['section'] = [
-      '#type' => 'details',
+      '#type' => 'ui_styles_styles',
       '#title' => $this->t('Section styles'),
-      '#open' => FALSE,
+      '#default_value' => [
+        'selected' => $section->getThirdPartySetting('ui_styles', 'selected') ?: [],
+        'extra' => $section->getThirdPartySetting('ui_styles', 'extra') ?: '',
+      ],
     ];
-    $form['ui_styles']['section'] = $this->stylesManager->alterForm($form['ui_styles']['section'], $selected, $extra);
 
     // Regions.
     /** @var array $regions_configuration */
@@ -88,20 +49,17 @@ class FormLayoutBuilderConfigureSectionAlter implements ContainerInjectionInterf
         '#type' => 'container',
       ];
     }
-
     foreach ($regions as $region_name => $region_infos) {
-      /** @var array $selected */
-      $selected = $regions_configuration[$region_name]['selected'] ?? [];
-      /** @var string $extra */
-      $extra = $regions_configuration[$region_name]['extra'] ?? '';
       $form['ui_styles']['regions'][$region_name] = [
-        '#type' => 'details',
+        '#type' => 'ui_styles_styles',
         '#title' => $this->t('@region_label region styles', [
           '@region_label' => $region_infos['label'] ?? '',
         ]),
-        '#open' => FALSE,
+        '#default_value' => [
+          'selected' => $regions_configuration[$region_name]['selected'] ?? [],
+          'extra' => $regions_configuration[$region_name]['extra'] ?? '',
+        ],
       ];
-      $form['ui_styles']['regions'][$region_name] = $this->stylesManager->alterForm($form['ui_styles']['regions'][$region_name], $selected, $extra);
     }
 
     // Our submit handler must execute before the default one, because the
@@ -130,20 +88,41 @@ class FormLayoutBuilderConfigureSectionAlter implements ContainerInjectionInterf
     $ui_styles = $formState->getValue('ui_styles');
 
     // Section.
-    $section->setThirdPartySetting('ui_styles', 'selected', UiStylesUtility::extractSelectedStyles($ui_styles['section']));
-    $section->setThirdPartySetting('ui_styles', 'extra', $ui_styles['section']['_ui_styles_extra']);
+    $selected = $ui_styles['section']['selected'] ?? [];
+    if (empty($selected)) {
+      $section->unsetThirdPartySetting('ui_styles', 'selected');
+    }
+    else {
+      $section->setThirdPartySetting('ui_styles', 'selected', $selected);
+    }
+    $extra = $ui_styles['section']['extra'] ?? '';
+    if (empty($extra)) {
+      $section->unsetThirdPartySetting('ui_styles', 'extra');
+    }
+    else {
+      $section->setThirdPartySetting('ui_styles', 'extra', $extra);
+    }
 
     // Regions.
     $regions = [];
     /** @var array $ui_styles_regions */
     $ui_styles_regions = $ui_styles['regions'] ?? [];
     foreach ($ui_styles_regions as $region_name => $region_styles) {
-      $regions[$region_name] = [
-        'selected' => UiStylesUtility::extractSelectedStyles($region_styles),
-        'extra' => $region_styles['_ui_styles_extra'],
-      ];
+      $selected = $region_styles['selected'] ?? [];
+      $extra = $region_styles['extra'] ?? '';
+      if (!empty($selected)) {
+        $regions[$region_name]['selected'] = $selected;
+      }
+      if (!empty($extra)) {
+        $regions[$region_name]['extra'] = $extra;
+      }
     }
-    $section->setThirdPartySetting('ui_styles', 'regions', $regions);
+    if (empty($regions)) {
+      $section->unsetThirdPartySetting('ui_styles', 'regions');
+    }
+    else {
+      $section->setThirdPartySetting('ui_styles', 'regions', $regions);
+    }
   }
 
 }

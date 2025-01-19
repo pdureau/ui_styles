@@ -7,7 +7,6 @@ namespace Drupal\ui_styles_page\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ui_styles\StylePluginManagerInterface;
-use Drupal\ui_styles\UiStylesUtility;
 use Drupal\ui_styles_page\UiStylesPageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -87,52 +86,17 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
     ];
 
     foreach ($system_regions as $region_name => $region) {
-      if (!empty($settings) && isset($settings[$region_name])) {
-        $selected = $settings[$region_name]['selected'];
-        $extra = $settings[$region_name]['extra'];
-      }
-      else {
-        $selected = [];
-        $extra = '';
-      }
-
       $form[UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS][$region_name] = [
-        '#type' => 'details',
+        '#type' => 'ui_styles_styles',
         '#title' => $region,
-        '#open' => FALSE,
-        '#tree' => TRUE,
+        '#theme' => $theme,
+        '#default_value' => [
+          'selected' => $settings[$region_name]['selected'] ?? [],
+          'extra' => $settings[$region_name]['extra'] ?? '',
+        ],
       ];
-
-      $form[UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS][$region_name] =
-        $this->stylesManager->alterForm($form[UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS][$region_name], $selected, $extra, $theme);
     }
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state): void {
-    parent::validateForm($form, $form_state);
-    /** @var array $regions */
-    $regions = $form_state->getValue(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
-    foreach ($regions as $region_name => $region) {
-      $selected = UiStylesUtility::extractSelectedStyles($region);
-      $extra = $region['_ui_styles_extra'] ?? '';
-      $form_state->setValue([
-        UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS,
-        $region_name,
-      ], [
-        'selected' => $selected,
-        'extra' => $extra,
-      ]);
-      if (empty($selected) && empty($extra)) {
-        $form_state->unsetValue([
-          UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS,
-          $region_name,
-        ]);
-      }
-    }
   }
 
   /**
@@ -143,10 +107,18 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
     $this->editableConfig = [
       $theme . '.settings',
     ];
-    $values = $form_state->getValue(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
+    /** @var array $values */
+    $values = $form_state->getValue(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS) ?? [];
+    $values = \array_filter($values);
+
     $config = $this->config($theme . '.settings');
-    $config->set(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS, $values)
-      ->save();
+    if (empty($values)) {
+      $config->clear(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS);
+    }
+    else {
+      $config->set(UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS, $values);
+    }
+    $config->save();
 
     parent::submitForm($form, $form_state);
   }

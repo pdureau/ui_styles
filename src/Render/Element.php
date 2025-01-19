@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles\Render;
 
-use Drupal\Core\Render\Element as CoreElement;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
+use Drupal\Core\Render\Element as CoreElement;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Template\AttributeHelper;
 

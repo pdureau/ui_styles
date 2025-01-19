@@ -410,6 +410,7 @@ class StylePluginManagerTest extends UnitTestCase {
       '#open' => FALSE,
     ];
 
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt2',
       'test2' => 'opt3',
@@ -426,6 +427,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame('Main' . $suffix, $altered_form['#title']);
 
     // Test that if no value is used suffix is not set.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [], '');
     $this->assertArrayHasKey('ui_styles_test1', $altered_form);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form);
@@ -465,6 +467,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->stylePluginManager->setStyles($ungrouped_styles);
 
     // No values.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',
@@ -476,6 +479,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
 
     // Value on test1.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt1',
       'test2' => '',
@@ -487,6 +491,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
 
     // Value on test2.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => 'opt1',
@@ -498,6 +503,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['ui_styles_test2']['#title']);
 
     // Value on extra.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',
@@ -525,6 +531,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->stylePluginManager->setStyles($grouped_styles);
 
     // No values.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',
@@ -540,6 +547,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on test1.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt1',
       'test2' => '',
@@ -555,6 +563,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on test2.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => 'opt2',
@@ -570,6 +579,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on extra.
+    // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',

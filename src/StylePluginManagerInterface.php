@@ -78,13 +78,17 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    *
    * @return array
    *   The modified form element.
+   *
+   * @deprecated in ui_styles:8.x-1.14 and is removed from ui_styles:2.0.0. Use
+   *    the ui_styles_styles form element instead.
+   * @see https://www.drupal.org/node/3500750
    */
   public function alterForm(array $form, array $selected = [], string $extra = '', string $theme = ''): array;
 
   /**
    * Add classes to target element.
    *
-   * @param array $target_element
+   * @param array $element
    *   The render element to add to.
    * @param array $selected
    *   The selected class(es), as an array.
@@ -94,7 +98,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    * @return array
    *   The modified render element.
    */
-  public function addClasses(array $target_element, array $selected = [], string $extra = ''): array;
+  public function addClasses(array $element, array $selected = [], string $extra = ''): array;
 
   /**
    * Filter plugins by the modules and the selected theme and its parents.

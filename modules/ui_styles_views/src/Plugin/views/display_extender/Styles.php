@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\ui_styles_views\Plugin\views\display_extender;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ui_styles\UiStylesUtility;
 use Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -67,22 +66,15 @@ class Styles extends DisplayExtenderPluginBase {
         continue;
       }
 
-      $values = [
-        'selected' => [],
-        'extra' => '',
-      ];
-      if (\array_key_exists($section_id, $this->options)) {
-        $values = $this->options[$section_id];
-      }
-      $selected = $values['selected'];
-      $extra = $values['extra'];
       $form[$section_id] = [
-        '#type' => 'details',
+        '#type' => 'ui_styles_styles',
         '#title' => $section_name,
-        '#open' => FALSE,
+        '#default_value' => [
+          'selected' => $this->options[$section_id]['selected'] ?? [],
+          'extra' => $this->options[$section_id]['extra'] ?? '',
+        ],
         '#tree' => TRUE,
       ];
-      $form[$section_id] = $this->stylesManager->alterForm($form[$section_id], $selected, $extra);
     }
   }
 
@@ -98,8 +90,12 @@ class Styles extends DisplayExtenderPluginBase {
 
     $form_state_values = $form_state->cleanValues()->getValues();
     foreach ($form_state_values as $section_id => $values) {
-      $this->options[$section_id]['selected'] = UiStylesUtility::extractSelectedStyles($values);
-      $this->options[$section_id]['extra'] = $values['_ui_styles_extra'];
+      if (!empty($values)) {
+        $this->options[$section_id] = $values;
+      }
+      else {
+        unset($this->options[$section_id]);
+      }
     }
   }
 
@@ -138,7 +134,7 @@ class Styles extends DisplayExtenderPluginBase {
     if (!\array_key_exists($section, $this->options)) {
       return [];
     }
-    return \array_values($this->options[$section]['selected']);
+    return \array_values($this->options[$section]['selected'] ?? []);
   }
 
   /**
@@ -154,7 +150,7 @@ class Styles extends DisplayExtenderPluginBase {
     if (!\array_key_exists($section, $this->options)) {
       return '';
     }
-    return $this->options[$section]['extra'];
+    return $this->options[$section]['extra'] ?? '';
   }
 
   /**

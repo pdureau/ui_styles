@@ -45,7 +45,6 @@ class EntityViewAlter implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
-    // @phpstan-ignore-next-line
     return new static(
       $container->get('plugin.manager.ui_styles')
     );

@@ -82,8 +82,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
-    // @phpstan-ignore-next-line
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,

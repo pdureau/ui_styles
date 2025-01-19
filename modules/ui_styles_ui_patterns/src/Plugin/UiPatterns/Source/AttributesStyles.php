@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_ui_patterns\Plugin\UiPatterns\Source;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Template\Attribute;
 use Drupal\ui_patterns\Attribute\Source;
 use Drupal\ui_patterns\SourcePluginBase;
-use Drupal\ui_styles\StylePluginManagerInterface;
 use Drupal\ui_styles\UiStylesUtility;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the source.
@@ -24,43 +24,45 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class AttributesStyles extends SourcePluginBase {
 
   /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->stylesManager = $container->get('plugin.manager.ui_styles');
-    return $instance;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getPropValue(): mixed {
-    $styles = $this->getSetting('styles');
-    if (!\is_array($styles)) {
-      return [];
+    // If config is not set yet and coming from default value.
+    $value = $this->getSetting('value');
+    if (\is_string($value) && !empty($value)) {
+      return static::convertStringToAttributesMapping($value);
     }
 
-    $selected = UiStylesUtility::extractSelectedStyles($styles);
-    $extra = $styles['_ui_styles_extra'] ?? '';
+    /** @var string $extra */
+    $extra = $this->getSetting('extra') ?? '';
+    $mapping = static::convertStringToAttributesMapping($extra);
+
+    $styles = $this->getSetting('styles');
+    if (!\is_array($styles)) {
+      return $mapping;
+    }
+
+    // Old config structure.
+    // @todo to remove in UI Styles 2.
+    if (isset($styles['_ui_styles_extra'])) {
+      // @phpstan-ignore-next-line
+      $selected = UiStylesUtility::extractSelectedStyles($styles);
+      $extra = $styles['_ui_styles_extra'];
+    }
+    else {
+      $selected = $styles['selected'] ?? [];
+      $extra = $styles['extra'] ?? '';
+    }
 
     $extra = \explode(' ', $extra);
     $classes = \array_merge($selected, $extra);
     $classes = \array_unique(\array_filter($classes));
-
     if (empty($classes)) {
-      return [];
+      return $mapping;
     }
-    return [
-      'class' => \array_values($classes),
-    ];
+
+    $mapping['class'] = \array_values($classes);
+    return $mapping;
   }
 
   /**
@@ -69,19 +71,79 @@ class AttributesStyles extends SourcePluginBase {
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
 
-    $styles = $this->getSetting('styles');
-    if (!\is_array($styles)) {
-      $styles = [];
+    // If config is not set yet and coming from default value.
+    $value = $this->getSetting('value');
+    if (\is_string($value) && !empty($value)) {
+      $mapping = static::convertStringToAttributesMapping($value);
+      $selected = [];
+      $extraStyles = $mapping['class'] ?? '';
+      unset($mapping['class']);
+      $attributes = new Attribute($mapping);
+      // Trim because Attribute::__toString() add a space on the left as it is
+      // intended to be printed in HTML.
+      $extra = \trim((string) $attributes);
     }
-    $selected = UiStylesUtility::extractSelectedStyles($styles);
-    $extra = $styles['_ui_styles_extra'] ?? '';
+    else {
+      $extra = $this->getSetting('extra') ?? '';
+      $styles = $this->getSetting('styles');
+      if (!\is_array($styles)) {
+        $styles = [];
+      }
+      // Old config structure.
+      // @todo to remove in UI Styles 2.
+      if (isset($styles['_ui_styles_extra'])) {
+        // @phpstan-ignore-next-line
+        $selected = UiStylesUtility::extractSelectedStyles($styles);
+        $extraStyles = $styles['_ui_styles_extra'];
+      }
+      else {
+        $selected = $styles['selected'] ?? [];
+        $extraStyles = $styles['extra'] ?? '';
+      }
+    }
 
     $form['styles'] = [
-      '#type' => 'container',
+      '#type' => 'ui_styles_styles',
+      '#default_value' => [
+        'selected' => $selected,
+        'extra' => $extraStyles,
+      ],
+      '#wrapper_type' => 'container',
       '#tree' => TRUE,
     ];
-    $form['styles'] = $this->stylesManager->alterForm($form['styles'], $selected, $extra);
+
+    $form['extra'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Extra HTML attributes'),
+      '#description' => $this->t('HTML attributes with double-quoted values.'),
+      '#default_value' => $extra,
+      '#placeholder' => 'title="Lorem ipsum" id="my-id"',
+    ];
+
     return $form;
+  }
+
+  /**
+   * Convert a string to an attribute mapping.
+   *
+   * @param string $value
+   *   The string to convert.
+   *
+   * @return array
+   *   Attributes mapping.
+   *
+   * @see \Drupal\ui_patterns\Plugin\UiPatterns\Source\AttributesWidget::convertStringToAttributesMapping()
+   */
+  protected static function convertStringToAttributesMapping(string $value): array {
+    $parse_html = '<div ' . $value . '></div>';
+    $attributes = [];
+    foreach (Html::load($parse_html)->getElementsByTagName('div') as $div) {
+      /** @var \DOMAttr $attr */
+      foreach ($div->attributes as $attr) {
+        $attributes[$attr->nodeName] = $attr->nodeValue;
+      }
+    }
+    return $attributes;
   }
 
 }

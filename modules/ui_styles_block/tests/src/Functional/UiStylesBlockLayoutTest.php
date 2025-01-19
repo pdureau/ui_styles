@@ -61,8 +61,8 @@ class UiStylesBlockLayoutTest extends UiStylesBlockFunctionalTestBase {
       'settings[label_display]' => TRUE,
     ];
     foreach ($this->blockParts as $blockPart) {
-      $edit['ui_styles[' . $blockPart . '][ui_styles_test_class]'] = 'test-class-' . $blockPart;
-      $edit['ui_styles[' . $blockPart . '][_ui_styles_extra]'] = 'test-class-extra-' . $blockPart;
+      $edit['ui_styles[' . $blockPart . '][wrapper][ui_styles_test_class]'] = 'test-class-' . $blockPart;
+      $edit['ui_styles[' . $blockPart . '][wrapper][_ui_styles_extra]'] = 'test-class-extra-' . $blockPart;
     }
     $this->drupalGet('admin/structure/block/add/' . $this::TEST_PLUGIN_BLOCK_ID . '/' . $this->defaultTheme);
     $this->submitForm($edit, 'Save block');

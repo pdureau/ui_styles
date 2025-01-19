@@ -1,0 +1,10 @@
+ui_patterns_source.ui_styles_attributes:
+  type: mapping
+  label: 'Source: UI Styles attributes'
+  mapping:
+    styles:
+      type: ui_styles.selected_mapping
+      label: 'Styles'
+    extra:
+      type: string
+      Label: 'Extra HTML attributes'

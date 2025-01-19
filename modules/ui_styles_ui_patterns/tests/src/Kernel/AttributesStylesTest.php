@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+// phpcs:disable DrupalPractice.General.DescriptionT.DescriptionT
+
 namespace Drupal\Tests\ui_styles_ui_patterns\Kernel\Source;
 
 use Drupal\Component\Render\MarkupInterface;
@@ -32,58 +34,32 @@ class AttributesStylesTest extends KernelTestBase {
   ];
 
   /**
-   * The source plugin being tested.
-   *
-   * @var \Drupal\ui_patterns\SourceInterface
-   */
-  protected SourceInterface $source;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    /** @var \Drupal\ui_patterns\SourcePluginManager $sourceManager */
-    $sourceManager = $this->container->get('plugin.manager.ui_patterns_source');
-    /** @var \Drupal\Core\Theme\ComponentPluginManager $componentManager */
-    $componentManager = $this->container->get('plugin.manager.sdc');
-
-    $component_id = 'ui_patterns_test:test-component';
-    /** @var array $component */
-    $component = $componentManager->getDefinition($component_id);
-    $propId = 'attributes_ui_patterns';
-    $pluginId = 'ui_styles_attributes';
-    $configuration = [
-      'source' => [
-        'styles' => [
-          'ui_styles_test' => 'test',
-          '_ui_styles_extra' => 'extra',
-        ],
-      ],
-    ];
-    $context = [];
-
-    $configuration = SourcePluginBase::buildConfiguration($propId, $component['props']['properties'][$propId], $configuration, $context);
-    /** @var \Drupal\ui_patterns\SourceInterface $plugin */
-    $plugin = $sourceManager->createInstance($pluginId, $configuration);
-    $this->source = $plugin;
-  }
-
-  /**
    * Test the plugin method.
    *
    * @covers ::getPropValue
    */
   public function testGetValue(): void {
+    $source = $this->getSourceFromConfiguration([
+      'styles' => [
+        'selected' => [
+          'test' => 'test',
+        ],
+        'extra' => 'extra extra2',
+      ],
+      'extra' => 'id="my-id" data-foo="bar"',
+    ]);
+
     /** @var array $definition */
-    $definition = $this->source->getPropDefinition();
-    $propValue = $this->source->getValue($definition['ui_patterns']['type_definition']);
+    $definition = $source->getPropDefinition();
+    $propValue = $source->getValue($definition['ui_patterns']['type_definition']);
     $expectedAttributes = [
       'class' => [
         'test',
         'extra',
+        'extra2',
       ],
+      'id' => 'my-id',
+      'data-foo' => 'bar',
     ];
     $this->assertEquals($expectedAttributes, $propValue);
   }
@@ -94,35 +70,162 @@ class AttributesStylesTest extends KernelTestBase {
    * @covers ::settingsForm
    */
   public function testSettingsForm(): void {
+    // Test empty config.
     $form = [];
     $formState = new FormState();
-    $form = $this->source->settingsForm($form, $formState);
+    $source = $this->getSourceFromConfiguration();
+    $form = $source->settingsForm($form, $formState);
     $expectedForm = [
       'styles' => [
-        '#type' => 'container',
+        '#type' => 'ui_styles_styles',
+        '#default_value' => [
+          'selected' => [],
+          'extra' => '',
+        ],
+        '#wrapper_type' => 'container',
         '#tree' => TRUE,
-        'ui_styles_test' => [
-          '#type' => 'select',
-          '#title' => 'Test (used)',
-          '#options' => [
-            'test' => 'Test',
-          ],
-          '#empty_option' => '- None -',
-          '#default_value' => 'test',
-          '#weight' => 0,
-        ],
-        '_ui_styles_extra' => [
-          '#type' => 'textfield',
-          '#title' => 'Extra classes',
-          // phpcs:disable DrupalPractice.General.DescriptionT.DescriptionT
-          '#description' => 'You can add many values using spaces as separators.',
-          '#default_value' => 'extra',
-        ],
+      ],
+      'extra' => [
+        '#type' => 'textfield',
+        '#title' => 'Extra HTML attributes',
+        '#description' => 'HTML attributes with double-quoted values.',
+        '#default_value' => '',
+        '#placeholder' => 'title="Lorem ipsum" id="my-id"',
       ],
     ];
-    $form['styles']['_ui_styles_extra']['#title'] = $form['styles']['_ui_styles_extra']['#title'] instanceof MarkupInterface ? $form['styles']['_ui_styles_extra']['#title']->__toString() : $form['styles']['_ui_styles_extra']['#title'];
-    $form['styles']['_ui_styles_extra']['#description'] = $form['styles']['_ui_styles_extra']['#description'] instanceof MarkupInterface ? $form['styles']['_ui_styles_extra']['#description']->__toString() : $form['styles']['_ui_styles_extra']['#description'];
+    $form['extra']['#title'] = $form['extra']['#title'] instanceof MarkupInterface ? $form['extra']['#title']->__toString() : $form['extra']['#title'];
+    $form['extra']['#description'] = $form['extra']['#description'] instanceof MarkupInterface ? $form['extra']['#description']->__toString() : $form['extra']['#description'];
     $this->assertEquals($expectedForm, $form);
+
+    // Deprecated config.
+    $form = [];
+    $formState = new FormState();
+    $source = $this->getSourceFromConfiguration([
+      'styles' => [
+        'ui_styles_test' => 'test',
+        '_ui_styles_extra' => 'extra',
+      ],
+    ]);
+    $form = $source->settingsForm($form, $formState);
+    $expectedForm = [
+      'styles' => [
+        '#type' => 'ui_styles_styles',
+        '#default_value' => [
+          'selected' => [
+            'test' => 'test',
+          ],
+          'extra' => 'extra',
+        ],
+        '#wrapper_type' => 'container',
+        '#tree' => TRUE,
+      ],
+      'extra' => [
+        '#type' => 'textfield',
+        '#title' => 'Extra HTML attributes',
+        '#description' => 'HTML attributes with double-quoted values.',
+        '#default_value' => '',
+        '#placeholder' => 'title="Lorem ipsum" id="my-id"',
+      ],
+    ];
+    $form['extra']['#title'] = $form['extra']['#title'] instanceof MarkupInterface ? $form['extra']['#title']->__toString() : $form['extra']['#title'];
+    $form['extra']['#description'] = $form['extra']['#description'] instanceof MarkupInterface ? $form['extra']['#description']->__toString() : $form['extra']['#description'];
+    $this->assertEquals($expectedForm, $form);
+
+    // With extra attributes.
+    $form = [];
+    $formState = new FormState();
+    $source = $this->getSourceFromConfiguration([
+      'styles' => [
+        'selected' => [
+          'test' => 'test',
+        ],
+        'extra' => 'extra extra2',
+      ],
+      'extra' => 'id="my-id" data-foo="bar"',
+    ]);
+    $form = $source->settingsForm($form, $formState);
+    $expectedForm = [
+      'styles' => [
+        '#type' => 'ui_styles_styles',
+        '#default_value' => [
+          'selected' => [
+            'test' => 'test',
+          ],
+          'extra' => 'extra extra2',
+        ],
+        '#wrapper_type' => 'container',
+        '#tree' => TRUE,
+      ],
+      'extra' => [
+        '#type' => 'textfield',
+        '#title' => 'Extra HTML attributes',
+        '#description' => 'HTML attributes with double-quoted values.',
+        '#default_value' => 'id="my-id" data-foo="bar"',
+        '#placeholder' => 'title="Lorem ipsum" id="my-id"',
+      ],
+    ];
+    $form['extra']['#title'] = $form['extra']['#title'] instanceof MarkupInterface ? $form['extra']['#title']->__toString() : $form['extra']['#title'];
+    $form['extra']['#description'] = $form['extra']['#description'] instanceof MarkupInterface ? $form['extra']['#description']->__toString() : $form['extra']['#description'];
+    $this->assertEquals($expectedForm, $form);
+
+    // From default value.
+    $form = [];
+    $formState = new FormState();
+    $source = $this->getSourceFromConfiguration([
+      'value' => 'class="my-class my-class2" id="my-id" data-foo="bar"',
+    ]);
+    $form = $source->settingsForm($form, $formState);
+    $expectedForm = [
+      'styles' => [
+        '#type' => 'ui_styles_styles',
+        '#default_value' => [
+          'selected' => [],
+          'extra' => 'my-class my-class2',
+        ],
+        '#wrapper_type' => 'container',
+        '#tree' => TRUE,
+      ],
+      'extra' => [
+        '#type' => 'textfield',
+        '#title' => 'Extra HTML attributes',
+        '#description' => 'HTML attributes with double-quoted values.',
+        '#default_value' => 'id="my-id" data-foo="bar"',
+        '#placeholder' => 'title="Lorem ipsum" id="my-id"',
+      ],
+    ];
+    $form['extra']['#title'] = $form['extra']['#title'] instanceof MarkupInterface ? $form['extra']['#title']->__toString() : $form['extra']['#title'];
+    $form['extra']['#description'] = $form['extra']['#description'] instanceof MarkupInterface ? $form['extra']['#description']->__toString() : $form['extra']['#description'];
+    $this->assertEquals($expectedForm, $form);
+  }
+
+  /**
+   * Get a source plugin.
+   *
+   * @param array $configuration
+   *   The source configuration.
+   *
+   * @return \Drupal\ui_patterns\SourceInterface
+   *   The source plugin instance.
+   */
+  protected function getSourceFromConfiguration(array $configuration = []): SourceInterface {
+    /** @var \Drupal\ui_patterns\SourcePluginManager $sourceManager */
+    $sourceManager = $this->container->get('plugin.manager.ui_patterns_source');
+    /** @var \Drupal\Core\Theme\ComponentPluginManager $componentManager */
+    $componentManager = $this->container->get('plugin.manager.sdc');
+
+    $component_id = 'ui_patterns_test:test-component';
+    /** @var array $component */
+    $component = $componentManager->getDefinition($component_id);
+    $propId = 'attributes_ui_patterns';
+    $pluginId = 'ui_styles_attributes';
+    $sourceConfiguration = [
+      'source' => $configuration,
+    ];
+    $context = [];
+
+    $sourceConfiguration = SourcePluginBase::buildConfiguration($propId, $component['props']['properties'][$propId], $sourceConfiguration, $context);
+    // @phpstan-ignore-next-line
+    return $sourceManager->createInstance($pluginId, $sourceConfiguration);
   }
 
 }

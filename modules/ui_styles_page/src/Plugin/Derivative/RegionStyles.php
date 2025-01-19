@@ -49,7 +49,6 @@ class RegionStyles extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, $base_plugin_id): static {
-    // @phpstan-ignore-next-line
     return new static(
       $container->get('theme_handler'),
       $container->get('plugin.manager.ui_styles')

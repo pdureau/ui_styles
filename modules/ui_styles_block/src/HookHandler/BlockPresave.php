@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\ui_styles_block\HookHandler;
 
 use Drupal\block\BlockInterface;
-use Drupal\ui_styles\UiStylesUtility;
 
 /**
  * Handle block presave.
@@ -24,12 +23,12 @@ class BlockPresave {
       return;
     }
     foreach ($uiStyles as $part_id => $part_styles) {
-      $selected = UiStylesUtility::extractSelectedStyles($part_styles);
-      $extra = $part_styles['_ui_styles_extra'];
-      $block->setThirdPartySetting('ui_styles', $part_id, [
-        'selected' => $selected,
-        'extra' => $extra,
-      ]);
+      if (!empty($part_styles)) {
+        $block->setThirdPartySetting('ui_styles', $part_id, $part_styles);
+      }
+      else {
+        $block->unsetThirdPartySetting('ui_styles', $part_id);
+      }
     }
   }
 

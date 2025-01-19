@@ -151,10 +151,10 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-section');
-    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section');
-    $page->fillField('ui_styles[regions][content][_ui_styles_extra]', 'test-class-extra-region');
-    $page->selectFieldOption('ui_styles[regions][content][ui_styles_test_class]', 'test-class-region');
+    $page->fillField('ui_styles[section][wrapper][_ui_styles_extra]', 'test-class-extra-section');
+    $page->selectFieldOption('ui_styles[section][wrapper][ui_styles_test_class]', 'test-class-section');
+    $page->fillField('ui_styles[regions][content][wrapper][_ui_styles_extra]', 'test-class-extra-region');
+    $page->selectFieldOption('ui_styles[regions][content][wrapper][ui_styles_test_class]', 'test-class-region');
 
     $page->pressButton('Update');
     $page->pressButton('Save layout');
@@ -170,12 +170,12 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $this->drupalGet('/admin/structure/types/manage/page/display/default/layout');
     $page->clickLink('Add section');
     $page->clickLink('Two column');
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-2-cols-section');
-    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section-2-col');
-    $page->fillField('ui_styles[regions][first][_ui_styles_extra]', 'test-class-extra-first');
-    $page->selectFieldOption('ui_styles[regions][first][ui_styles_test_class]', 'test-class-region-first');
-    $page->fillField('ui_styles[regions][second][_ui_styles_extra]', 'test-class-extra-second');
-    $page->selectFieldOption('ui_styles[regions][second][ui_styles_test_class]', 'test-class-region-second');
+    $page->fillField('ui_styles[section][wrapper][_ui_styles_extra]', 'test-class-extra-2-cols-section');
+    $page->selectFieldOption('ui_styles[section][wrapper][ui_styles_test_class]', 'test-class-section-2-col');
+    $page->fillField('ui_styles[regions][first][wrapper][_ui_styles_extra]', 'test-class-extra-first');
+    $page->selectFieldOption('ui_styles[regions][first][wrapper][ui_styles_test_class]', 'test-class-region-first');
+    $page->fillField('ui_styles[regions][second][wrapper][_ui_styles_extra]', 'test-class-extra-second');
+    $page->selectFieldOption('ui_styles[regions][second][wrapper][ui_styles_test_class]', 'test-class-region-second');
     $page->pressButton('Add section');
     $page->pressButton('Save layout');
 
@@ -225,10 +225,10 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     // Add a style on section.
     $page->clickLink('Configure Section 1');
 
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-section');
-    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section');
-    $page->fillField('ui_styles[regions][content][_ui_styles_extra]', 'test-class-extra-region');
-    $page->selectFieldOption('ui_styles[regions][content][ui_styles_test_class]', 'test-class-region');
+    $page->fillField('ui_styles[section][wrapper][_ui_styles_extra]', 'test-class-extra-section');
+    $page->selectFieldOption('ui_styles[section][wrapper][ui_styles_test_class]', 'test-class-section');
+    $page->fillField('ui_styles[regions][content][wrapper][_ui_styles_extra]', 'test-class-extra-region');
+    $page->selectFieldOption('ui_styles[regions][content][wrapper][ui_styles_test_class]', 'test-class-region');
 
     $page->pressButton('Update');
     $page->pressButton('Save layout');
@@ -244,12 +244,12 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $this->drupalGet('node/' . $this->node->id() . '/layout');
     $page->clickLink('Add section');
     $page->clickLink('Two column');
-    $page->fillField('ui_styles[section][_ui_styles_extra]', 'test-class-extra-2-cols-section');
-    $page->selectFieldOption('ui_styles[section][ui_styles_test_class]', 'test-class-section-2-col');
-    $page->fillField('ui_styles[regions][first][_ui_styles_extra]', 'test-class-extra-first');
-    $page->selectFieldOption('ui_styles[regions][first][ui_styles_test_class]', 'test-class-region-first');
-    $page->fillField('ui_styles[regions][second][_ui_styles_extra]', 'test-class-extra-second');
-    $page->selectFieldOption('ui_styles[regions][second][ui_styles_test_class]', 'test-class-region-second');
+    $page->fillField('ui_styles[section][wrapper][_ui_styles_extra]', 'test-class-extra-2-cols-section');
+    $page->selectFieldOption('ui_styles[section][wrapper][ui_styles_test_class]', 'test-class-section-2-col');
+    $page->fillField('ui_styles[regions][first][wrapper][_ui_styles_extra]', 'test-class-extra-first');
+    $page->selectFieldOption('ui_styles[regions][first][wrapper][ui_styles_test_class]', 'test-class-region-first');
+    $page->fillField('ui_styles[regions][second][wrapper][_ui_styles_extra]', 'test-class-extra-second');
+    $page->selectFieldOption('ui_styles[regions][second][wrapper][ui_styles_test_class]', 'test-class-region-second');
     $page->pressButton('Add section');
     $page->pressButton('Save layout');
 
@@ -289,36 +289,36 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Title');
     $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-title-block-extra-wrapper');
-    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-title-block-wrapper');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-title-block-extra-title');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-title-block-title');
-    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-title-block-extra-content');
-    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-title-block-content');
+    $page->fillField('ui_styles_wrapper[wrapper][_ui_styles_extra]', 'test-class-title-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[wrapper][ui_styles_test_class]', 'test-class-title-block-wrapper');
+    $page->fillField('ui_styles_title[wrapper][_ui_styles_extra]', 'test-class-title-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[wrapper][ui_styles_test_class]', 'test-class-title-block-title');
+    $page->fillField('ui_styles[wrapper][_ui_styles_extra]', 'test-class-title-block-extra-content');
+    $page->selectFieldOption('ui_styles[wrapper][ui_styles_test_class]', 'test-class-title-block-content');
     $page->pressButton('Add block');
 
     // Body field block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('Body');
     $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-body-block-extra-wrapper');
-    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-body-block-wrapper');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-body-block-extra-title');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-body-block-title');
-    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-body-block-extra-content');
-    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-body-block-content');
+    $page->fillField('ui_styles_wrapper[wrapper][_ui_styles_extra]', 'test-class-body-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[wrapper][ui_styles_test_class]', 'test-class-body-block-wrapper');
+    $page->fillField('ui_styles_title[wrapper][_ui_styles_extra]', 'test-class-body-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[wrapper][ui_styles_test_class]', 'test-class-body-block-title');
+    $page->fillField('ui_styles[wrapper][_ui_styles_extra]', 'test-class-body-block-extra-content');
+    $page->selectFieldOption('ui_styles[wrapper][ui_styles_test_class]', 'test-class-body-block-content');
     $page->pressButton('Add block');
 
     // Block content block.
     $page->clickLink('Add block in Section 1');
     $page->clickLink('My block content');
     $page->checkField('edit-settings-label-display');
-    $page->fillField('ui_styles_wrapper[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-wrapper');
-    $page->selectFieldOption('ui_styles_wrapper[ui_styles_test_class]', 'test-class-block-content-entity-block-wrapper');
-    $page->fillField('ui_styles_title[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-title');
-    $page->selectFieldOption('ui_styles_title[ui_styles_test_class]', 'test-class-block-content-entity-block-title');
-    $page->fillField('ui_styles[_ui_styles_extra]', 'test-class-block-content-entity-block-extra-content');
-    $page->selectFieldOption('ui_styles[ui_styles_test_class]', 'test-class-block-content-entity-block-content');
+    $page->fillField('ui_styles_wrapper[wrapper][_ui_styles_extra]', 'test-class-block-content-entity-block-extra-wrapper');
+    $page->selectFieldOption('ui_styles_wrapper[wrapper][ui_styles_test_class]', 'test-class-block-content-entity-block-wrapper');
+    $page->fillField('ui_styles_title[wrapper][_ui_styles_extra]', 'test-class-block-content-entity-block-extra-title');
+    $page->selectFieldOption('ui_styles_title[wrapper][ui_styles_test_class]', 'test-class-block-content-entity-block-title');
+    $page->fillField('ui_styles[wrapper][_ui_styles_extra]', 'test-class-block-content-entity-block-extra-content');
+    $page->selectFieldOption('ui_styles[wrapper][ui_styles_test_class]', 'test-class-block-content-entity-block-content');
     $page->pressButton('Add block');
 
     $page->pressButton('Save layout');

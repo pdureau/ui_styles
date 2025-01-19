@@ -4,46 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_block\HookHandler;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\ui_styles\StylePluginManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Block Layout Alter.
  */
-class FormBlockFormAlter implements ContainerInjectionInterface {
+class FormBlockFormAlter {
 
   use StringTranslationTrait;
-
-  /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
-  public function __construct(StylePluginManagerInterface $stylesManager) {
-    $this->stylesManager = $stylesManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    // @phpstan-ignore-next-line
-    return new static(
-      $container->get('plugin.manager.ui_styles')
-    );
-  }
 
   /**
    * Add UI Styles on block config form.
@@ -68,19 +38,21 @@ class FormBlockFormAlter implements ContainerInjectionInterface {
       return;
     }
 
-    if (empty($this->stylesManager->getDefinitionsForTheme($theme))) {
-      return;
-    }
-
     $form['ui_styles'] = [
       '#type' => 'container',
     ];
 
     foreach ($this->getBlockParts() as $part_id => $part_title) {
+      /** @var array $settings */
+      $settings = $block->getThirdPartySetting('ui_styles', $part_id, []);
       $form['ui_styles'][$part_id] = [
-        '#type' => 'details',
+        '#type' => 'ui_styles_styles',
         '#title' => $part_title,
-        '#open' => FALSE,
+        '#theme' => $theme,
+        '#default_value' => [
+          'selected' => $settings['selected'] ?? [],
+          'extra' => $settings['extra'] ?? '',
+        ],
       ];
 
       if ($part_id === 'title') {
@@ -90,17 +62,6 @@ class FormBlockFormAlter implements ContainerInjectionInterface {
           ],
         ];
       }
-
-      $selected = [];
-      $extra = '';
-      /** @var array $settings */
-      $settings = $block->getThirdPartySetting('ui_styles', $part_id, []);
-      if (!empty($settings)) {
-        $selected = $settings['selected'];
-        $extra = $settings['extra'];
-      }
-      // @phpstan-ignore-next-line
-      $form['ui_styles'][$part_id] = $this->stylesManager->alterForm($form['ui_styles'][$part_id], $selected, $extra, $theme);
     }
   }
 

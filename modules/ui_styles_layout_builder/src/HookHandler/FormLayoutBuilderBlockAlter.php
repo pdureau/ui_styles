@@ -4,48 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_layout_builder\HookHandler;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\ui_styles\StylePluginManagerInterface;
-use Drupal\ui_styles\UiStylesUtility;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Layout Builder block form alter.
  */
-class FormLayoutBuilderBlockAlter implements ContainerInjectionInterface {
+class FormLayoutBuilderBlockAlter {
 
-  use DependencySerializationTrait;
   use StringTranslationTrait;
-
-  /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
-  public function __construct(StylePluginManagerInterface $stylesManager) {
-    $this->stylesManager = $stylesManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    // @phpstan-ignore-next-line
-    return new static(
-      $container->get('plugin.manager.ui_styles')
-    );
-  }
 
   /**
    * Add UI Styles on block config form.
@@ -56,20 +23,24 @@ class FormLayoutBuilderBlockAlter implements ContainerInjectionInterface {
    *   The form state.
    */
   public function formAlter(array &$form, FormStateInterface $formState): void {
-    if (empty($this->stylesManager->getGroupedDefinitions())) {
-      return;
-    }
     /** @var \Drupal\layout_builder\Form\ConfigureBlockFormBase $formObject */
     $formObject = $formState->getFormObject();
     $component = $formObject->getCurrentComponent();
 
     foreach ($this->getBlockParts() as $part_id => $part_title) {
-      $form[$part_id] = [
-        '#type' => 'details',
-        '#title' => $part_title,
-        '#open' => FALSE,
-      ];
+      /** @var array $selected */
+      $selected = $component->get($part_id) ?: [];
+      /** @var string $extra */
+      $extra = $component->get($part_id . '_extra') ?: '';
 
+      $form[$part_id] = [
+        '#type' => 'ui_styles_styles',
+        '#title' => $part_title,
+        '#default_value' => [
+          'selected' => $selected,
+          'extra' => $extra,
+        ],
+      ];
       if ($part_id === 'ui_styles_title') {
         $form[$part_id]['#states'] = [
           'invisible' => [
@@ -77,13 +48,6 @@ class FormLayoutBuilderBlockAlter implements ContainerInjectionInterface {
           ],
         ];
       }
-
-      /** @var array $selected */
-      $selected = $component->get($part_id) ?: [];
-      /** @var string $extra */
-      $extra = $component->get($part_id . '_extra') ?: '';
-      // @phpstan-ignore-next-line
-      $form[$part_id] = $this->stylesManager->alterForm($form[$part_id], $selected, $extra);
     }
 
     // Our submit handler must execute before the default one, because the
@@ -113,8 +77,8 @@ class FormLayoutBuilderBlockAlter implements ContainerInjectionInterface {
       // Those values are flat for backward compatibility with initial design.
       // Once https://www.drupal.org/project/drupal/issues/3015152 is ready,
       // move them to proper third_party_settings and wrap them in a bag.
-      $component->set($part_id, UiStylesUtility::extractSelectedStyles($partValue));
-      $component->set($part_id . '_extra', $partValue['_ui_styles_extra']);
+      $component->set($part_id, $partValue['selected'] ?? []);
+      $component->set($part_id . '_extra', $partValue['extra'] ?? '');
     }
   }
 

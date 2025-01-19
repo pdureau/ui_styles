@@ -234,8 +234,11 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
 
   /**
    * {@inheritdoc}
+   *
+   * @SuppressWarnings(PHPMD.ErrorControlOperator)
    */
   public function alterForm(array $form, array $selected = [], string $extra = '', string $theme = ''): array {
+    @\trigger_error('StylePluginManagerInterface::alterForm() is deprecated in ui_styles:8.x-1.14 and is removed in ui_styles:2.0.0. See https://www.drupal.org/node/3500750', \E_USER_DEPRECATED);
     if (!empty($theme)) {
       $grouped_plugin_definitions = $this->getDefinitionsForTheme($theme);
     }
