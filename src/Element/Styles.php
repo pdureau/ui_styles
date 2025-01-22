@@ -118,7 +118,7 @@ class Styles extends FormElementBase {
     $sourceManager = static::sourceManager();
     $selected = $element['#default_value']['selected'] ?? [];
     $extra = $element['#default_value']['extra'] ?? '';
-    $suffix = ' (' . \t('used') . ')';
+    $suffix = static::getAppliedSuffix();
     $multipleGroups = (\count($groupedPluginDefinitions) == 1) ? FALSE : TRUE;
     // Open the root details if specified or if a child has an error.
     $open = (!empty($element['#open']) || !empty($element['#children_errors'])) ? TRUE : FALSE;
@@ -241,6 +241,16 @@ class Styles extends FormElementBase {
     $transliterated = \mb_strtolower($transliterated);
     $transliterated = \preg_replace('@[^a-z0-9_.]+@', '_', $transliterated);
     return $transliterated ?? '';
+  }
+
+  /**
+   * Get the suffix to indicate a style is applied.
+   *
+   * @return string
+   *   The "applied" suffix.
+   */
+  protected static function getAppliedSuffix(): string {
+    return ' <sup>(<mark>' . \t('applied') . '</mark>)</sup>';
   }
 
   /**

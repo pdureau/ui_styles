@@ -253,7 +253,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     if (\count($grouped_plugin_definitions) == 1) {
       $multiple_groups = FALSE;
     }
-    $suffix = ' (' . $this->t('used') . ')';
+    $suffix = ' <sup>(<mark>' . $this->t('applied') . '</mark>)</sup>';
     $global_used = $extra;
     foreach ($grouped_plugin_definitions as $group_plugin_definitions) {
       $group_used = FALSE;

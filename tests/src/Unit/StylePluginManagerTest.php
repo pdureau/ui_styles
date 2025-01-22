@@ -403,7 +403,6 @@ class StylePluginManagerTest extends UnitTestCase {
    * @covers ::alterForm
    */
   public function testAlterForm(): void {
-    $suffix = ' (used)';
     $form = [
       '#type' => 'details',
       '#title' => 'Main',
@@ -421,10 +420,10 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame('opt2', $altered_form['ui_styles_test1']['#default_value']);
     $this->assertSame('opt3', $altered_form['ui_styles_test2']['#default_value']);
     $this->assertSame($this->styles[0]['options'], $altered_form['ui_styles_test1']['#options']);
-    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[0]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['options'], $altered_form['ui_styles_test2']['#options']);
-    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['ui_styles_test2']['#title']);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame($this->styles[1]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['ui_styles_test2']['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
 
     // Test that if no value is used suffix is not set.
     // @phpstan-ignore-next-line
@@ -438,12 +437,11 @@ class StylePluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * Test if used suffix is correctly placed.
+   * Test if applied suffix is correctly placed.
    *
    * @covers ::alterForm
    */
-  public function testUsedSuffix(): void {
-    $suffix = ' (used)';
+  public function testAppliedSuffix(): void {
     $form = [
       '#type' => 'details',
       '#title' => 'Main',
@@ -486,8 +484,8 @@ class StylePluginManagerTest extends UnitTestCase {
     ], '');
     $this->assertArrayHasKey('ui_styles_test1', $altered_form);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
-    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['ui_styles_test1']['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
+    $this->assertSame($this->styles[0]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
 
     // Value on test2.
@@ -498,9 +496,9 @@ class StylePluginManagerTest extends UnitTestCase {
     ], '');
     $this->assertArrayHasKey('ui_styles_test1', $altered_form);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
-    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['ui_styles_test2']['#title']);
+    $this->assertSame($this->styles[1]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['ui_styles_test2']['#title']);
 
     // Value on extra.
     // @phpstan-ignore-next-line
@@ -510,7 +508,7 @@ class StylePluginManagerTest extends UnitTestCase {
     ], 'extra');
     $this->assertArrayHasKey('ui_styles_test1', $altered_form);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame($this->styles[0]['label'], $altered_form['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $altered_form['ui_styles_test2']['#title']);
 
@@ -556,10 +554,10 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertArrayHasKey('main_2', $altered_form);
     $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
-    $this->assertSame('Main' . $suffix, $altered_form['main']['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['main']['#title']);
     $this->assertSame('Main 2', $altered_form['main_2']['#title']);
-    $this->assertSame($this->styles[0]['label'] . $suffix, $altered_form['main']['ui_styles_test1']['#title']);
+    $this->assertSame($this->styles[0]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['main']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on test2.
@@ -572,11 +570,11 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertArrayHasKey('main_2', $altered_form);
     $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame('Main', $altered_form['main']['#title']);
-    $this->assertSame('Main 2' . $suffix, $altered_form['main_2']['#title']);
+    $this->assertSame('Main 2' . StylesElementTest::APPLIED_SUFFIX, $altered_form['main_2']['#title']);
     $this->assertSame($this->styles[0]['label'], $altered_form['main']['ui_styles_test1']['#title']);
-    $this->assertSame($this->styles[1]['label'] . $suffix, $altered_form['main_2']['ui_styles_test2']['#title']);
+    $this->assertSame($this->styles[1]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on extra.
     // @phpstan-ignore-next-line
@@ -588,7 +586,7 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertArrayHasKey('main_2', $altered_form);
     $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
     $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
-    $this->assertSame('Main' . $suffix, $altered_form['#title']);
+    $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame('Main', $altered_form['main']['#title']);
     $this->assertSame('Main 2', $altered_form['main_2']['#title']);
     $this->assertSame($this->styles[0]['label'], $altered_form['main']['ui_styles_test1']['#title']);
