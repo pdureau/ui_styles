@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_ui_patterns\Plugin\UiPatterns\Source;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\ui_patterns\Attribute\Source;
+use Drupal\ui_patterns\AttributesTrait;
 use Drupal\ui_patterns\SourcePluginBase;
 use Drupal\ui_styles\UiStylesUtility;
 
@@ -22,6 +22,8 @@ use Drupal\ui_styles\UiStylesUtility;
   prop_types: ['attributes']
 )]
 class AttributesStyles extends SourcePluginBase {
+
+  use AttributesTrait;
 
   /**
    * {@inheritdoc}
@@ -121,29 +123,6 @@ class AttributesStyles extends SourcePluginBase {
     ];
 
     return $form;
-  }
-
-  /**
-   * Convert a string to an attribute mapping.
-   *
-   * @param string $value
-   *   The string to convert.
-   *
-   * @return array
-   *   Attributes mapping.
-   *
-   * @see \Drupal\ui_patterns\Plugin\UiPatterns\Source\AttributesWidget::convertStringToAttributesMapping()
-   */
-  protected static function convertStringToAttributesMapping(string $value): array {
-    $parse_html = '<div ' . $value . '></div>';
-    $attributes = [];
-    foreach (Html::load($parse_html)->getElementsByTagName('div') as $div) {
-      /** @var \DOMAttr $attr */
-      foreach ($div->attributes as $attr) {
-        $attributes[$attr->nodeName] = $attr->nodeValue;
-      }
-    }
-    return $attributes;
   }
 
 }
