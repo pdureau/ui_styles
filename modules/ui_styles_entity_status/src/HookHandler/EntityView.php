@@ -81,8 +81,8 @@ class EntityView implements ContainerInjectionInterface {
       return;
     }
 
-    $selected = $settings['selected'];
-    $extra = $settings['extra'];
+    $selected = $settings['selected'] ?? [];
+    $extra = $settings['extra'] ?? '';
     $extra_array = \explode(' ', $extra);
     $styles = \array_merge($selected, $extra_array);
     $styles = \array_unique(\array_filter($styles));
