@@ -25,3 +25,8 @@ services:
       - '@library.discovery'
       - '@logger.channel.ui_styles'
       - '@plugin.manager.ui_styles'
+
+  ui_styles.page_cache_request_policy.allow_generated_stylesheet:
+    class: Drupal\ui_styles\PageCache\AllowGeneratedStylesheet
+    tags:
+      - { name: page_cache_request_policy }

@@ -47,7 +47,12 @@ class StylesheetController extends ControllerBase {
     );
 
     $response->addCacheableDependency(CacheableMetadata::createFromRenderArray([
-      '#cache' => ['max-age' => StylesheetGeneratorInterface::MAX_AGE],
+      '#cache' => [
+        'max-age' => StylesheetGeneratorInterface::MAX_AGE,
+        'contexts' => [
+          'url.query_args:prefix',
+        ],
+      ],
     ]));
 
     return $response;
