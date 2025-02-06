@@ -25,8 +25,8 @@ use Drupal\ui_styles\StylePluginManagerInterface;
  *   to details.
  * - #open: (optional) Indicates whether the container should be open by
  *   default if it is a details. Defaults to FALSE.
- * - #theme: (optional) Allows to expose only the styles available with this
- *   theme. Default to default theme.
+ * - #drupal_theme: (optional) Allows to expose only the styles available with
+ *   this theme. Default to default theme.
  *
  * Usage example:
  *
@@ -59,7 +59,7 @@ class Styles extends FormElementBase {
       ],
       '#wrapper_type' => 'details',
       '#open' => FALSE,
-      '#theme' => '',
+      '#drupal_theme' => '',
       '#process' => [
         [$class, 'buildForm'],
         [$class, 'processGroup'],
@@ -103,7 +103,7 @@ class Styles extends FormElementBase {
    *   The form element.
    */
   public static function buildForm(array &$element, FormStateInterface $formState, array &$completeForm): array {
-    $theme = $element['#theme'] ?? '';
+    $theme = $element['#drupal_theme'] ?? '';
     $stylesManager = static::stylesManager();
     if (!empty($theme)) {
       $groupedPluginDefinitions = $stylesManager->getDefinitionsForTheme($theme);

@@ -89,7 +89,7 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
       $form[UiStylesPageInterface::REGION_STYLES_KEY_THEME_SETTINGS][$region_name] = [
         '#type' => 'ui_styles_styles',
         '#title' => $region,
-        '#theme' => $theme,
+        '#drupal_theme' => $theme,
         '#default_value' => [
           'selected' => $settings[$region_name]['selected'] ?? [],
           'extra' => $settings[$region_name]['extra'] ?? '',

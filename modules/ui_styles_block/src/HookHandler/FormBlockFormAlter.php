@@ -48,7 +48,7 @@ class FormBlockFormAlter {
       $form['ui_styles'][$part_id] = [
         '#type' => 'ui_styles_styles',
         '#title' => $part_title,
-        '#theme' => $theme,
+        '#drupal_theme' => $theme,
         '#default_value' => [
           'selected' => $settings['selected'] ?? [],
           'extra' => $settings['extra'] ?? '',

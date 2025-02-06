@@ -39,7 +39,7 @@ class FormSystemThemeSettingsAlter {
     $form[UiStylesEntityStatusInterface::UNPUBLISHED_CLASSES_THEME_SETTING_KEY] = [
       '#type' => 'ui_styles_styles',
       '#title' => $this->t('Unpublished entity styles'),
-      '#theme' => $theme,
+      '#drupal_theme' => $theme,
       '#default_value' => [
         'selected' => $settings['selected'] ?? [],
         'extra' => $settings['extra'] ?? '',
