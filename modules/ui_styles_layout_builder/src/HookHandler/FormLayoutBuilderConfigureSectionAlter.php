@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\ui_styles_layout_builder\HookHandler;
 
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -12,6 +13,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  */
 class FormLayoutBuilderConfigureSectionAlter {
 
+  use DependencySerializationTrait;
   use StringTranslationTrait;
 
   /**
