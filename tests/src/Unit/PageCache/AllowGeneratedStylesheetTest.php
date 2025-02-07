@@ -54,9 +54,9 @@ class AllowGeneratedStylesheetTest extends UnitTestCase {
     return [
       [NULL, '/'],
       [NULL, '/other-path?q=/other/subtrees/'],
-      [NULL, '/ui_styles/stylesheet.css/b'],
-      [NULL, '/a/ui_styles/stylesheet.css'],
-      [RequestPolicyInterface::ALLOW, '/ui_styles/stylesheet.css'],
+      [NULL, '/ui_styles/stylesheet/b'],
+      [NULL, '/a/ui_styles/stylesheet'],
+      [RequestPolicyInterface::ALLOW, '/ui_styles/stylesheet'],
     ];
   }
 

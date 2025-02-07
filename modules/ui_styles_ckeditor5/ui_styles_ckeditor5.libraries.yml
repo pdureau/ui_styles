@@ -31,4 +31,4 @@ internal.ckeditor5.ui_styles_inline.admin:
 stylesheet:
   css:
     theme:
-      /ui_styles/stylesheet.css?prefix=.ck-content: { minified: true }
+      /ui_styles/stylesheet?prefix=.ck-content: { minified: true }

@@ -1,5 +1,5 @@
 ui_styles.stylesheet:
-  path: '/ui_styles/stylesheet.css'
+  path: '/ui_styles/stylesheet'
   defaults:
     _controller: 'Drupal\ui_styles\Controller\StylesheetController::generateStylesheet'
     _title: 'UI Styles CSS generator'
