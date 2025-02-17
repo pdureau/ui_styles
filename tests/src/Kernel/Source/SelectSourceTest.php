@@ -81,6 +81,7 @@ class SelectSourceTest extends SourceTestBase {
       '#attributes' => [
         'class' => [
           'ui-styles-source-select-plugin',
+          'js-ui-styles-source-select-plugin',
         ],
       ],
       '#attached' => [

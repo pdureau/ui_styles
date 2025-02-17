@@ -3,6 +3,11 @@ source_plugin_select:
     theme:
       assets/css/ui_styles_source_plugin_select.css: {}
       /ui_styles/stylesheet?prefix=.ui-styles-source-select-plugin: { minified: true }
+  js:
+    assets/js/ui_styles_source_plugin_select.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
 
 source_plugin_toolbar:
   css:

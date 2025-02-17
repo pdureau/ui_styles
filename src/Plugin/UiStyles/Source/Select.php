@@ -70,6 +70,7 @@ class Select extends SourcePluginBase {
       '#attributes' => [
         'class' => [
           'ui-styles-source-select-plugin',
+          'js-ui-styles-source-select-plugin',
         ],
       ],
       '#attached' => [
