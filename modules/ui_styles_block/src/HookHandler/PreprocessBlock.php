@@ -16,35 +16,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class PreprocessBlock implements ContainerInjectionInterface {
 
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
-
-  /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    StylePluginManagerInterface $stylesManager,
-  ) {
-    $this->entityTypeManager = $entityTypeManager;
-    $this->stylesManager = $stylesManager;
-  }
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected StylePluginManagerInterface $stylesManager,
+  ) {}
 
   /**
    * {@inheritdoc}

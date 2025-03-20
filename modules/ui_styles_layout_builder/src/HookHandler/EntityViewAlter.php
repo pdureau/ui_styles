@@ -22,24 +22,9 @@ class EntityViewAlter implements ContainerInjectionInterface {
 
   use SectionStorageTrait;
 
-  /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
   public function __construct(
-    StylePluginManagerInterface $stylesManager,
-  ) {
-    $this->stylesManager = $stylesManager;
-  }
+    protected StylePluginManagerInterface $stylesManager,
+  ) {}
 
   /**
    * {@inheritdoc}

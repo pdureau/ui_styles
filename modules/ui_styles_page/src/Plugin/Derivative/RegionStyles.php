@@ -15,35 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RegionStyles extends DeriverBase implements ContainerDeriverInterface {
 
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected ThemeHandlerInterface $themeHandler;
-
-  /**
-   * The plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
-   *   The theme handler.
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   */
   public function __construct(
-    ThemeHandlerInterface $themeHandler,
-    StylePluginManagerInterface $stylesManager,
-  ) {
-    $this->themeHandler = $themeHandler;
-    $this->stylesManager = $stylesManager;
-  }
+    protected ThemeHandlerInterface $themeHandler,
+    protected StylePluginManagerInterface $stylesManager,
+  ) {}
 
   /**
    * {@inheritdoc}

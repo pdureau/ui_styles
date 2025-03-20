@@ -24,14 +24,13 @@ class FormBlockFormAlter {
    *   The form state.
    */
   public function blockFormAlter(array &$form, FormStateInterface $formState): void {
-    /** @var \Drupal\block\BlockForm $form_object */
     $form_object = $formState->getFormObject();
-    /** @var \Drupal\block\BlockInterface $block */
-    $block = $form_object->getEntity();
-
     if (!($form_object instanceof EntityFormInterface)) {
       return;
     }
+
+    /** @var \Drupal\block\BlockInterface $block */
+    $block = $form_object->getEntity();
 
     $theme = $block->getTheme();
     if ($theme == NULL) {

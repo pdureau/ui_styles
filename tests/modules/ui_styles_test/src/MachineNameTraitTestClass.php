@@ -14,17 +14,9 @@ class MachineNameTraitTestClass {
 
   use MachineNameTrait;
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
-   *   The transliteration service.
-   */
   public function __construct(
-    TransliterationInterface $transliteration,
-  ) {
-    $this->transliteration = $transliteration;
-  }
+    protected TransliterationInterface $transliteration,
+  ) {}
 
   /**
    * Wrapper around protected method.

@@ -40,43 +40,20 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
   ];
 
   /**
-   * The styles plugin manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected StylePluginManagerInterface $stylesManager;
-
-  /**
    * The CKE5 config key.
    *
    * @var string
    */
   protected string $ckeditor5ConfigKey;
 
-  /**
-   * Constructor.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $stylesManager
-   *   The styles plugin manager.
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
-   *   The transliteration service.
-   */
   public function __construct(
     array $configuration,
     string $plugin_id,
     CKEditor5PluginDefinition $plugin_definition,
-    StylePluginManagerInterface $stylesManager,
-    TransliterationInterface $transliteration,
+    protected StylePluginManagerInterface $stylesManager,
+    protected TransliterationInterface $transliteration,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->stylesManager = $stylesManager;
-    $this->transliteration = $transliteration;
   }
 
   /**

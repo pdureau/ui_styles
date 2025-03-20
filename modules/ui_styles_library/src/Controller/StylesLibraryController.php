@@ -13,24 +13,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class StylesLibraryController extends ControllerBase {
 
-  /**
-   * Styles manager service.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected $stylesManager;
+  public function __construct(
+    protected StylePluginManagerInterface $stylesManager,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
-  final public function __construct(StylePluginManagerInterface $styles_manager) {
-    $this->stylesManager = $styles_manager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): self {
+  public static function create(ContainerInterface $container): static {
     return new static($container->get('plugin.manager.ui_styles'));
   }
 

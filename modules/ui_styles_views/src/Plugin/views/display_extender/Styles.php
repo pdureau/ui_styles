@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\ui_styles_views\Plugin\views\display_extender;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\ui_styles\StylePluginManagerInterface;
 use Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,7 +28,7 @@ class Styles extends DisplayExtenderPluginBase {
    *
    * @var \Drupal\ui_styles\StylePluginManagerInterface
    */
-  protected $stylesManager;
+  protected StylePluginManagerInterface $stylesManager;
 
   /**
    * {@inheritdoc}

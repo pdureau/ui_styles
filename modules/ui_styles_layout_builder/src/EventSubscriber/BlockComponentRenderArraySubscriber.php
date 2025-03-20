@@ -15,22 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
 
-  /**
-   * The style manager.
-   *
-   * @var \Drupal\ui_styles\StylePluginManagerInterface
-   */
-  protected $styleManager;
-
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\ui_styles\StylePluginManagerInterface $style_manager
-   *   The style manager.
-   */
-  public function __construct(StylePluginManagerInterface $style_manager) {
-    $this->styleManager = $style_manager;
-  }
+  public function __construct(
+    protected StylePluginManagerInterface $styleManager,
+  ) {}
 
   /**
    * {@inheritdoc}
