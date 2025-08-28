@@ -15,7 +15,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
   /**
    * List of theme hook using item_attributes instead of attributes.
    */
-  public const THEME_WITH_ITEM_ATTRIBUTES = [
+  public const array THEME_WITH_ITEM_ATTRIBUTES = [
     'image_formatter',
     'responsive_image_formatter',
   ];
@@ -26,7 +26,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    * @return \Drupal\ui_styles\Definition\StyleDefinition|null
    *   The plugin definition. NULL if not found.
    *
-   * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+   * @SuppressWarnings("PHPMD.BooleanArgumentFlag")
    */
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE);
 
@@ -69,7 +69,7 @@ interface StylePluginManagerInterface extends PluginManagerInterface, Categorizi
    *
    * @param array $form
    *   The form array to add to.
-   * @param array $selected
+   * @param string[] $selected
    *   The selected class(es).
    * @param string $extra
    *   The optional free extra class(es).

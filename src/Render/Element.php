@@ -17,9 +17,9 @@ class Element extends CoreElement {
   /**
    * List of #type to consider without attributes.
    *
-   * @var array
+   * @var string[]
    */
-  public static $typeWithoutAttributes = [
+  public static array $typeWithoutAttributes = [
     'inline_template',
     'link',
     'processed_text',
@@ -28,9 +28,9 @@ class Element extends CoreElement {
   /**
    * List of #type to consider with attributes.
    *
-   * @var array
+   * @var string[]
    */
-  public static $typeWithAttributes = [
+  public static array $typeWithAttributes = [
     'component',
     'html_tag',
     'pattern',
@@ -40,9 +40,9 @@ class Element extends CoreElement {
   /**
    * List of #theme to consider with attributes.
    *
-   * @var array
+   * @var string[]
    */
-  public static $themeWithAttributes = [
+  public static array $themeWithAttributes = [
     'block',
     'layout',
   ];
@@ -53,9 +53,9 @@ class Element extends CoreElement {
    * Meaningless wrappers must not receive styling until the very last moment
    * when we can't find an element to style.
    *
-   * @var array
+   * @var string[]
    */
-  public static $meaninglessThemeWrappers = [
+  public static array $meaninglessThemeWrappers = [
     'block',
     'layout',
     'view',
@@ -66,7 +66,7 @@ class Element extends CoreElement {
    *
    * @var string[]
    */
-  public static $emptyProperties = [
+  public static array $emptyProperties = [
     '#access',
     '#access_callback',
     '#attached',
@@ -90,6 +90,7 @@ class Element extends CoreElement {
   public static function addClasses(array $element, array $classes, string $attr_property = '#attributes'): array {
     $element[$attr_property] = $element[$attr_property] ?? [];
     $element[$attr_property] = AttributeHelper::mergeCollections(
+      // @phpstan-ignore-next-line
       $element[$attr_property],
       ['class' => $classes]
     );
@@ -114,7 +115,7 @@ class Element extends CoreElement {
    * @param array $element
    *   The render element. Must be reference to update in place later.
    *
-   * @return array
+   * @return array[]
    *   Plain array of nested elements references to directly manipulate.
    */
   public static function findFirstAcceptingAttributes(array &$element): array {
@@ -125,6 +126,7 @@ class Element extends CoreElement {
       foreach (static::children($element) as $key) {
         $candidates[] = &$element[$key];
       }
+      /** @var array[] $candidates */
       return $candidates;
     }
     // If an element is accepting attributes and not just a wrapper,
@@ -136,6 +138,7 @@ class Element extends CoreElement {
     // Go deeper in the tree.
     $siblings_marked_keys = [];
     foreach (static::children($element) as $key) {
+      // @phpstan-ignore-next-line
       $new_candidates = static::findFirstAcceptingAttributes($element[$key]);
       $candidates = \array_merge($candidates, $new_candidates);
       if (!empty($new_candidates)) {
@@ -147,8 +150,10 @@ class Element extends CoreElement {
     if (!empty($siblings_marked_keys)) {
       $unmarked = \array_diff(static::children($element), $siblings_marked_keys);
       foreach ($unmarked as $key) {
+        // @phpstan-ignore-next-line
         if (static::hasAllEmptyChildren($element[$key])) {
           // Exclude empty elements.
+          // @phpstan-ignore-next-line
           if (static::isEmpty($element[$key])) {
             continue;
           }
@@ -157,6 +162,7 @@ class Element extends CoreElement {
         }
       }
     }
+    /** @var array[] $candidates */
     return $candidates;
   }
 
@@ -256,6 +262,7 @@ class Element extends CoreElement {
    */
   protected static function isThemeHookAcceptingAttributes(array $element) {
     $theme = self::getTheme($element);
+    /** @var array<string, array> $registry */
     $registry = \Drupal::service('theme.registry')->get();
     if (\array_key_exists($theme, $registry)) {
       $theme_hook = $registry[$theme];
@@ -267,7 +274,7 @@ class Element extends CoreElement {
       if (\array_key_exists('template', $theme_hook) && \in_array($theme_hook['template'], self::$themeWithAttributes, TRUE)) {
         return TRUE;
       }
-      if (\array_key_exists('variables', $theme_hook)) {
+      if (\array_key_exists('variables', $theme_hook) && \is_array($theme_hook['variables'])) {
         return \array_key_exists('attributes', $theme_hook['variables'])
           || \array_key_exists('item_attributes', $theme_hook['variables']);
       }
@@ -285,6 +292,7 @@ class Element extends CoreElement {
    *   Attributes acceptance.
    */
   protected static function isRenderElementAcceptingAttributes(array $element) {
+    /** @var array{"#type": string, "#theme"?: string} $element */
     // For performance reasons, check first with lists of known render
     // elements.
     if (\in_array($element['#type'], self::$typeWithoutAttributes, TRUE)) {
@@ -296,6 +304,7 @@ class Element extends CoreElement {
 
     // If not in lists, do a resource hungry check, processing the render
     // element.
+    /** @var array{"#pre_render"?: string[]} $info */
     $info = \Drupal::service('plugin.manager.element_info')->getInfo($element['#type']);
     if (isset($info['#pre_render'])) {
       foreach ($info['#pre_render'] as $callable) {
@@ -324,12 +333,17 @@ class Element extends CoreElement {
       return '';
     }
 
-    if (!\is_array($element['#theme'])) {
+    if (\is_string($element['#theme'])) {
       return $element['#theme'];
+    }
+
+    if (!\is_array($element['#theme'])) {
+      return '';
     }
 
     // Some #theme values are an array of suggestions.
     // Most of the time, the last item is the original theme hook.
+    /** @var string $theme */
     $theme = \end($element['#theme']);
     // Anyway, lets be sure it is not a suggestion.
     return \explode('__', $theme)[0];

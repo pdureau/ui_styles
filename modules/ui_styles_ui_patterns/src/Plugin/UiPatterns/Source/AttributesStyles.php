@@ -47,12 +47,16 @@ class AttributesStyles extends SourcePluginBase {
     // Old config structure.
     // @todo to remove in UI Styles 2.
     if (isset($styles['_ui_styles_extra'])) {
+      /** @var array $selected */
       // @phpstan-ignore-next-line
       $selected = UiStylesUtility::extractSelectedStyles($styles);
+      /** @var string $extra */
       $extra = $styles['_ui_styles_extra'];
     }
     else {
+      /** @var array $selected */
       $selected = $styles['selected'] ?? [];
+      /** @var string $extra */
       $extra = $styles['extra'] ?? '';
     }
 

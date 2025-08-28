@@ -115,7 +115,7 @@ class StyleDefinitionTest extends UnitTestCase {
   /**
    * Test getOptionsForPreview.
    *
-   * @param array $style
+   * @param array<string, mixed> $style
    *   The style like in the YAML declaration.
    * @param array $expected
    *   The expected result.
@@ -296,7 +296,7 @@ class StyleDefinitionTest extends UnitTestCase {
   /**
    * Test getOptionsWithIcon.
    *
-   * @param array $style
+   * @param array<string, mixed> $style
    *   The style like in the YAML declaration.
    * @param array $expected
    *   The expected result.

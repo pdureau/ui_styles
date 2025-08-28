@@ -3,3 +3,4 @@ type: module
 description: 'Define styles from modules and themes.'
 core_version_requirement: ^10.3 || ^11
 package: 'User interface'
+php: 8.3

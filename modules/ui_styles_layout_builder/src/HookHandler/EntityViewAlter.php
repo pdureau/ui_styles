@@ -58,6 +58,13 @@ class EntityViewAlter implements ContainerInjectionInterface {
    *   entity components.
    */
   public function alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
+    if (!isset($build['_layout_builder'])
+      || !\is_array($build['_layout_builder'])
+      || !\is_string($build['#view_mode'])
+    ) {
+      return;
+    }
+
     if (!$entity instanceof ContentEntityInterface) {
       return;
     }
@@ -92,6 +99,12 @@ class EntityViewAlter implements ContainerInjectionInterface {
    *   The section delta.
    */
   protected function addStylesToSection(array &$layoutBuilder, Section $section, int $delta): void {
+    if (!isset($layoutBuilder[$delta])
+      || !\is_array($layoutBuilder[$delta])
+    ) {
+      return;
+    }
+
     /** @var array $selected */
     $selected = $section->getThirdPartySetting('ui_styles', 'selected') ?: [];
     /** @var string $extra */
@@ -115,6 +128,7 @@ class EntityViewAlter implements ContainerInjectionInterface {
       // Otherwise, classes would be added twice.
       $layoutBuilder[$delta][$region_name]['#attributes'] = $layoutBuilder[$delta][$region_name]['#attributes'] ?? [];
       $layoutBuilder[$delta][$region_name]['#attributes'] = AttributeHelper::mergeCollections(
+        // @phpstan-ignore-next-line
         $layoutBuilder[$delta][$region_name]['#attributes'],
         [
           'class' => $styles,

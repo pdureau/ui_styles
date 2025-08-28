@@ -32,7 +32,8 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container): self {
+  public static function create(ContainerInterface $container): static {
+    /** @var static $instance */
     $instance = parent::create($container);
     $instance->stylesManager = $container->get('plugin.manager.ui_styles');
     return $instance;
@@ -103,6 +104,7 @@ class RegionsThemeSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    /** @var string $theme */
     $theme = $form_state->get('theme_name');
     $this->editableConfig = [
       $theme . '.settings',

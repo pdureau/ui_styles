@@ -24,7 +24,7 @@ class UiStylesUtility {
    *   the ui_styles_styles form element instead.
    * @see https://www.drupal.org/node/3500750
    *
-   * @SuppressWarnings(PHPMD.ErrorControlOperator)
+   * @SuppressWarnings("PHPMD.ErrorControlOperator")
    */
   public static function extractSelectedStyles(array $formValues): array {
     @\trigger_error('UiStylesUtility::extractSelectedStyles() is deprecated in ui_styles:8.x-1.14 and is removed in ui_styles:2.0.0. See https://www.drupal.org/node/3500750', \E_USER_DEPRECATED);

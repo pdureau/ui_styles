@@ -202,10 +202,12 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @phpstan-ignore-next-line
    */
   public function processDefinition(&$definition, $plugin_id): void {
+    /** @var string $plugin_id */
     // Call parent first to set defaults while still manipulating an array.
     // Otherwise, as there is currently no derivative system among CSS variable
     // plugins, there is no deriver or class attributes.
     parent::processDefinition($definition, $plugin_id);
+    /** @var array<string, mixed> $definition */
 
     if (empty($definition['id'])) {
       throw new PluginException(\sprintf('Style plugin property (%s) definition "id" is required.', $plugin_id));
@@ -214,10 +216,8 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     $definition = new StyleDefinition($definition);
     // Makes links titles translatable.
     $links = \array_map(static function ($link) {
-      if (\is_array($link) && !$link['title'] instanceof TranslatableMarkup) {
-        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        $link['title'] = new TranslatableMarkup($link['title'], [], ['context' => 'ui_styles']);
-      }
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
+      $link['title'] = new TranslatableMarkup($link['title'], [], ['context' => 'ui_styles']);
       return $link;
     }, $definition->getLinks());
     $definition->setLinks($links);
@@ -229,13 +229,14 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    * @phpstan-ignore-next-line
    */
   protected function providerExists($provider): bool {
+    /** @var string $provider */
     return $this->moduleHandler->moduleExists($provider) || $this->themeHandler->themeExists($provider);
   }
 
   /**
    * {@inheritdoc}
    *
-   * @SuppressWarnings(PHPMD.ErrorControlOperator)
+   * @SuppressWarnings("PHPMD.ErrorControlOperator")
    */
   public function alterForm(array $form, array $selected = [], string $extra = '', string $theme = ''): array {
     @\trigger_error('StylePluginManagerInterface::alterForm() is deprecated in ui_styles:8.x-1.14 and is removed in ui_styles:2.0.0. See https://www.drupal.org/node/3500750', \E_USER_DEPRECATED);
@@ -289,18 +290,21 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
 
           $form[$group_key][$element_name] = $plugin_element;
           if ($used) {
+            // @phpstan-ignore-next-line
             $form[$group_key][$element_name]['#title'] .= $suffix;
           }
         }
         else {
           $form[$element_name] = $plugin_element;
           if ($used) {
+            // @phpstan-ignore-next-line
             $form[$element_name]['#title'] .= $suffix;
           }
         }
       }
 
       if (!empty($group_key) && $group_used && isset($form[$group_key]['#title'])) {
+        // @phpstan-ignore-next-line
         $form[$group_key]['#title'] .= $suffix;
       }
     }
@@ -312,6 +316,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     ];
 
     if ($global_used && !empty($form['#title'])) {
+      // @phpstan-ignore-next-line
       $form['#title'] .= $suffix;
     }
 
@@ -354,6 +359,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
     // deeper into the rendering tree.
     if (Element::isMeaninglessWrapper($element)) {
       foreach (Element::children($element) as $key) {
+        // @phpstan-ignore-next-line
         $element[$key] = $this->addClassesToAcceptingOrWrap($element[$key], $classes);
       }
       return $element;
@@ -379,7 +385,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
   public function getDefinitionsForTheme(string $theme): array {
     $themes = $this->themeHandler->listInfo();
     // Create a list which includes the current theme and all its base themes.
-    if (isset($themes[$theme]->base_themes)) {
+    if (isset($themes[$theme]->base_themes) && \is_array($themes[$theme]->base_themes)) {
       $theme_keys = \array_keys($themes[$theme]->base_themes);
       $theme_keys[] = $theme;
     }
@@ -405,6 +411,7 @@ class StylePluginManager extends DefaultPluginManager implements StylePluginMana
    */
   protected function getElementAttributesProperty(array $element): string {
     if (\array_key_exists('#theme', $element)
+      // @phpstan-ignore-next-line
       && \in_array($element['#theme'], $this::THEME_WITH_ITEM_ATTRIBUTES, TRUE)
     ) {
       return '#item_attributes';

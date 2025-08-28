@@ -19,6 +19,7 @@ class AllowGeneratedStylesheet implements RequestPolicyInterface {
    */
   public function check(Request $request) {
     if ($request->isMethod(Request::METHOD_GET) && $request->getPathInfo() == '/ui_styles/stylesheet') {
+      // @phpstan-ignore-next-line
       return static::ALLOW;
     }
     return NULL;

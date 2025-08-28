@@ -67,6 +67,7 @@ class FormLayoutBuilderConfigureSectionAlter {
     // Our submit handler must execute before the default one, because the
     // default handler stores the section & component data in the tempstore
     // and we need to update those objects before that happens.
+    // @phpstan-ignore-next-line
     \array_unshift($form['#submit'], [$this, 'submitForm']);
 
     // Set form actions to a high weight, just so that we can make our form

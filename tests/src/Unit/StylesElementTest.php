@@ -24,14 +24,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class StylesElementTest extends UnitTestCase {
 
-  public const APPLIED_SUFFIX = ' <sup>(<mark>applied</mark>)</sup>';
+  public const string APPLIED_SUFFIX = ' <sup>(<mark>applied</mark>)</sup>';
 
   /**
    * A list of styles definitions.
    *
-   * @var array
+   * @var array{id: string, category: string, options: string[], label:string}[]
    */
-  protected $styles = [
+  protected array $styles = [
     0 => [
       'id' => 'test1',
       'category' => 'Main',
@@ -138,6 +138,7 @@ class StylesElementTest extends UnitTestCase {
         'extra' => 'has_extra',
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
     $this->assertSame('has_extra', $processedElement['wrapper']['_ui_styles_extra']['#default_value']);
     $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
@@ -155,9 +156,8 @@ class StylesElementTest extends UnitTestCase {
       '#type' => 'ui_styles_styles',
       '#title' => 'Main',
     ];
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']);
     $this->assertSame($this->styles[0]['options'], $processedElement['wrapper']['ui_styles_test1']['#options']);
     $this->assertSame($this->styles[0]['label'], $processedElement['wrapper']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['options'], $processedElement['wrapper']['ui_styles_test2']['#options']);
@@ -203,9 +203,9 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']);
     $this->assertSame('Main', $processedElement['wrapper']['#title']);
     $this->assertSame($this->styles[0]['label'], $processedElement['wrapper']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $processedElement['wrapper']['ui_styles_test2']['#title']);
@@ -221,9 +221,8 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame($this->styles[0]['label'] . static::APPLIED_SUFFIX, $processedElement['wrapper']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $processedElement['wrapper']['ui_styles_test2']['#title']);
@@ -239,9 +238,8 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame($this->styles[0]['label'], $processedElement['wrapper']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'] . static::APPLIED_SUFFIX, $processedElement['wrapper']['ui_styles_test2']['#title']);
@@ -258,9 +256,8 @@ class StylesElementTest extends UnitTestCase {
         'extra' => 'extra',
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, _ui_styles_extra: array{"#default_value": string}, ui_styles_test1: array{"#default_value": string, "#options": array, "#title": string}, ui_styles_test2: array{"#default_value": string, "#options": array, "#title": string}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame($this->styles[0]['label'], $processedElement['wrapper']['ui_styles_test1']['#title']);
     $this->assertSame($this->styles[1]['label'], $processedElement['wrapper']['ui_styles_test2']['#title']);
@@ -292,11 +289,8 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('main', $processedElement['wrapper']);
-    $this->assertArrayHasKey('main_2', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']['main_2']);
     $this->assertSame('Main', $processedElement['wrapper']['#title']);
     $this->assertSame('Main', $processedElement['wrapper']['main']['#title']);
     $this->assertSame('Main 2', $processedElement['wrapper']['main_2']['#title']);
@@ -314,11 +308,8 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('main', $processedElement['wrapper']);
-    $this->assertArrayHasKey('main_2', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']['main_2']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['main']['#title']);
     $this->assertSame('Main 2', $processedElement['wrapper']['main_2']['#title']);
@@ -336,11 +327,8 @@ class StylesElementTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('main', $processedElement['wrapper']);
-    $this->assertArrayHasKey('main_2', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']['main_2']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame('Main', $processedElement['wrapper']['main']['#title']);
     $this->assertSame('Main 2' . static::APPLIED_SUFFIX, $processedElement['wrapper']['main_2']['#title']);
@@ -359,11 +347,8 @@ class StylesElementTest extends UnitTestCase {
         'extra' => 'extra',
       ],
     ];
+    /** @var array{wrapper: array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}}} $processedElement */
     $processedElement = Styles::buildForm($element, $formState, $completeForm);
-    $this->assertArrayHasKey('main', $processedElement['wrapper']);
-    $this->assertArrayHasKey('main_2', $processedElement['wrapper']);
-    $this->assertArrayHasKey('ui_styles_test1', $processedElement['wrapper']['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $processedElement['wrapper']['main_2']);
     $this->assertSame('Main' . static::APPLIED_SUFFIX, $processedElement['wrapper']['#title']);
     $this->assertSame('Main', $processedElement['wrapper']['main']['#title']);
     $this->assertSame('Main 2', $processedElement['wrapper']['main_2']['#title']);

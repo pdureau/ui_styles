@@ -4,6 +4,7 @@
     "license": "GPL-2.0-or-later",
     "type": "drupal-module",
     "require": {
+        "php": ">=8.3",
         "sabberworm/php-css-parser": "^8.6"
     },
     "require-dev": {

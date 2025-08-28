@@ -19,8 +19,10 @@ class PreprocessBlock {
    */
   public function preprocess(array &$variables): void {
     if (!empty($variables['configuration']['label_display'])) {
+      /** @var \Drupal\Core\Template\Attribute|array $ui_style_title_attributes */
       $ui_style_title_attributes = $variables['configuration']['ui_style_title_attributes'] ?? [];
       $variables['title_attributes'] = AttributeHelper::mergeCollections(
+        // @phpstan-ignore-next-line
         $variables['title_attributes'],
         $ui_style_title_attributes
       );

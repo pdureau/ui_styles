@@ -81,6 +81,7 @@ class UiStylesRenderElementTest extends UnitTestCase {
       ],
     ];
 
+    /** @var array{"#attributes": array{class: array}} $elementMerged */
     $elementMerged = Element::addClasses($element, ['added-class']);
     $this->assertContains('original-class', $elementMerged['#attributes']['class']);
     $this->assertContains('added-class', $elementMerged['#attributes']['class']);

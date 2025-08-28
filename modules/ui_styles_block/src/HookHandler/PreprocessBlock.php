@@ -38,7 +38,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
    *   The preprocessed variables.
    */
   public function preprocess(array &$variables): void {
-    // Blocks coming from page manager widget does not have id. If there is no
+    // Blocks coming from page manager widget do not have id. If there is no
     // Block ID, skip that.
     if (empty($variables['elements']['#id'])) {
       return;
@@ -46,6 +46,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
 
     // Load the block by ID.
     $block = $this->entityTypeManager->getStorage('block')
+      // @phpstan-ignore-next-line
       ->load($variables['elements']['#id']);
 
     // If there is no block with this ID, skip.
@@ -72,7 +73,9 @@ class PreprocessBlock implements ContainerInjectionInterface {
         continue;
       }
 
+      /** @var array $selected */
       $selected = $styles[$config_key]['selected'] ?? [];
+      /** @var string $extra */
       $extra = $styles[$config_key]['extra'] ?? '';
 
       $extra = \explode(' ', $extra);
@@ -80,6 +83,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
       $classes = \array_unique(\array_filter($classes));
 
       $variables[$attribute_name] = AttributeHelper::mergeCollections(
+        // @phpstan-ignore-next-line
         $variables[$attribute_name],
         [
           'class' => $classes,
@@ -90,9 +94,13 @@ class PreprocessBlock implements ContainerInjectionInterface {
     // Special case for content.
     // As default block template does not use the content_attributes, inject
     // classes to the block content.
+    /** @var array $selected */
     $selected = $styles['content']['selected'] ?? [];
+    /** @var string $extra */
     $extra = $styles['content']['extra'] ?? '';
-    $variables['content'] = $this->stylesManager->addClasses($variables['content'], $selected, $extra);
+    if (\is_array($variables['content'])) {
+      $variables['content'] = $this->stylesManager->addClasses($variables['content'], $selected, $extra);
+    }
   }
 
   /**

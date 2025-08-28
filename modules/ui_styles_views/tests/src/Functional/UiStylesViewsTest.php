@@ -43,7 +43,7 @@ class UiStylesViewsTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    *
-   * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+   * @SuppressWarnings("PHPMD.BooleanArgumentFlag")
    */
   protected function setUp($import_test_views = TRUE, $modules = ['ui_styles_views_test_config']): void {
     parent::setUp($import_test_views, $modules);

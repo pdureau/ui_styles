@@ -7,7 +7,6 @@ namespace Drupal\Tests\ui_styles\Unit;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Tests\UnitTestCase;
-use Drupal\ui_styles\Source\SourcePluginManager;
 use Drupal\ui_styles_test\DummySourcePluginManager;
 
 /**
@@ -43,18 +42,6 @@ class SourcePluginManagerTest extends UnitTestCase {
     $namespaces = new \ArrayObject([]);
 
     $this->sourcePluginManager = new DummySourcePluginManager($namespaces, $cache, $moduleHandler);
-  }
-
-  /**
-   * Tests the constructor.
-   *
-   * @covers ::__construct
-   */
-  public function testConstructor(): void {
-    $this->assertInstanceOf(
-      SourcePluginManager::class,
-      $this->sourcePluginManager
-    );
   }
 
   /**

@@ -48,6 +48,7 @@ class Styles extends DisplayExtenderPluginBase {
     if ($form_state->get('section') != 'ui_styles') {
       return;
     }
+    // @phpstan-ignore-next-line
     $form['#title'] .= $this->t('UI Styles');
 
     if (empty($this->stylesManager->getGroupedDefinitions())) {
@@ -135,6 +136,7 @@ class Styles extends DisplayExtenderPluginBase {
     if (!\array_key_exists($section, $this->options)) {
       return [];
     }
+    // @phpstan-ignore-next-line
     return \array_values($this->options[$section]['selected'] ?? []);
   }
 
@@ -151,6 +153,7 @@ class Styles extends DisplayExtenderPluginBase {
     if (!\array_key_exists($section, $this->options)) {
       return '';
     }
+    // @phpstan-ignore-next-line
     return $this->options[$section]['extra'] ?? '';
   }
 

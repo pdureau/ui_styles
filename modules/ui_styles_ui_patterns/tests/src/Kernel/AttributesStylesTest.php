@@ -49,7 +49,7 @@ class AttributesStylesTest extends KernelTestBase {
       'extra' => 'id="my-id" data-foo="bar"',
     ]);
 
-    /** @var array $definition */
+    /** @var array{ui_patterns: array{type_definition: \Drupal\ui_patterns\PropTypeInterface}} $definition */
     $definition = $source->getPropDefinition();
     $propValue = $source->getValue($definition['ui_patterns']['type_definition']);
     $expectedAttributes = [
@@ -223,6 +223,7 @@ class AttributesStylesTest extends KernelTestBase {
     ];
     $context = [];
 
+    // @phpstan-ignore-next-line
     $sourceConfiguration = SourcePluginBase::buildConfiguration($propId, $component['props']['properties'][$propId], $sourceConfiguration, $context);
     // @phpstan-ignore-next-line
     return $sourceManager->createInstance($pluginId, $sourceConfiguration);

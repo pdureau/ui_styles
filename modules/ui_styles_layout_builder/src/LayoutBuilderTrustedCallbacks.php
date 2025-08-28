@@ -25,6 +25,13 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
    * Pre-render callback: Sets color preset logo.
    */
   public static function preRender(array $element): array {
+    if (!isset($element['#section_storage'])
+      || !isset($element['layout_builder'])
+      || !\is_array($element['layout_builder'])
+    ) {
+      return $element;
+    }
+
     $styles_manager = \Drupal::service('plugin.manager.ui_styles');
     /** @var \Drupal\layout_builder\SectionStorageInterface $section_storage */
     $section_storage = $element['#section_storage'];
@@ -36,7 +43,9 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
       }
 
       // Dealing with "add section link" sections.
-      if (!isset($element['layout_builder'][$index]['layout-builder__section'])) {
+      if (!isset($element['layout_builder'][$index]['layout-builder__section'])
+        || !\is_array($element['layout_builder'][$index]['layout-builder__section'])
+      ) {
         continue;
       }
       $layout = &$element['layout_builder'][$index]['layout-builder__section'];
@@ -54,7 +63,9 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
       $regions_configuration = $section->getThirdPartySetting('ui_styles', 'regions', []);
       foreach ($regions_configuration as $region_name => $region_styles) {
         // Skip if the region is not available anymore due to changed layout.
-        if (!isset($layout[$region_name])) {
+        if (!isset($layout[$region_name])
+          || !\is_array($layout[$region_name])
+        ) {
           continue;
         }
         /** @var array $selected */

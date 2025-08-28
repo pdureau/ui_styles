@@ -74,7 +74,10 @@ class Styles extends FormElementBase {
    * {@inheritdoc}
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if (\is_array($input) && isset($input['wrapper']) && !empty($input['wrapper'])) {
+    if (\is_array($input)
+      && \is_array($input['wrapper'])
+      && !empty($input['wrapper'])
+    ) {
       $value = [
         'selected' => static::extractSelectedStyles($input['wrapper']),
         'extra' => $input['wrapper']['_ui_styles_extra'] ?? '',
@@ -86,6 +89,7 @@ class Styles extends FormElementBase {
         'extra' => '',
       ];
     }
+    /** @var array $value */
     return \array_filter($value);
   }
 
@@ -103,6 +107,7 @@ class Styles extends FormElementBase {
    *   The form element.
    */
   public static function buildForm(array &$element, FormStateInterface $formState, array &$completeForm): array {
+    /** @var string $theme */
     $theme = $element['#drupal_theme'] ?? '';
     $stylesManager = static::stylesManager();
     if (!empty($theme)) {
@@ -116,6 +121,7 @@ class Styles extends FormElementBase {
       return $element;
     }
     $sourceManager = static::sourceManager();
+    /** @var string[] $selected */
     $selected = $element['#default_value']['selected'] ?? [];
     $extra = $element['#default_value']['extra'] ?? '';
     $suffix = static::getAppliedSuffix();
@@ -165,18 +171,21 @@ class Styles extends FormElementBase {
 
           $element['wrapper'][$groupKey][$elementName] = $pluginElement;
           if ($used) {
+            // @phpstan-ignore-next-line
             $element['wrapper'][$groupKey][$elementName]['#title'] .= $suffix;
           }
         }
         else {
           $element['wrapper'][$elementName] = $pluginElement;
           if ($used) {
+            // @phpstan-ignore-next-line
             $element['wrapper'][$elementName]['#title'] .= $suffix;
           }
         }
       }
 
       if (!empty($groupKey) && $groupUsed && isset($element['wrapper'][$groupKey]['#title'])) {
+        // @phpstan-ignore-next-line
         $element['wrapper'][$groupKey]['#title'] .= $suffix;
       }
     }
@@ -188,6 +197,7 @@ class Styles extends FormElementBase {
     ];
 
     if ($globalUsed && !empty($element['wrapper']['#title'])) {
+      // @phpstan-ignore-next-line
       $element['wrapper']['#title'] .= $suffix;
     }
 

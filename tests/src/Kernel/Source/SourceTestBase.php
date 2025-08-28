@@ -10,6 +10,8 @@ use Drupal\ui_styles\Source\SourcePluginManagerInterface;
 
 /**
  * Base class for source plugins kernel tests.
+ *
+ * @coversDefaultClass \Drupal\ui_styles\Source\SourcePluginBase
  */
 abstract class SourceTestBase extends KernelTestBase {
 
@@ -49,6 +51,7 @@ abstract class SourceTestBase extends KernelTestBase {
    * @covers ::isApplicable
    */
   public function testIsApplicable(): void {
+    /** @var array{array{styleDefinition: array<string, mixed>, expected: bool}} $testData */
     $testData = $this->isApplicableProvider();
     foreach ($testData as $data) {
       $styleDefinition = new StyleDefinition($data['styleDefinition']);

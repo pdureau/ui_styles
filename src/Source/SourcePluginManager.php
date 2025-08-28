@@ -52,7 +52,10 @@ class SourcePluginManager extends DefaultPluginManager implements SourcePluginMa
   public function getSortedDefinitions(?array $definitions = NULL): array {
     $definitions = $definitions ?? $this->getDefinitions();
 
+    // @phpstan-ignore-next-line
     \uasort($definitions, static function (array $item1, array $item2) {
+      /** @var array{weight: int, id: string} $item1 */
+      /** @var array{weight: int, id: string} $item2 */
       // Sort by weight.
       $weight = $item1['weight'] <=> $item2['weight'];
       if ($weight != 0) {
@@ -75,6 +78,10 @@ class SourcePluginManager extends DefaultPluginManager implements SourcePluginMa
   public function getApplicableSourcePlugin(StyleDefinition $styleDefinition): ?SourceInterface {
     $definitions = $this->getSortedDefinitions();
     foreach ($definitions as $definition) {
+      if (!\is_string($definition['id'])) {
+        continue;
+      }
+
       $instance = $this->createInstance($definition['id']);
       if ($instance instanceof SourceInterface && $instance->isApplicable($styleDefinition)) {
         return $instance;

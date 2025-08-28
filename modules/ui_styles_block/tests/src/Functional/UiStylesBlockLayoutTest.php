@@ -17,12 +17,12 @@ class UiStylesBlockLayoutTest extends UiStylesBlockFunctionalTestBase {
   /**
    * Block test.
    */
-  protected const TEST_BLOCK_ID = 'ui_styles_block_test';
+  protected const string TEST_BLOCK_ID = 'ui_styles_block_test';
 
   /**
    * Plugin block ID.
    */
-  protected const TEST_PLUGIN_BLOCK_ID = 'system_powered_by_block';
+  protected const string TEST_PLUGIN_BLOCK_ID = 'system_powered_by_block';
 
   /**
    * The list of block parts.

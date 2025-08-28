@@ -22,7 +22,7 @@ use Sabberworm\CSS\Settings;
  */
 class StylesheetGenerator implements StylesheetGeneratorInterface {
 
-  public const LIBRARY_PARSING_LIMIT = 2;
+  public const int LIBRARY_PARSING_LIMIT = 2;
 
   /**
    * The output format.
@@ -49,6 +49,8 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
    */
   public function generateStylesheet(string $prefix = ''): string {
     [$cssFiles, $styleOptionsClasses] = $this->getCssFilesAndOptions();
+    /** @var string[] $cssFiles */
+    /** @var string[] $styleOptionsClasses */
 
     $generatedCss = $this->generateCss($cssFiles, $styleOptionsClasses, $prefix);
     $generatedCssVariables = $this->generateCssVariables($cssFiles, $generatedCss);
@@ -58,8 +60,8 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
   /**
    * Return the CSS files content and the styles options for all the themes.
    *
-   * @return array
-   *   return the CSS files and the styles options for all the themes.
+   * @return array[]
+   *   Return the CSS files and the styles options for all the themes.
    */
   protected function getCssFilesAndOptions(): array {
     $cssFiles = [];
@@ -80,9 +82,9 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
   /**
    * Generate CSS file for styles.
    *
-   * @param array $cssFiles
+   * @param string[] $cssFiles
    *   The CSS files to parse.
-   * @param array $styleOptionsClasses
+   * @param string[] $styleOptionsClasses
    *   The style option classes.
    * @param string $prefix
    *   The CSS selector prefix.
@@ -128,7 +130,7 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
    * Parse generated CSS file to extract the CSS variable used.
    * Parse again CSS files to get the CSS variables.
    *
-   * @param array $cssFiles
+   * @param string[] $cssFiles
    *   The CSS files to parse.
    * @param string $generatedCss
    *   The generated CSS from style options.
@@ -169,6 +171,7 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
     if ($this->moduleHandler->moduleExists('ui_skins')) {
       $css_variables = [];
       foreach ($this->themeHandler->listInfo() as $theme => $themeObject) {
+        /** @var array<string, array<string, array<string>>>|null $ui_skins_css_variables_settings */
         $ui_skins_css_variables_settings = \theme_get_setting(UiSkinsInterface::CSS_VARIABLES_THEME_SETTING_KEY, $theme);
         if (!\is_array($ui_skins_css_variables_settings)) {
           continue;
@@ -229,24 +232,25 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
    * @param string $theme
    *   The theme machine name.
    *
-   * @return array
+   * @return string[]
    *   An array of libraries defined for the theme.
    */
   protected function getThemeLibraries(string $theme): array {
     $themeExtension = $this->themeHandler->getTheme($theme);
+    // @phpstan-ignore-next-line
     return $themeExtension->info['libraries'] ?? [];
   }
 
   /**
    * Retrieve all CSS file content used for libraries of a given theme.
    *
-   * @param array $libraries
+   * @param string[] $libraries
    *   An array of libraries.
    *
    * @return array
    *   An array of CSS file content used.
    *
-   * @SuppressWarnings(PHPMD.ErrorControlOperator)
+   * @SuppressWarnings("PHPMD.ErrorControlOperator")
    */
   protected function getCssFilesFromLibraries(array $libraries): array {
     $cssFiles = [];
@@ -254,10 +258,11 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
       [$extension, $name] = \explode('/', $library, static::LIBRARY_PARSING_LIMIT);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
 
-      if (!$definition || !isset($definition['css'])) {
+      if (!$definition || !isset($definition['css']) || !\is_array($definition['css'])) {
         continue;
       }
 
+      /** @var array{type: string, data: string} $cssLevelFiles */
       foreach ($definition['css'] as $cssLevelFiles) {
         if ($cssLevelFiles['type'] == 'external') {
           $cssFilePath = $cssLevelFiles['data'];

@@ -9,13 +9,38 @@ use Drupal\Core\Url;
 
 /**
  * Style definition class.
+ *
+ * @phpstan-type StyleOptions array<string, string|array{
+ *   label: string,
+ *   description?: string,
+ *   previewed_with?: string[],
+ *   icon?: string
+ * }>
  */
 class StyleDefinition extends PluginDefinition {
 
   /**
    * Style definition.
    *
-   * @var array
+   * @var array{
+   *   id: string,
+   *   enabled: bool,
+   *   label: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   description: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   links: array<string|array{
+   *     url: string,
+   *     title?: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   }>,
+   *   category: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   options: StyleOptions,
+   *   empty_option: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   previewed_with: array<string>,
+   *   previewed_as: string,
+   *   icon: string,
+   *   weight: int,
+   *   additional: array<string, mixed>,
+   *   provider: string,
+   * }
    */
   protected array $definition = [
     'id' => '',
@@ -36,10 +61,14 @@ class StyleDefinition extends PluginDefinition {
 
   /**
    * Constructor.
+   *
+   * @param array<string, mixed> $definition
+   *   The definition.
    */
   public function __construct(array $definition = []) {
     foreach ($definition as $name => $value) {
       if (\array_key_exists($name, $this->definition)) {
+        // @phpstan-ignore-next-line
         $this->definition[$name] = $value;
       }
       else {
@@ -132,7 +161,7 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Getter.
    *
-   * @return array
+   * @return StyleOptions
    *   Property value.
    */
   public function getOptions(): array {
@@ -151,7 +180,7 @@ class StyleDefinition extends PluginDefinition {
       if (\is_scalar($option)) {
         $options[$option_id] = $option;
       }
-      elseif (isset($option['label'])) {
+      else {
         $options[$option_id] = $option['label'];
       }
     }
@@ -171,7 +200,6 @@ class StyleDefinition extends PluginDefinition {
     $options = [];
     foreach ($this->getOptions() as $option_id => $option) {
       $options[$option_id] = [
-        'label' => '',
         'description' => '',
         'previewed_with' => $style_previewed_with,
         'previewed_as' => $style_previewed_as,
@@ -181,7 +209,7 @@ class StyleDefinition extends PluginDefinition {
       if (\is_scalar($option)) {
         $options[$option_id]['label'] = $option;
       }
-      elseif (isset($option['label'])) {
+      else {
         $options[$option_id]['label'] = $option['label'];
       }
 
@@ -223,7 +251,7 @@ class StyleDefinition extends PluginDefinition {
       if (\is_scalar($option)) {
         $options[$option_id]['label'] = $option;
       }
-      elseif (isset($option['label'])) {
+      else {
         $options[$option_id]['label'] = $option['label'];
       }
 
@@ -250,7 +278,7 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Setter.
    *
-   * @param array $options
+   * @param StyleOptions $options
    *   Property value.
    *
    * @return $this
@@ -296,7 +324,7 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Setter.
    *
-   * @param array $previewedWith
+   * @param string[] $previewedWith
    *   Property value.
    *
    * @return $this
@@ -398,7 +426,7 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Setter.
    *
-   * @param array $additional
+   * @param array<string, mixed> $additional
    *   Property value.
    *
    * @return $this
@@ -434,7 +462,10 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Getter.
    *
-   * @return array
+   * @return array<array{
+   *   url: string,
+   *   title: \Drupal\Core\StringTranslation\TranslatableMarkup|string,
+   *   }>
    *   The links.
    */
   public function getLinks(): array {
@@ -460,7 +491,7 @@ class StyleDefinition extends PluginDefinition {
   /**
    * Setter.
    *
-   * @param array $links
+   * @param array<string|array{url: string, title?: \Drupal\Core\StringTranslation\TranslatableMarkup|string}> $links
    *   Property value.
    *
    * @return $this
@@ -512,7 +543,7 @@ class StyleDefinition extends PluginDefinition {
       '#title' => $link['title'],
     ];
 
-    if (!empty($link['url'])) {
+    if (!empty($link['url']) && \is_string($link['url'])) {
       $renderLink['#url'] = Url::fromUri($link['url']);
     }
 

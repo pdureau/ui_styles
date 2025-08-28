@@ -15,7 +15,6 @@ use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
 use Drupal\ui_styles\Definition\StyleDefinition;
 use Drupal\ui_styles\Source\SourcePluginManagerInterface;
-use Drupal\ui_styles\StylePluginManager;
 use Drupal\ui_styles_test\DummyStylePluginManager;
 use Drupal\ui_styles_test\Plugin\UiStyles\Source\TestSelect;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,7 +52,7 @@ class StylePluginManagerTest extends UnitTestCase {
   /**
    * A list of styles definitions.
    *
-   * @var array
+   * @var array{id: string, category: string, options: string[], label:string}[]
    */
   protected $styles = [
     0 => [
@@ -140,18 +139,6 @@ class StylePluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * Tests the constructor.
-   *
-   * @covers ::__construct
-   */
-  public function testConstructor(): void {
-    $this->assertInstanceOf(
-      StylePluginManager::class,
-      $this->stylePluginManager
-    );
-  }
-
-  /**
    * Tests the processDefinition().
    *
    * @covers ::processDefinition
@@ -159,12 +146,8 @@ class StylePluginManagerTest extends UnitTestCase {
   public function testProcessDefinitionWillReturnException(): void {
     $plugin_id = 'test';
     $definition = ['no_id' => $plugin_id];
-    try {
-      $this->stylePluginManager->processDefinition($definition, $plugin_id);
-    }
-    catch (PluginException $exception) {
-      $this->assertTrue(TRUE, 'The expected exception happened.');
-    }
+    $this->expectException(PluginException::class);
+    $this->stylePluginManager->processDefinition($definition, $plugin_id);
   }
 
   /**
@@ -179,7 +162,6 @@ class StylePluginManagerTest extends UnitTestCase {
     $expected = new StyleDefinition($definition);
     $expected->setCategory($this->stringTranslation->translate('Other'));
 
-    /** @var \Drupal\ui_styles\Definition\StyleDefinition $definition */
     $this->stylePluginManager->processDefinition($definition, $plugin_id);
     $this->assertInstanceOf(StyleDefinition::class, $definition);
     $this->assertEquals($definition->toArray(), $expected->toArray());
@@ -529,15 +511,12 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->stylePluginManager->setStyles($grouped_styles);
 
     // No values.
+    /** @var array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}} $altered_form */
     // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',
     ], '');
-    $this->assertArrayHasKey('main', $altered_form);
-    $this->assertArrayHasKey('main_2', $altered_form);
-    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
     $this->assertSame('Main', $altered_form['#title']);
     $this->assertSame('Main', $altered_form['main']['#title']);
     $this->assertSame('Main 2', $altered_form['main_2']['#title']);
@@ -545,15 +524,12 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on test1.
+    /** @var array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}} $altered_form */
     // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => 'opt1',
       'test2' => '',
     ], '');
-    $this->assertArrayHasKey('main', $altered_form);
-    $this->assertArrayHasKey('main_2', $altered_form);
-    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
     $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['main']['#title']);
     $this->assertSame('Main 2', $altered_form['main_2']['#title']);
@@ -561,15 +537,12 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'], $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on test2.
+    /** @var array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}} $altered_form */
     // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => 'opt2',
     ], '');
-    $this->assertArrayHasKey('main', $altered_form);
-    $this->assertArrayHasKey('main_2', $altered_form);
-    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
     $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame('Main', $altered_form['main']['#title']);
     $this->assertSame('Main 2' . StylesElementTest::APPLIED_SUFFIX, $altered_form['main_2']['#title']);
@@ -577,15 +550,12 @@ class StylePluginManagerTest extends UnitTestCase {
     $this->assertSame($this->styles[1]['label'] . StylesElementTest::APPLIED_SUFFIX, $altered_form['main_2']['ui_styles_test2']['#title']);
 
     // Value on extra.
+    /** @var array{"#title": string, main: array{"#title": string, ui_styles_test1: array{"#title": string}}, main_2: array{"#title": string, ui_styles_test2: array{"#title": string}}} $altered_form */
     // @phpstan-ignore-next-line
     $altered_form = $this->stylePluginManager->alterForm($form, [
       'test1' => '',
       'test2' => '',
     ], 'extra');
-    $this->assertArrayHasKey('main', $altered_form);
-    $this->assertArrayHasKey('main_2', $altered_form);
-    $this->assertArrayHasKey('ui_styles_test1', $altered_form['main']);
-    $this->assertArrayHasKey('ui_styles_test2', $altered_form['main_2']);
     $this->assertSame('Main' . StylesElementTest::APPLIED_SUFFIX, $altered_form['#title']);
     $this->assertSame('Main', $altered_form['main']['#title']);
     $this->assertSame('Main 2', $altered_form['main_2']['#title']);
@@ -609,11 +579,13 @@ class StylePluginManagerTest extends UnitTestCase {
       ],
     ];
     // Test no styles.
+    /** @var array{"#attributes": array{class: array}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element);
     $this->assertContains('original-class', $newElement['#attributes']['class']);
     $this->assertNotContains('added-class', $newElement['#attributes']['class']);
 
     // Test Element::isAcceptingAttributes.
+    /** @var array{"#attributes": array{class: array}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['#attributes']['class']);
     $this->assertContains('added-class', $newElement['#attributes']['class']);
@@ -637,6 +609,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{"#attributes": array{class: array}, element: array{"#no_attributes": array{class: array}, element1: array{"#no_attributes": array, element1_1: array{"#no_attributes": array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['element']['#no_attributes']['class']);
     $this->assertContains('added-class', $newElement['#attributes']['class']);
@@ -697,11 +670,12 @@ class StylePluginManagerTest extends UnitTestCase {
       ['element3'],
     ];
     foreach ($test_cases_must_have_parents as $parents) {
-      /** @var array $nested_element */
+      /** @var array{"#attributes": array{class: array}} $nested_element */
       $nested_element = NestedArray::getValue($newElement, $parents);
       $this->assertContains('added-class', $nested_element['#attributes']['class']);
       $this->assertContains('extra-class', $nested_element['#attributes']['class']);
     }
+    // @phpstan-ignore-next-line
     $this->assertArrayHasKey('element', $newElement['element3']);
     // Elements that must not have new classes added.
     $test_cases_not_have_parents = [
@@ -729,6 +703,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test: array{"#attributes": array{class: array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['test']['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test']['#attributes']['class']);
@@ -750,6 +725,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test: array{"#item_attributes": array{class: array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['test']['#item_attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test']['#item_attributes']['class']);
@@ -771,6 +747,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test: array{"#attributes": array{class: array}, element: array{"#no_attributes": array{class: array}}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     // The content had been wrapped in a div.
     $this->assertContains('original-class', $newElement['content']['test']['element']['#no_attributes']['class']);
@@ -794,6 +771,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{"#attributes": array{class: array}, element: array{ test: array{"#no_attributes": array{class: array}}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     // The content had been wrapped in a div.
     $this->assertContains('original-class', $newElement['content']['element']['test']['#no_attributes']['class']);
@@ -809,6 +787,7 @@ class StylePluginManagerTest extends UnitTestCase {
         'class' => ['original-class'],
       ],
     ];
+    /** @var array{"#attributes": array{class: array}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['#attributes']['class']);
     $this->assertContains('added-class', $newElement['#attributes']['class']);
@@ -822,6 +801,7 @@ class StylePluginManagerTest extends UnitTestCase {
         'class' => ['original-class'],
       ],
     ];
+    /** @var array{"#attributes": array{class: array}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['#attributes']['class']);
     $this->assertContains('added-class', $newElement['#attributes']['class']);
@@ -850,6 +830,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{_layout_builder: array{0: array{"#attributes": array{class: array}}, 1: array{"#attributes": array{class: array}}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['_layout_builder'][0]['#attributes']['class']);
@@ -881,6 +862,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{_layout_builder: array, _no_layout_builder: array{0: array{"#attributes": array{class: array}}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['_no_layout_builder'][0]['#attributes']['class']);
@@ -902,6 +884,7 @@ class StylePluginManagerTest extends UnitTestCase {
         'class' => ['original-class'],
       ],
     ];
+    /** @var array{content: array{"#attributes": array{class: array}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['#attributes']['class']);
@@ -922,6 +905,7 @@ class StylePluginManagerTest extends UnitTestCase {
         'class' => ['original-class'],
       ],
     ];
+    /** @var array{content: array{"#attributes": array{class: array}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['#attributes']['class']);
@@ -942,6 +926,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test: array{"#attributes": array{class: array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['test']['#attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test']['#attributes']['class']);
@@ -962,6 +947,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test_image_formatter: array{"#item_attributes": array{class: array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['test_image_formatter']['#item_attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test_image_formatter']['#item_attributes']['class']);
@@ -982,6 +968,7 @@ class StylePluginManagerTest extends UnitTestCase {
         ],
       ],
     ];
+    /** @var array{content: array{test_responsive_image_formatter: array{"#item_attributes": array{class: array}}}} $newElement */
     $newElement = $this->stylePluginManager->addClasses($element, ['added-class'], 'extra-class');
     $this->assertContains('original-class', $newElement['content']['test_responsive_image_formatter']['#item_attributes']['class']);
     $this->assertContains('added-class', $newElement['content']['test_responsive_image_formatter']['#item_attributes']['class']);

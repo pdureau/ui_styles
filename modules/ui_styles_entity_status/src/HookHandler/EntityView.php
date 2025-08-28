@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\ui_styles_entity_status\HookHandler;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
@@ -52,6 +53,10 @@ class EntityView implements ContainerInjectionInterface {
    *   The view mode the entity is rendered in.
    */
   public function alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, string $view_mode): void {
+    if (!$entity instanceof ContentEntityInterface) {
+      return;
+    }
+
     if (!$entity instanceof EntityPublishedInterface) {
       return;
     }
@@ -66,7 +71,9 @@ class EntityView implements ContainerInjectionInterface {
       return;
     }
 
+    /** @var array $selected */
     $selected = $settings['selected'] ?? [];
+    /** @var string $extra */
     $extra = $settings['extra'] ?? '';
     $extra_array = \explode(' ', $extra);
     $styles = \array_merge($selected, $extra_array);
@@ -74,6 +81,7 @@ class EntityView implements ContainerInjectionInterface {
 
     $build['#attributes'] = $build['#attributes'] ?? [];
     $build['#attributes'] = AttributeHelper::mergeCollections(
+      // @phpstan-ignore-next-line
       $build['#attributes'],
       [
         'class' => $styles,
@@ -81,7 +89,6 @@ class EntityView implements ContainerInjectionInterface {
     );
 
     // Layout Builder display.
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if ($display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled()) {
       $storage = $this->getDisplaySectionStorage($entity, $display, $view_mode);
       if ($storage == NULL) {
@@ -90,6 +97,12 @@ class EntityView implements ContainerInjectionInterface {
 
       $layout_builder = &$build['_layout_builder'];
       foreach ($storage->getSections() as $delta => $section) {
+        if (!isset($layout_builder[$delta])
+          || !\is_array($layout_builder[$delta])
+        ) {
+          continue;
+        }
+
         $layout_builder[$delta] = $this->stylesManager->addClasses($layout_builder[$delta], $selected, $extra);
       }
     }

@@ -22,7 +22,9 @@ class PreprocessRegion {
     }
 
     $region = $variables['region'];
+    /** @var array $selected */
     $selected = $settings[$region]['selected'] ?? [];
+    /** @var string $extra */
     $extra = $settings[$region]['extra'] ?? '';
 
     $extra = \explode(' ', $extra);
@@ -35,6 +37,7 @@ class PreprocessRegion {
 
     $variables['attributes'] = $variables['attributes'] ?? [];
     $variables['attributes'] = AttributeHelper::mergeCollections(
+      // @phpstan-ignore-next-line
       $variables['attributes'],
       [
         'class' => $classes,

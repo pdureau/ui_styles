@@ -28,14 +28,14 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
   /**
    * The key to store multiple groups in form state.
    */
-  public const MULTIPLE_GROUPS_KEY = 'ui_styles_multiple_groups';
+  public const string MULTIPLE_GROUPS_KEY = 'ui_styles_multiple_groups';
 
   /**
    * The default configuration for this plugin.
    *
    * @var string[][]
    */
-  public const DEFAULT_CONFIGURATION = [
+  public const array DEFAULT_CONFIGURATION = [
     'enabled_styles' => [],
   ];
 
@@ -111,6 +111,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
       $opened_group = FALSE;
       foreach ($groupedDefinitions as $definition) {
         $style_plugin_id = $definition->id();
+        // @phpstan-ignore-next-line
         $default_value = \in_array($style_plugin_id, $this->configuration['enabled_styles'], TRUE) ? $style_plugin_id : NULL;
 
         // If the group has at least one style enabled. Display it opened.
@@ -197,6 +198,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
    */
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
     $config = $static_plugin_config;
+    /** @var string[] $enabled_styles */
     $enabled_styles = $this->configuration['enabled_styles'];
 
     foreach ($enabled_styles as $plugin_id) {
@@ -235,6 +237,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
    */
   protected function getEnabledStylesClasses(): array {
     $enabled_classes = [];
+    /** @var string[] $enabled_styles */
     $enabled_styles = $this->configuration['enabled_styles'];
 
     foreach ($enabled_styles as $plugin_id) {
@@ -253,7 +256,7 @@ abstract class UiStylesBase extends CKEditor5PluginDefault implements CKEditor5P
   /**
    * Get the CSS classes to exclude when selecting an option.
    *
-   * @param array $styleOptions
+   * @param string[] $styleOptions
    *   The style options of the style plugin?
    * @param array $selectedOptionClasses
    *   The CSS classes of the style option?

@@ -59,7 +59,9 @@ class BlockComponentRenderArraySubscriber implements EventSubscriberInterface {
     $extra = $component->get('ui_styles_wrapper_extra') ?: '';
 
     $dummy = $this->styleManager->addClasses($dummy, $selected, $extra);
+    /** @var \Drupal\Core\Template\Attribute|array $dummy_attributes */
     $dummy_attributes = $dummy['#attributes'] ?? [];
+    /** @var \Drupal\Core\Template\Attribute|array $block_attributes */
     $block_attributes = $build['#attributes'] ?? [];
     $build['#attributes'] = AttributeHelper::mergeCollections(
       $block_attributes,

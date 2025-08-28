@@ -12,7 +12,7 @@
   overflow: hidden !important;
   flex-direction: column !important;
   height: 47px !important;
-  border: 1px solid rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid rgb(0, 0, 0, 0.8) !important;
 }
 
 .ui-styles-source-select-plugin > div > div::after {
@@ -23,14 +23,14 @@
   width: 0.8em !important;
   height: 0.5em !important;
   content: "" !important;
-  background-color: rgba(0, 0, 0, 0.8) !important;
+  background-color: rgb(0, 0, 0, 0.8) !important;
   clip-path: polygon(100% 0%, 0 0%, 50% 100%) !important;
 }
 
 div:has(> .ui-styles-source-select-plugin[type="radio"]:hover),
 div:has(> .ui-styles-source-select-plugin[type="radio"] + label:hover) {
   color: #fff !important;
-  background-color: rgba(0, 0, 0, 0.3) !important;
+  background-color: rgb(0, 0, 0, 0.3) !important;
 }
 
 div:has(> .ui-styles-source-select-plugin[type="radio"]:checked) {

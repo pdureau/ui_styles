@@ -59,6 +59,7 @@ class UnpublishedStylesTest extends UiStylesEntityStatusFunctionalTestBase {
     }
 
     // Create a node.
+    /** @var \Drupal\node\NodeInterface $node */
     $node = $this->createNode();
 
     // Test with the node published.

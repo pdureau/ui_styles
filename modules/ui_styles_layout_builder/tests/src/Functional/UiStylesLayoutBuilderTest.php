@@ -65,7 +65,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
   /**
    * The list of Layout Builder block classes expected or not expected.
    *
-   * @var array
+   * @var string[]
    */
   protected array $blockClasses = [
     'test-class-title-block-wrapper',
@@ -110,6 +110,7 @@ class UiStylesLayoutBuilderTest extends BlockContentTestBase {
     );
 
     // Create a node.
+    // @phpstan-ignore-next-line
     $this->node = $this->createNode([
       'type' => 'page',
       'title' => 'My node title',
