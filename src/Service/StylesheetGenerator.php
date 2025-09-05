@@ -14,7 +14,6 @@ use Drupal\ui_styles\StylePluginManagerInterface;
 use Psr\Log\LoggerInterface;
 use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Parser;
-use Sabberworm\CSS\Property\Selector;
 use Sabberworm\CSS\Settings;
 
 /**
@@ -102,10 +101,6 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
 
       foreach ($parsedCss->getAllDeclarationBlocks() as $block) {
         foreach ($block->getSelectors() as $selector) {
-          if (!($selector instanceof Selector)) {
-            continue;
-          }
-
           if (!\in_array($selector->getSelector(), $styleOptionsClasses, TRUE)) {
             $block->removeSelector($selector);
             continue;
@@ -195,7 +190,15 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
       }
 
       if (!empty($css_variables)) {
-        $generatedCssVariables .= UiSkinsUtility::getCssVariablesInlineCss($css_variables);
+        $inlineCssVariables = UiSkinsUtility::getCssVariablesInlineCss($css_variables);
+        if (!empty($inlineCssVariables)) {
+          // Compact again.
+          $parsedCss = (new Parser(
+            $inlineCssVariables,
+            Settings::create()->withLenientParsing(),
+          ))->parse();
+          $generatedCssVariables .= $parsedCss->render(OutputFormat::createCompact());
+        }
       }
     }
 
