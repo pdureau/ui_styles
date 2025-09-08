@@ -261,7 +261,18 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
       [$extension, $name] = \explode('/', $library, static::LIBRARY_PARSING_LIMIT);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
 
-      if (!$definition || !isset($definition['css']) || !\is_array($definition['css'])) {
+      if (!$definition) {
+        continue;
+      }
+
+      // Recursively get dependencies.
+      if (isset($definition['dependencies']) && \is_array($definition['dependencies'])) {
+        /** @var string[] $dependencies */
+        $dependencies = $definition['dependencies'];
+        $cssFiles = \array_merge($cssFiles, $this->getCssFilesFromLibraries($dependencies));
+      }
+
+      if (!isset($definition['css']) || !\is_array($definition['css'])) {
         continue;
       }
 
