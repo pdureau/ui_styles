@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\ui_styles_views\Plugin\views\display_extender;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\ui_styles\StylePluginManagerInterface;
+use Drupal\views\Attribute\ViewsDisplayExtender;
 use Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -13,14 +15,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Styles display extender plugin.
  *
  * @ingroup views_display_extender_plugins
- *
- * @ViewsDisplayExtender(
- *     id = "ui_styles",
- *     title = @Translation("Styles display extender"),
- *     help = @Translation("Settings to styles to many view sections."),
- *     no_ui = FALSE
- * )
  */
+#[ViewsDisplayExtender(
+  id: 'ui_styles',
+  title: new TranslatableMarkup('Styles display extender'),
+  help: new TranslatableMarkup('Settings to styles to many view sections.'),
+  no_ui: FALSE
+)]
 class Styles extends DisplayExtenderPluginBase {
 
   /**
