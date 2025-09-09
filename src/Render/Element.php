@@ -23,6 +23,7 @@ class Element extends CoreElement {
     'inline_template',
     'link',
     'processed_text',
+    'webform',
   ];
 
   /**
@@ -307,6 +308,7 @@ class Element extends CoreElement {
     /** @var array{"#pre_render"?: string[]} $info */
     $info = \Drupal::service('plugin.manager.element_info')->getInfo($element['#type']);
     if (isset($info['#pre_render'])) {
+      $element += $info;
       foreach ($info['#pre_render'] as $callable) {
         $element = self::doCallback('#pre_render', $callable, [$element]);
       }
