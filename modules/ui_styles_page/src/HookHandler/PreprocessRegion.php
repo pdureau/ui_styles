@@ -21,6 +21,7 @@ class PreprocessRegion {
       return;
     }
 
+    /** @var string $region */
     $region = $variables['region'];
     /** @var array $selected */
     $selected = $settings[$region]['selected'] ?? [];

@@ -38,6 +38,7 @@ class LayoutBuilderTrustedCallbacks implements TrustedCallbackInterface {
     $delta = 0;
     $max = \count($section_storage->getSections());
     foreach (Element::children($element['layout_builder']) as $index) {
+      /** @var string $index */
       if ($delta >= $max) {
         break;
       }

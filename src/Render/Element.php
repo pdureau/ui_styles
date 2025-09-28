@@ -125,6 +125,7 @@ class Element extends CoreElement {
     // We return even non-accepting elements because it's the content.
     if (\in_array($element['#theme'] ?? '', ['field'], TRUE)) {
       foreach (static::children($element) as $key) {
+        /** @var string $key */
         $candidates[] = &$element[$key];
       }
       /** @var array[] $candidates */
@@ -151,6 +152,7 @@ class Element extends CoreElement {
     if (!empty($siblings_marked_keys)) {
       $unmarked = \array_diff(static::children($element), $siblings_marked_keys);
       foreach ($unmarked as $key) {
+        /** @var string $key */
         // @phpstan-ignore-next-line
         if (static::hasAllEmptyChildren($element[$key])) {
           // Exclude empty elements.
@@ -189,6 +191,7 @@ class Element extends CoreElement {
       return TRUE;
     }
     foreach ($children as $key) {
+      /** @var string $key */
       if (!empty($element[$key])) {
         return FALSE;
       }
@@ -267,7 +270,10 @@ class Element extends CoreElement {
     $registry = \Drupal::service('theme.registry')->get();
     if (\array_key_exists($theme, $registry)) {
       $theme_hook = $registry[$theme];
-      if (!\array_key_exists('variables', $theme_hook) && \array_key_exists('base hook', $theme_hook)) {
+      if (!\array_key_exists('variables', $theme_hook)
+        && \array_key_exists('base hook', $theme_hook)
+        && \is_string($theme_hook['base hook'])
+      ) {
         $theme_hook = $registry[$theme_hook['base hook']];
       }
       // Some templates are special. They have no theme variables, but they

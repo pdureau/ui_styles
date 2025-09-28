@@ -12,8 +12,11 @@ use Drupal\ui_skins\UiSkinsInterface;
 use Drupal\ui_skins\UiSkinsUtility;
 use Drupal\ui_styles\StylePluginManagerInterface;
 use Psr\Log\LoggerInterface;
+use Sabberworm\CSS\CSSList\AtRuleBlockList;
+use Sabberworm\CSS\CSSList\CSSBlockList;
 use Sabberworm\CSS\OutputFormat;
 use Sabberworm\CSS\Parser;
+use Sabberworm\CSS\RuleSet\DeclarationBlock;
 use Sabberworm\CSS\Settings;
 
 /**
@@ -99,24 +102,60 @@ class StylesheetGenerator implements StylesheetGeneratorInterface {
         Settings::create()->withLenientParsing(),
       ))->parse();
 
-      foreach ($parsedCss->getAllDeclarationBlocks() as $block) {
-        foreach ($block->getSelectors() as $selector) {
-          if (!\in_array($selector->getSelector(), $styleOptionsClasses, TRUE)) {
-            $block->removeSelector($selector);
-            continue;
+      $cnt = $parsedCss->getContents();
+      foreach ($cnt as $item) {
+        if ($item instanceof AtRuleBlockList) {
+          $atCloned = clone $item;
+          $atCloned->setContents([]);
+          foreach ($item->getAllDeclarationBlocks() as $block) {
+            $this->cleanBlockFromUnwantedSelectors($block, $styleOptionsClasses, $prefix);
+            if (!empty($block->getSelectors())) {
+              $atCloned->append($block);
+            }
           }
-
-          if (!empty($prefix)) {
-            $selector->setSelector($prefix . ' ' . $selector->getSelector());
+          if (\count($atCloned->getContents()) > 0) {
+            $generatedCss .= $atCloned->render($this->outputFormat);
           }
         }
-
-        if (!empty($block->getSelectors())) {
-          $generatedCss .= $block->render($this->outputFormat);
+        elseif ($item instanceof CSSBlockList) {
+          foreach ($item->getAllDeclarationBlocks() as $block) {
+            $this->cleanBlockFromUnwantedSelectors($block, $styleOptionsClasses, $prefix);
+            if (!empty($block->getSelectors())) {
+              $generatedCss .= $block->render($this->outputFormat);
+            }
+          }
+        }
+        elseif ($item instanceof DeclarationBlock) {
+          $this->cleanBlockFromUnwantedSelectors($item, $styleOptionsClasses, $prefix);
+          if (!empty($item->getSelectors())) {
+            $generatedCss .= $item->render($this->outputFormat);
+          }
         }
       }
     }
     return $generatedCss;
+  }
+
+  /**
+   * Removes unwanted selectors and add prefix from the block.
+   *
+   * @param \Sabberworm\CSS\RuleSet\DeclarationBlock $block
+   *   The block to alter selectors.
+   * @param array $styleOptionsClasses
+   *   The style option classes.
+   * @param string $prefix
+   *   The CSS selector prefix.
+   */
+  protected function cleanBlockFromUnwantedSelectors(DeclarationBlock &$block, array $styleOptionsClasses, string $prefix = ''): void {
+    foreach ($block->getSelectors() as $selector) {
+      if (!\in_array($selector->getSelector(), $styleOptionsClasses, TRUE)) {
+        $block->removeSelector($selector);
+        continue;
+      }
+      if (!empty($prefix)) {
+        $selector->setSelector($prefix . ' ' . $selector->getSelector());
+      }
+    }
   }
 
   /**

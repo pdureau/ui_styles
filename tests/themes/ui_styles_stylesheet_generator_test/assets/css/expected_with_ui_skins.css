@@ -10,6 +10,11 @@
 .prefix .style1-class2 {
   color: var(--foo);
 }
+@media (min-width: 768px) {
+  .prefix .style1-class3 {
+    color: var(--foo);
+  }
+}
 
 .prefix .style2-class1,
 .prefix .style2-class2 {

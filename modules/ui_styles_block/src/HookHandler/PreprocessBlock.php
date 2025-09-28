@@ -106,7 +106,7 @@ class PreprocessBlock implements ContainerInjectionInterface {
   /**
    * The list of currently handled attributes.
    *
-   * @return array
+   * @return array<string, string>
    *   The list of handled attributes keyed by entry in configuration.
    */
   protected function getHandledAttributes(): array {
